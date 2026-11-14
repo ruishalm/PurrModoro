@@ -190,7 +190,8 @@
       "width": 100,
       "height": 128,
       "wallItem": false,
-      "description": "Prateleira de madeira clara para deixar o quarto organizado."
+      "description": "Prateleira de madeira clara para deixar o quarto organizado.",
+      "isSurface": true
     },
     {
       "id": "plant_mini",
@@ -559,6 +560,153 @@
       }
     },
     {
+      "id": "table_coffee_wood",
+      "name": "Mesinha de Centro Cozy",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 70,
+      "image": "assets/items/table_coffee_wood.png",
+      "width": 76,
+      "height": 52,
+      "wallItem": false,
+      "isSurface": true,
+      "description": "Mesinha baixa isométrica ideal para apoiar potinhos, plantas ou decorações!"
+    },
+    {
+      "id": "table_side_wood",
+      "name": "Aparador Cafeteria",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 85,
+      "image": "assets/items/table_side_wood.png",
+      "width": 72,
+      "height": 64,
+      "wallItem": false,
+      "isSurface": true,
+      "description": "Bancada de madeira com dois níveis para apoiar itens e velinhas."
+    },
+    {
+      "id": "shelf_wall_wood",
+      "name": "Prateleira Flutuante",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 55,
+      "image": "assets/items/shelf_wall_wood.png",
+      "width": 68,
+      "height": 48,
+      "wallItem": true,
+      "isSurface": true,
+      "description": "Prateleira de parede que também funciona como apoio para plantinhas e mimos!"
+    },
+    {
+      "id": "coffee_boba",
+      "name": "Bubble Tea de Taro",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 25,
+      "image": "assets/items/coffee_boba.png",
+      "width": 28,
+      "height": 28,
+      "wallItem": false,
+      "particle": "🧋",
+      "buff": {
+        "type": "coin_multiplier",
+        "multiplier": 1.35,
+        "label": "+35% moedas"
+      },
+      "description": "Chá cremoso de taro com pérolas doces: +35% de moedas no próximo foco!"
+    },
+    {
+      "id": "coffee_matcha",
+      "name": "Matcha Latte Gelado",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 30,
+      "image": "assets/items/coffee_matcha.png",
+      "width": 28,
+      "height": 28,
+      "wallItem": false,
+      "particle": "🍵",
+      "buff": {
+        "type": "coin_multiplier",
+        "multiplier": 1.4,
+        "label": "+40% moedas"
+      },
+      "description": "Matcha cremoso com folhinha de hortelã: +40% de moedas no próximo foco!"
+    },
+    {
+      "id": "food_taiyaki",
+      "name": "Taiyaki de Chocolate",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 16,
+      "image": "assets/items/food_taiyaki.png",
+      "width": 28,
+      "height": 28,
+      "wallItem": false,
+      "particle": "🍫",
+      "buff": {
+        "type": "treat",
+        "happiness": 30,
+        "label": "Doce Crocante"
+      },
+      "description": "Waffle japonês de peixinho quentinho recheado com chocolate."
+    },
+    {
+      "id": "food_strawberry_cake",
+      "name": "Shortcake de Morango",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 22,
+      "image": "assets/items/food_strawberry_cake.png",
+      "width": 28,
+      "height": 28,
+      "wallItem": false,
+      "particle": "🍰",
+      "buff": {
+        "type": "treat",
+        "happiness": 35,
+        "label": "Doce Real"
+      },
+      "description": "Fatiazinha fofa de bolo com chantilly e morango fresco!"
+    },
+    {
+      "id": "food_onigiri",
+      "name": "Onigiri de Salmão",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 14,
+      "image": "assets/items/food_onigiri.png",
+      "width": 28,
+      "height": 28,
+      "wallItem": false,
+      "particle": "🍙",
+      "buff": {
+        "type": "treat",
+        "happiness": 25,
+        "label": "Lanchinho Zen"
+      },
+      "description": "Bolinho de arroz com carinha fofa e algas crocantes!"
+    },
+    {
+      "id": "food_ramen",
+      "name": "Ramen Quentinho",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 24,
+      "image": "assets/items/food_ramen.png",
+      "width": 28,
+      "height": 28,
+      "wallItem": false,
+      "particle": "🍜",
+      "buff": {
+        "type": "treat",
+        "happiness": 40,
+        "label": "Barriga Quentinha"
+      },
+      "description": "Tigela fumegante de lámen com ovo e naruto para recarregar energias!"
+    },
+    {
       "id": "decor_eye_jar",
       "name": "Pote Mágico Animado",
       "category": "furniture",
@@ -856,7 +1004,7 @@
           "fps": 5
         }
       },
-      "previewScale": 1.25
+      "previewScale": 1.45
     },
     {
       "id": "cat_evil_box",
@@ -935,6 +1083,45 @@
         }
       },
       "previewScale": 2.0
+    },
+    {
+      "id": "cat_dino",
+      "name": "Dino Sem Wi-Fi",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 115,
+      "description": "Caiu a internet? Esse 'gatinho' pré-histórico pula cactos de procrastinação com você!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_dino_idle.png",
+          "frames": 8,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_dino_sleep.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_dino_cheer.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "cry": {
+          "src": "assets/sprites/cat_dino_cry.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
     }
   ],
   "pets": [
@@ -950,7 +1137,7 @@
       "fw": 32,
       "fh": 32,
       "fps": 7,
-      "scale": 2.0
+      "scale": 1.25
     },
     {
       "id": "pet_golden",
@@ -979,6 +1166,118 @@
       "fh": 32,
       "fps": 9,
       "scale": 2.0
+    }
+  ],
+  "hats": [
+    {
+      "id": "hat_crown",
+      "name": "Coroinha Real",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 65,
+      "image": "assets/items/hat_crown.png",
+      "width": 24,
+      "height": 20,
+      "description": "Coroa dourada com rubis para o soberano do foco!"
+    },
+    {
+      "id": "hat_chef",
+      "name": "Chapéu Mestre Cuca",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 45,
+      "image": "assets/items/hat_chef.png",
+      "width": 24,
+      "height": 20,
+      "description": "Para amassar pãozinhos e cozinhar suas tarefas!"
+    },
+    {
+      "id": "hat_wizard",
+      "name": "Chapéu de Mago",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 70,
+      "image": "assets/items/hat_wizard.png",
+      "width": 24,
+      "height": 20,
+      "description": "Chapéu pontudo estrelado cheio de magia arcana!"
+    },
+    {
+      "id": "hat_bow_pink",
+      "name": "Lacinho Rosa Doce",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 30,
+      "image": "assets/items/hat_bow_pink.png",
+      "width": 24,
+      "height": 20,
+      "description": "Fita delicada rosa pastel que deixa qualquer gato irresistível."
+    },
+    {
+      "id": "hat_sprout",
+      "name": "Brotinho da Sorte",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 25,
+      "image": "assets/items/hat_sprout.png",
+      "width": 24,
+      "height": 20,
+      "description": "Duas folhinhas verdes brotando no topo da cabecinha!"
+    },
+    {
+      "id": "hat_tophat",
+      "name": "Cartola Elegante",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 60,
+      "image": "assets/items/hat_tophat.png",
+      "width": 24,
+      "height": 20,
+      "description": "Visual aristocrático com fita vermelha para grandes feitos."
+    },
+    {
+      "id": "hat_straw",
+      "name": "Chapéu de Palha",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 40,
+      "image": "assets/items/hat_straw.png",
+      "width": 24,
+      "height": 20,
+      "description": "Clássico chapéu de aventura com fita vermelha!"
+    },
+    {
+      "id": "hat_beret",
+      "name": "Boina de Artista",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 50,
+      "image": "assets/items/hat_beret.png",
+      "width": 24,
+      "height": 20,
+      "description": "Boina charmosa estilo parisiense para momentos criativos."
+    },
+    {
+      "id": "hat_headphones",
+      "name": "Headphone Lo-Fi",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 75,
+      "image": "assets/items/hat_headphones.png",
+      "width": 24,
+      "height": 20,
+      "description": "Fones confortáveis para ouvir batidas chill enquanto foca!"
+    },
+    {
+      "id": "hat_halo",
+      "name": "Auréola de Anjinho",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 80,
+      "image": "assets/items/hat_halo.png",
+      "width": 24,
+      "height": 20,
+      "description": "Flutua brilhando sobre o gatinho mais disciplinado!"
     }
   ]
 }
