@@ -30,7 +30,7 @@ if not exist "node_modules\electron\dist\electron.exe" (
   echo [1/2] Electron ja instalado. Pulando download!
 )
 
-echo [2/2] Criando atalhos na Area de Trabalho e Menu Iniciar...
+echo [2/2] Criando atalhos na Area de Trabalho, Menu Iniciar e Inicializar com o Windows...
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\install_shortcuts.ps1" -ProjectRoot "%~dp0."
 if errorlevel 1 (
   echo [ERRO] Falha ao criar atalhos do Windows.
