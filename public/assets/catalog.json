@@ -1089,7 +1089,8 @@
       "name": "Dino Sem Wi-Fi",
       "category": "cats",
       "subCategory": "skin",
-      "price": 115,
+      "price": 0,
+      "starter": true,
       "description": "Caiu a internet? Esse 'gatinho' pré-histórico pula cactos de procrastinação com você!",
       "animations": {
         "idle": {
