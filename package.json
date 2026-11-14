@@ -7,11 +7,12 @@
   "scripts": {
     "prepare-assets": "python scripts/prepare_assets.py",
     "start": "node scripts/launch.js",
-    "dist": "electron-builder --win"
+    "dist": "electron-builder --win --publish never"
   },
   "build": {
     "appId": "com.ruishalm.purrmodoro",
     "productName": "PurrModoro",
+    "asar": false,
     "directories": {
       "output": "dist"
     },
@@ -29,11 +30,15 @@
       ]
     },
     "nsis": {
+      "artifactName": "PurrModoro-Setup.${ext}",
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
       "shortcutName": "PurrModoro"
+    },
+    "portable": {
+      "artifactName": "PurrModoro-Portable.${ext}"
     }
   },
   "keywords": [
@@ -46,7 +51,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "electron": "^33.2.0"
+    "electron": "^33.2.0",
+    "electron-builder": "^26.18.0"
   }
 }
-
