@@ -1707,6 +1707,7 @@ function renderThemeShopCards(grid) {
   ROOM_THEME_CATALOG.forEach((tDef) => {
     const card = document.createElement('div');
     card.className = 'shop-card';
+    card.title = `${tDef.name} — ${tDef.description}`;
 
     const preview = document.createElement('div');
     preview.className = 'shop-preview';
@@ -1777,6 +1778,9 @@ function renderShop() {
   list.forEach((entry) => {
     const card = document.createElement('div');
     card.className = 'shop-card';
+    card.title = entry.description
+      ? `${entry.name} — ${entry.description}`
+      : `${entry.name}`;
 
     const preview = document.createElement('div');
     preview.className = 'shop-preview';
@@ -2298,6 +2302,10 @@ function renderInventory() {
 
     const card = document.createElement('div');
     card.className = 'inv-item-card';
+    card.title =
+      available > 0
+        ? `${def.name} — Clique em "+ Colocar" para levar ao quarto`
+        : `${def.name} — Clique em "✓ No quarto" para selecionar este item`;
 
     const img = document.createElement('img');
     img.src = def.image;
@@ -2791,10 +2799,6 @@ function bindEvents() {
   document.getElementById('minimizeCompactBtn').addEventListener('click', () => {
     window.purrSound.playClick();
     setAppMode('compact');
-  });
-  document.getElementById('snapClockBtn').addEventListener('click', () => {
-    window.purrSound.playClick();
-    window.purrAPI?.snapToClock?.();
   });
   document.getElementById('closeAppBtn').addEventListener('click', () => {
     window.purrSound.playClick();

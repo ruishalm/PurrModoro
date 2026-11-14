@@ -6,9 +6,9 @@ Um **Idle Game + Timer Pomodoro** em pixel art para Windows onde seu gatinho (ou
 
 ## 📥 Download & Instalação (Windows)
 
-### Opção 1 — Executável `.exe` Pronto (Sem precisar de Node.js)
+### Opção 1 — Executável `.exe` Pronto — v0.1 Beta (`v0.1.0-beta`)
 
-Baixe e execute direto no Windows pela página de [GitHub Releases](https://github.com/ruishalm/PurrModoro/releases):
+Baixe e execute direto no Windows sem precisar de Node.js pela página de [GitHub Releases](https://github.com/ruishalm/PurrModoro/releases):
 
 - **[📦 Baixar Instalador (`PurrModoro-Setup.exe`)](https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Setup.exe)** — assistente de instalação com criação de atalhos na Área de Trabalho e no Menu Iniciar.
 - **[🐾 Baixar Versão Portátil (`PurrModoro-Portable.exe`)](https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Portable.exe)** — executável único, basta baixar e abrir sem instalar.
