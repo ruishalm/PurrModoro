@@ -10,6 +10,9 @@ If Not fso.FileExists(electronExe) Then
 End If
 
 Set procEnv = shell.Environment("PROCESS")
-procEnv("ELECTRON_RUN_AS_NODE") = ""
+On Error Resume Next
+procEnv.Remove "ELECTRON_RUN_AS_NODE"
+On Error GoTo 0
 shell.CurrentDirectory = projectDir
-shell.Run Chr(34) & electronExe & Chr(34) & " " & Chr(34) & projectDir & Chr(34), 0, False
+shell.Run Chr(34) & electronExe & Chr(34) & " " & Chr(34) & projectDir & Chr(34), 1, False
+

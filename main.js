@@ -1,20 +1,117 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
 const COMPACT_SIZE = { width: 396, height: 172 };
 const COMPACT_COLLAPSED_SIZE = { width: 242, height: 158 };
-const EXPANDED_SIZE = { width: 940, height: 650 };
+const EXPANDED_SIZE = { width: 1120, height: 740 };
 
 let mainWindow = null;
 let tray = null;
 let currentMode = 'compact';
 let compactCollapsed = false;
 let alwaysOnTop = true;
+let openAtLogin = true;
+let trayBalloonShown = false;
 let isQuitting = false;
 
 function getSaveFilePath() {
   return path.join(app.getPath('userData'), 'purrmodoro-save.json');
+}
+
+function getPrefsFilePath() {
+  return path.join(app.getPath('userData'), 'purrmodoro-prefs.json');
+}
+
+function getStartupShortcutPath() {
+  return path.join(
+    app.getPath('appData'),
+    'Microsoft',
+    'Windows',
+    'Start Menu',
+    'Programs',
+    'Startup',
+    'PurrModoro.lnk'
+  );
+}
+
+function applyAutoLaunch(enabled) {
+  openAtLogin = Boolean(enabled);
+  if (process.platform === 'win32') {
+    const startupLnk = getStartupShortcutPath();
+    try {
+      if (app.isPackaged) {
+        app.setLoginItemSettings({ openAtLogin, path: process.execPath });
+        if (!openAtLogin && fs.existsSync(startupLnk)) {
+          fs.unlinkSync(startupLnk);
+        }
+      } else {
+        app.setLoginItemSettings({ openAtLogin: false });
+        if (openAtLogin) {
+          const wscriptExe = path.join(
+            process.env.SystemRoot || 'C:\\Windows',
+            'System32',
+            'wscript.exe'
+          );
+          const vbsPath = path.join(__dirname, 'launch_silent.vbs');
+          shell.writeShortcutLink(startupLnk, 'create', {
+            target: wscriptExe,
+            args: `//B "${vbsPath}"`,
+            cwd: __dirname,
+            description: 'PurrModoro — Gatinho de Foco & Timer Pomodoro',
+            icon: getIconPath(),
+            iconIndex: 0,
+          });
+        } else if (fs.existsSync(startupLnk)) {
+          fs.unlinkSync(startupLnk);
+        }
+      }
+    } catch (err) {
+      console.warn('Aviso ao configurar inicialização com o Windows:', err.message);
+    }
+  }
+  try {
+    const prefsPath = getPrefsFilePath();
+    fs.mkdirSync(path.dirname(prefsPath), { recursive: true });
+    fs.writeFileSync(prefsPath, JSON.stringify({ openAtLogin }, null, 2), 'utf-8');
+  } catch {
+    // ignora falha de gravação de preferência
+  }
+  if (tray) tray.setContextMenu(buildTrayMenu());
+}
+
+function initAutoLaunchOnStartup() {
+  const prefsPath = getPrefsFilePath();
+  let desired = true; // Padrão em toda instalação nova: iniciar com o Windows
+  try {
+    if (fs.existsSync(prefsPath)) {
+      const parsed = JSON.parse(fs.readFileSync(prefsPath, 'utf-8'));
+      if (typeof parsed?.openAtLogin === 'boolean') {
+        desired = parsed.openAtLogin;
+      }
+    }
+  } catch {
+    desired = true;
+  }
+  applyAutoLaunch(desired);
+}
+
+function hideWindowToTray() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.hide();
+  if (tray && !trayBalloonShown) {
+    trayBalloonShown = true;
+    try {
+      tray.displayBalloon({
+        iconType: 'info',
+        title: 'PurrModoro recolhido na bandeja! 🐾',
+        content: 'O timer continua rodando. Clique no ícone perto do relógio para abrir.',
+      });
+    } catch {
+      // displayBalloon não suportado em alguns ambientes
+    }
+  }
+  if (tray) tray.setContextMenu(buildTrayMenu());
 }
 
 function getWorkAreaAnchoredBounds(mode) {
@@ -85,6 +182,11 @@ function buildTrayMenu() {
       },
     },
     {
+      label: '📥 Recolher para a Bandeja',
+      click: () => hideWindowToTray(),
+    },
+    { type: 'separator' },
+    {
       label: '📌 Sempre no Topo',
       type: 'checkbox',
       checked: alwaysOnTop,
@@ -93,6 +195,12 @@ function buildTrayMenu() {
         mainWindow?.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
         mainWindow?.webContents.send('tray-action', { type: 'always-on-top', value: alwaysOnTop });
       },
+    },
+    {
+      label: '🚀 Iniciar com o Windows',
+      type: 'checkbox',
+      checked: openAtLogin,
+      click: (item) => applyAutoLaunch(item.checked),
     },
     { type: 'separator' },
     {
@@ -119,7 +227,8 @@ function createTray() {
     tray.on('click', () => {
       if (!mainWindow || mainWindow.isDestroyed()) return;
       if (!mainWindow.isVisible()) {
-        mainWindow.show();
+        applyMode(currentMode);
+        return;
       }
       applyMode(currentMode === 'compact' ? 'expanded' : 'compact');
     });
@@ -157,7 +266,7 @@ function createWindow() {
   mainWindow.on('close', (event) => {
     if (!isQuitting) {
       event.preventDefault();
-      applyMode('compact');
+      hideWindowToTray();
     }
   });
 }
@@ -236,6 +345,11 @@ function registerIpc() {
     }
   });
 
+  ipcMain.handle('hide-to-tray', () => {
+    hideWindowToTray();
+    return true;
+  });
+
   ipcMain.handle('quit-app', () => {
     isQuitting = true;
     app.quit();
@@ -254,6 +368,7 @@ if (!gotSingleInstanceLock) {
   });
 
   app.whenReady().then(() => {
+    initAutoLaunchOnStartup();
     registerIpc();
     createWindow();
     createTray();

@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('purrAPI', {
   getAlwaysOnTop: () => ipcRenderer.invoke('get-always-on-top'),
   loadState: () => ipcRenderer.invoke('load-state'),
   saveState: (state) => ipcRenderer.invoke('save-state', state),
+  hideToTray: () => ipcRenderer.invoke('hide-to-tray'),
   quitApp: () => ipcRenderer.invoke('quit-app'),
   onTrayAction: (callback) => {
     const listener = (_event, action) => callback(action);
