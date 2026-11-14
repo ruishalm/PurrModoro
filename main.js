@@ -128,8 +128,17 @@ function getWorkAreaAnchoredBounds(mode) {
   const width = Math.min(target.width, Math.max(minW, wa.width - 20));
   const height = Math.min(target.height, Math.max(minH, wa.height - 20));
 
-  const marginRight = mode === 'expanded' ? 16 : 8;
-  const marginBottom = mode === 'expanded' ? 16 : 2;
+  const marginRight = 8;
+  const marginBottom = 2;
+
+  if (mode === 'expanded') {
+    return {
+      x: Math.round(wa.x + (wa.width - width) / 2),
+      y: Math.round(wa.y + (wa.height - height) / 2),
+      width,
+      height,
+    };
+  }
 
   return {
     x: Math.round(wa.x + wa.width - width - marginRight),
@@ -147,7 +156,14 @@ function applyMode(mode) {
   mainWindow.setResizable(true);
   mainWindow.setBounds(bounds, false);
   mainWindow.setResizable(false);
-  mainWindow.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
+
+  if (currentMode === 'expanded') {
+    mainWindow.setAlwaysOnTop(false);
+    mainWindow.setVisibleOnAllWorkspaces(false);
+  } else {
+    mainWindow.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
+    mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  }
 
   if (!mainWindow.isVisible()) {
     mainWindow.show();
@@ -187,12 +203,16 @@ function buildTrayMenu() {
     },
     { type: 'separator' },
     {
-      label: '📌 Sempre no Topo',
+      label: '📌 Sempre no Topo (Modo Relógio)',
       type: 'checkbox',
       checked: alwaysOnTop,
       click: (item) => {
         alwaysOnTop = item.checked;
-        mainWindow?.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
+        if (currentMode === 'compact') {
+          mainWindow?.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
+        } else {
+          mainWindow?.setAlwaysOnTop(false);
+        }
         mainWindow?.webContents.send('tray-action', { type: 'always-on-top', value: alwaysOnTop });
       },
     },
@@ -311,7 +331,11 @@ function registerIpc() {
 
   ipcMain.handle('set-always-on-top', (_event, flag) => {
     alwaysOnTop = Boolean(flag);
-    mainWindow?.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
+    if (currentMode === 'compact') {
+      mainWindow?.setAlwaysOnTop(alwaysOnTop, 'screen-saver');
+    } else {
+      mainWindow?.setAlwaysOnTop(false);
+    }
     if (tray) tray.setContextMenu(buildTrayMenu());
     return alwaysOnTop;
   });

@@ -34,7 +34,7 @@
       <div class="compact-drag-bar">
         <span class="drag-grip" title="Arraste para mover">⠿ PurrModoro</span>
         <div class="compact-top-badges">
-          <span class="coin-pill compact-coin" title="Suas moedinhas">
+          <span class="coin-pill compact-coin" title="Para ganhar moedas, use o timer em suas tarefas!" data-tip="Para ganhar moedas, use o timer em suas tarefas!">
             <span class="coin-dot"></span>
             <span id="compactCoins">100</span>
           </span>
@@ -104,13 +104,12 @@
         <div id="headerBuffPill" class="buff-pill hidden" title="Multiplicador de moedas no próximo ciclo de foco">
           ☕ <span id="headerBuffText">+25%</span>
         </div>
-        <div class="coin-pill header-coins" title="Moedas disponíveis">
+        <div class="coin-pill header-coins" title="Para ganhar moedas, use o timer em suas tarefas!" data-tip="Para ganhar moedas, use o timer em suas tarefas!">
           <span class="coin-dot"></span>
           <span id="headerCoins">100</span>
         </div>
         <button id="muteBtn" class="hdr-btn" title="Ativar/Silenciar Sons">🔊</button>
-        <button id="snapClockBtn" class="hdr-btn" title="Reposicionar perto do relógio">📍</button>
-        <button id="minimizeCompactBtn" class="hdr-btn hdr-accent" title="Minimizar para o Relógio">
+        <button id="minimizeCompactBtn" class="hdr-btn hdr-accent" title="Minimizar para o Modo Relógio perto da hora">
           🐾 Modo Relógio
         </button>
         <button id="closeAppBtn" class="hdr-btn hdr-danger" title="Fechar e recolher para a bandeja">✕</button>
@@ -123,10 +122,10 @@
         <div class="room-topbar">
           <div class="theme-switcher" title="Escolha o estilo do quartinho">
             <span class="label-sm">Tema:</span>
-            <button class="theme-chip active" data-theme="cozy">☕ Cozy</button>
-            <button class="theme-chip" data-theme="pastel">🌸 Pastel</button>
-            <button class="theme-chip" data-theme="bamboo">🎋 Bamboo</button>
-            <button class="theme-chip" data-theme="halloween">🎃 Noite</button>
+            <button class="theme-chip active" data-theme="cozy" title="Aplicar tema Cozy acolhedor">☕ Cozy</button>
+            <button class="theme-chip" data-theme="pastel" title="Aplicar tema Pastel doce (desbloqueável na loja)">🌸 Pastel</button>
+            <button class="theme-chip" data-theme="bamboo" title="Aplicar tema Jardim Bamboo (desbloqueável na loja)">🎋 Bamboo</button>
+            <button class="theme-chip" data-theme="halloween" title="Aplicar tema Noite Mística / Halloween (desbloqueável na loja)">🎃 Noite</button>
           </div>
           <div class="room-hint">Arraste os móveis livremente! 🐾</div>
         </div>
@@ -163,25 +162,25 @@
 
         <!-- Rodapé rápido do quarto -->
         <div class="room-footer">
-          <span id="roomActiveCatText">🐱 Companheiro: <strong>Mochi Laranja</strong></span>
-          <span id="roomStatsText">🪑 2 móveis no quarto • 🔥 0 ciclos hoje</span>
+          <span id="roomActiveCatText" title="Gatinho ou companheiro ativo no quarto e perto do relógio">🐱 Companheiro: <strong>Mochi Laranja</strong></span>
+          <span id="roomStatsText" title="Quantidade de móveis decorando o quarto e ciclos concluídos hoje">🪑 2 móveis no quarto • 🔥 0 ciclos hoje</span>
         </div>
       </section>
 
       <!-- LADO DIREITO: ABAS (TIMER / LOJINHA / MEU QUARTO) -->
       <aside class="side-panel">
         <nav class="side-tabs">
-          <button class="side-tab active" data-tab="timer">🍅 Timer</button>
-          <button class="side-tab" data-tab="shop">🛒 Lojinha</button>
-          <button class="side-tab" data-tab="inventory">🎒 Quarto</button>
+          <button class="side-tab active" data-tab="timer" title="Configurar e acompanhar seu Timer Pomodoro">🍅 Timer</button>
+          <button class="side-tab" data-tab="shop" title="Comprar móveis, gatinhos, chapéus, pets e comidinhas">🛒 Lojinha</button>
+          <button class="side-tab" data-tab="inventory" title="Equipar seus gatinhos, chapéus, pets e móveis comprados">🎒 Quarto</button>
         </nav>
 
         <!-- ABA 1: TIMER POMODORO REGULÁVEL -->
         <div id="tab-timer" class="tab-content active">
           <div class="phase-selector">
-            <button class="phase-btn active" data-phase="focus">🍅 Foco</button>
-            <button class="phase-btn" data-phase="shortBreak">☕ Pausa</button>
-            <button class="phase-btn" data-phase="longBreak">🌙 Longa</button>
+            <button class="phase-btn active" data-phase="focus" title="Ciclo de foco (2 moedas/min + bônus em tarefas longas)">🍅 Foco</button>
+            <button class="phase-btn" data-phase="shortBreak" title="Pausa curta para descansar (1 moeda/min)">☕ Pausa</button>
+            <button class="phase-btn" data-phase="longBreak" title="Pausa longa após completar a rodada de ciclos (~1.2 moedas/min)">🌙 Longa</button>
           </div>
 
           <div class="timer-card">
@@ -192,19 +191,19 @@
             </div>
 
             <div class="quick-adjust-row">
-              <button class="adj-btn" data-delta="-5">-5m</button>
-              <button class="adj-btn" data-delta="-1">-1m</button>
+              <button class="adj-btn" data-delta="-5" title="Diminuir 5 minutos do timer">-5m</button>
+              <button class="adj-btn" data-delta="-1" title="Diminuir 1 minuto do timer">-1m</button>
               <span class="adj-label">Ajuste rápido</span>
-              <button class="adj-btn" data-delta="1">+1m</button>
-              <button class="adj-btn" data-delta="5">+5m</button>
+              <button class="adj-btn" data-delta="1" title="Aumentar 1 minuto no timer">+1m</button>
+              <button class="adj-btn" data-delta="5" title="Aumentar 5 minutos no timer">+5m</button>
             </div>
 
-            <div id="rewardPreviewText" class="reward-preview">
+            <div id="rewardPreviewText" class="reward-preview" title="Complete o timer até o fim sem desistir para ganhar essas moedinhas!">
               Recompensa ao concluir: 🪙 <strong>+30 moedas</strong>
             </div>
 
             <div class="timer-main-actions">
-              <button id="mainPlayPauseBtn" class="px-btn px-btn-primary">▶ Iniciar Foco</button>
+              <button id="mainPlayPauseBtn" class="px-btn px-btn-primary" title="Iniciar ou pausar a contagem atual">▶ Iniciar Foco</button>
               <button id="resetTimerBtn" class="px-btn px-btn-ghost" title="Reiniciar tempo atual">↺</button>
               <button id="giveUpBtn" class="px-btn px-btn-danger hidden" title="Cancelar foco (o gatinho vai chorar!)">🏳️ Desistir</button>
             </div>
@@ -217,10 +216,10 @@
             </div>
 
             <div class="presets-row">
-              <button class="preset-chip" data-f="25" data-s="5" data-l="15">Clássico 25/5</button>
-              <button class="preset-chip" data-f="15" data-s="3" data-l="10">Sprint 15/3</button>
-              <button class="preset-chip" data-f="50" data-s="10" data-l="20">Deep 50/10</button>
-              <button class="preset-chip" data-f="20" data-s="5" data-l="15">Leve 20/5</button>
+              <button class="preset-chip" data-f="25" data-s="5" data-l="15" title="Aplicar preset: 25m Foco / 5m Pausa / 15m Longa">Clássico 25/5</button>
+              <button class="preset-chip" data-f="15" data-s="3" data-l="10" title="Aplicar preset: 15m Foco / 3m Pausa / 10m Longa">Sprint 15/3</button>
+              <button class="preset-chip" data-f="50" data-s="10" data-l="20" title="Aplicar preset: 50m Foco / 10m Pausa / 20m Longa">Deep 50/10</button>
+              <button class="preset-chip" data-f="20" data-s="5" data-l="15" title="Aplicar preset: 20m Foco / 5m Pausa / 15m Longa">Leve 20/5</button>
             </div>
 
             <div class="settings-grid">
@@ -271,25 +270,25 @@
         <!-- ABA 2: LOJINHA -->
         <div id="tab-shop" class="tab-content">
           <div class="shop-categories">
-            <button class="shop-cat-btn active" data-cat="furniture">🪑 Móveis</button>
-            <button class="shop-cat-btn" data-cat="cats">🐱 Gatos</button>
-            <button class="shop-cat-btn" data-cat="hats">🎩 Chapéus</button>
-            <button class="shop-cat-btn" data-cat="pets">🐶 Pets</button>
-            <button class="shop-cat-btn" data-cat="food">☕ Café</button>
+            <button class="shop-cat-btn active" data-cat="furniture" title="Comprar móveis, decoração e temas para o quarto">🪑 Móveis</button>
+            <button class="shop-cat-btn" data-cat="cats" title="Desbloquear gatinhos e o Dino Sem Wi-Fi">🐱 Gatos</button>
+            <button class="shop-cat-btn" data-cat="hats" title="Desbloquear chapéuzinhos e acessórios para seu gatinho">🎩 Chapéus</button>
+            <button class="shop-cat-btn" data-cat="pets" title="Adotar amigos pets para passear pelo quarto">🐶 Pets</button>
+            <button class="shop-cat-btn" data-cat="food" title="Comidinhas interativas e bebidas com bônus de moedas">☕ Café</button>
           </div>
 
           <div id="shopSubfilters" class="shop-subfilters">
-            <button class="sub-chip active" data-sub="all">Todos</button>
-            <button class="sub-chip" data-sub="tema">🎨 Temas</button>
-            <button class="sub-chip" data-sub="janela">Janelas</button>
-            <button class="sub-chip" data-sub="movel">Mesas & Estantes</button>
-            <button class="sub-chip" data-sub="cama">Camas</button>
-            <button class="sub-chip" data-sub="arranhador">Arranhadores</button>
-            <button class="sub-chip" data-sub="planta">Plantas</button>
-            <button class="sub-chip" data-sub="quadro">Quadros</button>
-            <button class="sub-chip" data-sub="potinho">Potinhos</button>
-            <button class="sub-chip" data-sub="brinquedo">Brinquedos</button>
-            <button class="sub-chip" data-sub="halloween">Halloween</button>
+            <button class="sub-chip active" data-sub="all" title="Mostrar todos os móveis e temas">Todos</button>
+            <button class="sub-chip" data-sub="tema" title="Filtrar temas do quarto">🎨 Temas</button>
+            <button class="sub-chip" data-sub="janela" title="Filtrar janelas de parede">Janelas</button>
+            <button class="sub-chip" data-sub="movel" title="Filtrar mesas, estantes e móveis">Mesas & Estantes</button>
+            <button class="sub-chip" data-sub="cama" title="Filtrar caminhas e almofadas">Camas</button>
+            <button class="sub-chip" data-sub="arranhador" title="Filtrar arranhadores">Arranhadores</button>
+            <button class="sub-chip" data-sub="planta" title="Filtrar plantinhas e decoração">Plantas</button>
+            <button class="sub-chip" data-sub="quadro" title="Filtrar quadros e pôsteres">Quadros</button>
+            <button class="sub-chip" data-sub="potinho" title="Filtrar potinhos de ração e água">Potinhos</button>
+            <button class="sub-chip" data-sub="brinquedo" title="Filtrar brinquedos para o gatinho">Brinquedos</button>
+            <button class="sub-chip" data-sub="halloween" title="Filtrar itens especiais de Halloween">Halloween</button>
           </div>
 
           <div id="shopGrid" class="shop-grid"></div>
