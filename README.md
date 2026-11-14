@@ -4,27 +4,49 @@ Um **Idle Game + Timer Pomodoro** em pixel art para Windows onde seu gatinho (ou
 
 ---
 
-## 📥 Download Direto (.exe para Windows)
+## 📥 Download & Instalação (Windows)
 
-Quer usar sem precisar configurar nada? Baixe o executável pronto na página de Releases:
+### Opção 1 — Executável `.exe` Pronto (Sem precisar de Node.js)
 
-👉 **[Baixar PurrModoro para Windows (.exe) — Releases](https://github.com/ruishalm/PurrModoro/releases/latest)**
+Baixe e execute direto no Windows pela página de [GitHub Releases](https://github.com/ruishalm/PurrModoro/releases):
 
-- **Instalador Windows (`PurrModoro Setup *.exe`)**: instala com assistente e cria atalhos na Área de Trabalho e no Menu Iniciar.
-- **Versão Portátil (`PurrModoro *.exe`)**: basta abrir e usar sem instalar nada.
+- **[📦 Baixar Instalador (`PurrModoro-Setup.exe`)](https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Setup.exe)** — assistente de instalação com criação de atalhos na Área de Trabalho e no Menu Iniciar.
+- **[🐾 Baixar Versão Portátil (`PurrModoro-Portable.exe`)](https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Portable.exe)** — executável único, basta baixar e abrir sem instalar.
 
 > **Aviso do Windows SmartScreen**: por ser um projeto indie sem certificado pago de código, o Windows pode exibir *"O Windows protegeu o computador"*. Clique em **"Mais informações" → "Executar assim mesmo"**.
 
-<details>
-<summary>🛠️ Quer gerar o <code>.exe</code> localmente a partir do código-fonte?</summary>
+### Opção 2 — Rodar ou Gerar o `.exe` pelo Código-Fonte
+
+Requer [Node.js](https://nodejs.org/) (v18+).
 
 ```bash
-npm install
-npm install -D electron-builder
-npm run dist
+git clone https://github.com/ruishalm/PurrModoro.git
+cd PurrModoro
 ```
-Os executáveis (`Setup` e `Portable`) serão gerados automaticamente na pasta `dist/`.
-</details>
+
+- **Instalação com 1 Clique (`install_purrmodoro.bat`)**:
+  - Instala automaticamente o Electron (se necessário).
+  - Reseta qualquer progresso de testes anterior para uma **instalação limpa** (`100` moedinhas iniciais, **Mochi** + **Dino Sem Wi-Fi** e itens iniciais).
+  - Cria atalhos com o ícone do gatinho na **Área de Trabalho**, **Menu Iniciar** e **Inicializar com o Windows (`Startup`)**, abrindo direto perto do relógio sem janela preta de prompt.
+  - Para remover os atalhos depois (mantendo seu progresso atual salvo em `AppData`), rode **`uninstall_purrmodoro.bat`**.
+- **Via Terminal (`npm`)**:
+  ```bash
+  # Instalar dependências
+  npm install
+
+  # Abrir o PurrModoro perto do relógio do Windows
+  npm start
+
+  # (Opcional) Reprocessar sprites a partir de Assets/
+  npm run prepare-assets
+
+  # Gerar PurrModoro-Setup.exe e PurrModoro-Portable.exe localmente em dist/
+  npm run dist
+  ```
+
+> **Sem janela de CMD**: para abrir direto quando quiser via código-fonte, use os atalhos criados ou **`start_purrmodoro.bat`**.
+
+> **Ícone na Bandeja (System Tray) & Botão Fechar (`✕`)**: ao clicar no **`✕`** para fechar, o PurrModoro **recolhe para a bandeja do sistema** mantendo o timer ativo. Clique com o botão esquerdo no ícone perto do relógio para reabrir, ou com o botão direito para pausar o timer, alternar **Sempre no Topo**, ativar/desativar **Iniciar com o Windows** (já ativo por padrão) ou encerrar de vez (`🚪 Sair do PurrModoro`).
 
 ---
 
@@ -91,46 +113,6 @@ A recompensa escala diretamente com a duração da sua task:
 | **🌙 Pausa Longa** | **~1.2x min** | — | `10m = 12` • `15m = 18` • `20m = 24` 🪙 |
 
 > Bônus de café (*Latte `+25%`* / *Moka `+50%`*) multiplicam o valor total do próximo foco concluído!
-
----
-
-## 📦 Instalador Simples (Windows)
-
-### Pré-requisitos
-- [Node.js](https://nodejs.org/) (v18+)
-
-### Opção A — Instalação com 1 Clique (Recomendado)
-1. Clone ou baixe este repositório:
-   ```bash
-   git clone https://github.com/ruishalm/PurrModoro.git
-   cd PurrModoro
-   ```
-2. Dê duplo-clique em **`install_purrmodoro.bat`** (ou rode no terminal):
-   - Instala automaticamente o Electron (se ainda não estiver instalado).
-   - Reseta o progresso de testes anterior para uma **instalação limpa do zero** (100 moedinhas iniciais, gatinho Mochi e itens básicos).
-   - Cria o atalho **`PurrModoro`** na **Área de Trabalho**, no **Menu Iniciar** e ativa **Iniciar com o Windows** automaticamente (pode ser desmarcado depois na bandeja).
-   - Abre o PurrModoro perto do relógio sem deixar janela preta de prompt aberta.
-
-Para remover os atalhos (incluindo o de inicialização) mantendo seu progresso atual salvo em `AppData`, basta rodar **`uninstall_purrmodoro.bat`**.
-
-### Opção B — Via Terminal (`npm`)
-```bash
-# Instalar dependências
-npm install
-
-# Abrir o PurrModoro perto do relógio do Windows
-npm start
-
-# (Opcional) Reprocessar sprites a partir de Assets/
-npm run prepare-assets
-
-# (Opcional) Gerar instalador/portátil .exe em dist/ (requer electron-builder)
-npm install -D electron-builder && npm run dist
-```
-
-> **Sem janela de CMD**: Para abrir direto quando quiser, use os atalhos criados ou **`start_purrmodoro.bat`**.
-
-> **Ícone na Bandeja (System Tray) & Botão Fechar (`✕`)**: Ao clicar no **`✕`** para fechar, o PurrModoro **recolhe para a bandeja do sistema** mantendo seu timer rodando em segundo plano. Clique com o botão esquerdo no ícone perto do relógio para reabrir, ou com o botão direito para pausar o timer, alternar **Sempre no Topo**, ativar/desativar **Iniciar com o Windows** ou encerrar de vez (`🚪 Sair do PurrModoro`).
 
 ---
 

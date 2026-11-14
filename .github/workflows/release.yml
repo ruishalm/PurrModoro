@@ -1,0 +1,49 @@
+name: Build & Release Windows EXE
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Prepare unpacked Electron dist
+        shell: pwsh
+        run: |
+          if (-not (Test-Path "node_modules/electron/dist/electron.exe")) {
+            node node_modules/electron/install.js
+          }
+          Remove-Item -Force "node_modules/electron/dist/resources/default_app.asar","node_modules/electron/dist/version" -ErrorAction SilentlyContinue
+
+      - name: Build Windows executables (.exe)
+        run: npx electron-builder --win --publish never --config.electronDist=node_modules/electron/dist
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          name: PurrModoro ${{ github.ref_name }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/PurrModoro-Setup.exe
+            dist/PurrModoro-Portable.exe
