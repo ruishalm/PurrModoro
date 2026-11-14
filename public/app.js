@@ -35,12 +35,59 @@ const SPEECH_PHRASES = {
   ],
 };
 
+const DINO_PHRASES = [
+  'RAWWR! (miau jurássico!) 🦖',
+  'ERR_PROCRASTINATION_DISCONNECTED 🌵',
+  'Pulando cactos no foco! 🦖✨',
+  'Sem Wi-Fi, 100% produtividade! 🦖🐾',
+  'Prrrr-ex feliz! 🦖💖',
+];
+
+const ROOM_THEME_CATALOG = [
+  {
+    id: 'cozy',
+    name: 'Tema Cafeteria Cozy',
+    chipLabel: '☕ Cozy',
+    price: 0,
+    starter: true,
+    description: 'Paredes creme aconchegantes e piso de madeira quentinha.',
+  },
+  {
+    id: 'pastel',
+    name: 'Tema Doce Pastel',
+    chipLabel: '🌸 Pastel',
+    price: 120,
+    starter: false,
+    description: 'Tons suaves de algodão-doce e lavanda para estudar em paz.',
+  },
+  {
+    id: 'bamboo',
+    name: 'Tema Jardim Bamboo',
+    chipLabel: '🎋 Bamboo',
+    price: 150,
+    starter: false,
+    description: 'Inspirado em casas de chá com tatame e verde zen.',
+  },
+  {
+    id: 'halloween',
+    name: 'Tema Noite Mística',
+    chipLabel: '🎃 Noite',
+    price: 180,
+    starter: false,
+    description: 'Quarto noturno estrelado com lua crescente e clima de bruxinha!',
+  },
+];
+
 const DEFAULT_STATE = {
+  saveVersion: 2,
   coins: 100,
   unlockedCats: ['cat_mochi'],
   activeCat: 'cat_mochi',
+  unlockedHats: [],
+  activeHat: null,
   unlockedPets: [],
   activePets: [],
+  unlockedThemes: ['cozy'],
   ownedItems: {
     plant_mini: 1,
     bowl_water_blue: 1,
@@ -49,6 +96,7 @@ const DEFAULT_STATE = {
     { uid: 'starter-plant', itemId: 'plant_mini', x: 68, y: 60, flip: false, z: 60 },
     { uid: 'starter-bowl', itemId: 'bowl_water_blue', x: 34, y: 68, flip: false, z: 68 },
   ],
+  placedFoods: [],
   roomTheme: 'cozy',
   compactCollapsed: false,
   isometricMigratedV2: true,
@@ -74,19 +122,46 @@ const WALL_NATIVE_SIDE = {
   window_oak: 'right',
   art_plant: 'right',
   art_cat_portrait: 'right',
-  art_heart_grey: 'right',
+  art_heart_grey: 'left',
   art_stripes: 'left',
   art_abstract: 'left',
   art_dog_golden: 'flat',
+  shelf_wall_wood: 'right',
 };
 
-let catalog = { items: [], cats: [], pets: [] };
+// Superfícies (estantes, mesas, aparador, prateleira de parede) onde itens menores podem apoiar
+const SURFACE_SPECS = {
+  shelf_wood: {
+    xSpanFactor: 0.36,
+    minUpFactor: 0.08,
+    maxUpFactor: 0.88,
+    tiers: [0.14, 0.34, 0.54, 0.78],
+  },
+  table_coffee_wood: {
+    xSpanFactor: 0.38,
+    minUpFactor: 0.42,
+    maxUpFactor: 0.76,
+  },
+  table_side_wood: {
+    xSpanFactor: 0.38,
+    minUpFactor: 0.50,
+    maxUpFactor: 0.82,
+  },
+  shelf_wall_wood: {
+    xSpanFactor: 0.38,
+    minUpFactor: 0.38,
+    maxUpFactor: 0.72,
+  },
+};
+
+let catalog = { items: [], cats: [], pets: [], hats: [] };
 let state = structuredClone(DEFAULT_STATE);
 let appMode = 'compact'; // 'compact' | 'expanded'
 let shopCategory = 'furniture';
 let shopSubFilter = 'all';
 let selectedPlacedUid = null;
 let dragState = null;
+let heldFood = null;
 
 // Estado do Timer
 const timer = {
@@ -122,6 +197,7 @@ function getCatalogItem(id) {
     catalog.items.find((i) => i.id === id) ||
     catalog.cats.find((c) => c.id === id) ||
     catalog.pets.find((p) => p.id === id) ||
+    (catalog.hats || []).find((h) => h.id === id) ||
     null
   );
 }
@@ -132,6 +208,10 @@ function getCatDef(id) {
 
 function getPetDef(id) {
   return catalog.pets.find((p) => p.id === id);
+}
+
+function getHatDef(id) {
+  return (catalog.hats || []).find((h) => h.id === id) || null;
 }
 
 function loadImage(src) {
@@ -167,18 +247,35 @@ async function loadState() {
       saved = null;
     }
   }
-  if (saved && typeof saved === 'object') {
-    state = {
-      ...structuredClone(DEFAULT_STATE),
-      ...saved,
-      compactCollapsed: Boolean(saved.compactCollapsed),
-      isometricMigratedV2: Boolean(saved.isometricMigratedV2),
-      timerConfig: { ...DEFAULT_STATE.timerConfig, ...(saved.timerConfig || {}) },
-      stats: { ...DEFAULT_STATE.stats, ...(saved.stats || {}) },
-      ownedItems: saved.ownedItems || { ...DEFAULT_STATE.ownedItems },
-      placedItems: Array.isArray(saved.placedItems) ? saved.placedItems : [...DEFAULT_STATE.placedItems],
-    };
+  if (!saved || typeof saved !== 'object' || saved.saveVersion !== 2) {
+    state = structuredClone(DEFAULT_STATE);
+    saveState(true);
+    return;
   }
+
+  state = {
+    ...structuredClone(DEFAULT_STATE),
+    ...saved,
+    saveVersion: 2,
+    compactCollapsed: Boolean(saved.compactCollapsed),
+    isometricMigratedV2: Boolean(saved.isometricMigratedV2),
+    timerConfig: { ...DEFAULT_STATE.timerConfig, ...(saved.timerConfig || {}) },
+    stats: { ...DEFAULT_STATE.stats, ...(saved.stats || {}) },
+    ownedItems: saved.ownedItems || { ...DEFAULT_STATE.ownedItems },
+    placedItems: Array.isArray(saved.placedItems) ? saved.placedItems : [...DEFAULT_STATE.placedItems],
+  };
+  const savedThemes = Array.isArray(saved?.unlockedThemes) ? saved.unlockedThemes : ['cozy'];
+  state.unlockedThemes = Array.from(new Set(['cozy', ...savedThemes]));
+  if (!state.unlockedThemes.includes(state.roomTheme)) {
+    state.roomTheme = 'cozy';
+  }
+  state.unlockedHats = Array.isArray(saved?.unlockedHats) ? saved.unlockedHats : [];
+  state.activeHat = saved?.activeHat && state.unlockedHats.includes(saved.activeHat) ? saved.activeHat : null;
+  state.placedFoods = Array.isArray(saved?.placedFoods) ? saved.placedFoods : [];
+  const loadedCoins = Number(state.coins);
+  state.coins = !Number.isFinite(loadedCoins) || loadedCoins >= 900000
+    ? 100
+    : Math.max(0, Math.floor(loadedCoins));
 }
 
 let saveDebounce = null;
@@ -207,7 +304,7 @@ function saveState(immediate = false) {
    RENDERIZADOR DE SPRITE EM CANVAS (PIXEL-PERFECT)
    ============================================================================ */
 
-function drawSpriteSheetFrame(canvas, src, fw, fh, frameIndex, flip = false) {
+function drawSpriteSheetFrame(canvas, src, fw, fh, frameIndex, flip = false, customScale = null) {
   const img = loadImage(src);
   if (!img.complete || img.naturalWidth === 0) return;
 
@@ -220,9 +317,9 @@ function drawSpriteSheetFrame(canvas, src, fw, fh, frameIndex, flip = false) {
   ctx.imageSmoothingEnabled = false;
 
   const scale = Math.min(canvas.width / fw, canvas.height / fh);
-  const intScale = scale >= 1 ? Math.floor(scale) : scale;
-  const dw = Math.round(fw * intScale);
-  const dh = Math.round(fh * intScale);
+  const drawScale = customScale !== null ? customScale : (scale >= 1 ? Math.floor(scale) : scale);
+  const dw = Math.round(fw * drawScale);
+  const dh = Math.round(fh * drawScale);
   const dx = Math.round((canvas.width - dw) / 2);
   const dy = canvas.height - dh;
 
@@ -233,6 +330,98 @@ function drawSpriteSheetFrame(canvas, src, fw, fh, frameIndex, flip = false) {
   }
   ctx.drawImage(img, sx, 0, fw, fh, dx, dy, dw, dh);
   ctx.restore();
+}
+
+const CAT_HEAD_ANCHORS = {
+  'cat_mochi_idle.png': { x: 10, y: 5, bob: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0] },
+  'cat_mochi_box.png': { x: 15, y: 5, bob: [0, 0, 0, 0] },
+  'cat_cream_cheer.png': { x: 31, y: 18, bob: [0, 1] },
+  'cat_tuxedo_cheer.png': { x: 31, y: 18, bob: [0, 1] },
+  'cat_white_cheer.png': { x: 31, y: 18, bob: [0, 1] },
+  'cat_cream_cry.png': { x: 27, y: 18, bob: [0, 1, 1, 0] },
+  'cat_tuxedo_cry.png': { x: 27, y: 18, bob: [0, 1, 1, 0] },
+  'cat_cream_sleep.png': { x: 40, y: 29, bob: [0, 0, 1, 0] },
+  'cat_tuxedo_sleep.png': { x: 40, y: 29, bob: [0, 0, 1, 0] },
+  'cat_curled_sleep.png': { x: 19, y: 3, bob: [0] },
+  'cat_dracula.png': { x: 9, y: 4, bob: [0, 0, 1, 0, 0, 1] },
+  'cat_vampire_angry.png': { x: 10, y: 4, bob: [0, 0, 0, 1, 1, 1, 0, 0, 0] },
+  'cat_witch.png': { x: 17, y: 17, bob: [0, -2, -4, -6, -4, -2] },
+  'cat_evil_box.png': { x: 15, y: 8, bob: [0, -2, -5, -6, -6, -6, -6, -6, -6, -6, -6, -6] },
+  'cat_zombie_eating.png': { x: 11, y: 5, bob: [0, 0, 0, 0, 1, 2, 2, 1, 0, 0, 0, 0, 0, 0, 0] },
+  'cat_dino_idle.png': { x: 20, y: 7, bob: [0, -1, 0, 0, 0, -1, 0, 0] },
+  'cat_dino_sleep.png': { x: 19, y: 16, bob: [0, 0, 1, 0] },
+  'cat_dino_cheer.png': { x: 20, y: 7, bob: [0, -3, -4, -2] },
+  'cat_dino_cry.png': { x: 20, y: 7, bob: [0, 1, 0, 1] },
+};
+
+function drawCatFrameWithHat(canvas, anim, frameIndex, flip = false, customScale = null, hatIdOverride = undefined) {
+  drawSpriteSheetFrame(canvas, anim.src, anim.fw, anim.fh, frameIndex, flip, customScale);
+  const hatId = hatIdOverride !== undefined ? hatIdOverride : state.activeHat;
+  if (!hatId) return;
+  const hatDef = getHatDef(hatId);
+  if (!hatDef) return;
+  const hatImg = loadImage(hatDef.image);
+  if (!hatImg.complete || hatImg.naturalWidth === 0) return;
+
+  const ctx = canvas.getContext('2d');
+  const scale = Math.min(canvas.width / anim.fw, canvas.height / anim.fh);
+  const drawScale = customScale !== null ? customScale : (scale >= 1 ? Math.floor(scale) : scale);
+  const dw = Math.round(anim.fw * drawScale);
+  const dh = Math.round(anim.fh * drawScale);
+  const dx = Math.round((canvas.width - dw) / 2);
+  const dy = canvas.height - dh;
+
+  const sheetName = anim.src.split('/').pop();
+  const anchor = CAT_HEAD_ANCHORS[sheetName] || { x: anim.fw / 2, y: 4, bob: [0] };
+  const bobArr = anchor.bob || [0];
+  const bobY = bobArr[frameIndex % bobArr.length] || 0;
+  const headCanvasX = dx + anchor.x * drawScale;
+  const headCanvasY = dy + (anchor.y + bobY) * drawScale;
+
+  const hatScale = anim.fw <= 32 ? drawScale * 0.62 : drawScale * 1.15;
+  const hatW = Math.round(hatImg.naturalWidth * hatScale);
+  const hatH = Math.round(hatImg.naturalHeight * hatScale);
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+  if (flip) {
+    ctx.translate(canvas.width, 0);
+    ctx.scale(-1, 1);
+  }
+  ctx.drawImage(
+    hatImg,
+    Math.round(headCanvasX - hatW / 2),
+    Math.round(headCanvasY - hatH * 0.78),
+    hatW,
+    hatH
+  );
+  ctx.restore();
+}
+
+function getActorSpriteScale(kind, config, inCompact = false, animFw = 32) {
+  const id = config?.id;
+  if (kind === 'cat') {
+    if (id === 'cat_witch' && animFw === 48) return inCompact ? 1.15 : 1.48;
+    if (animFw <= 32) return 2.0;
+    if (animFw === 43) return 1.45;
+    return 1.0;
+  }
+  if (id === 'pet_bunny') return 1.25;
+  if (id === 'pet_zombie_hand') return 1.65;
+  if (id === 'pet_golden') return 1.2;
+  return 1.0;
+}
+
+function getActorCanvasSize(kind, config) {
+  const id = config?.id;
+  if (kind === 'cat') {
+    if (id === 'cat_witch') return { w: 72, h: 90 };
+    return { w: 68, h: 82 };
+  }
+  if (id === 'pet_bunny') return { w: 40, h: 32 };
+  if (id === 'pet_zombie_hand') return { w: 44, h: 52 };
+  if (id === 'pet_golden') return { w: 66, h: 38 };
+  return { w: 48, h: 48 };
 }
 
 function getCatAnimationForState(catDef, moodOrBehavior) {
@@ -266,6 +455,7 @@ async function setAppMode(mode) {
     expandedEl.classList.add('hidden');
     compactEl.classList.remove('hidden');
     selectPlacedItem(null);
+    cancelHeldFood();
   }
 
   if (window.purrAPI?.setMode) {
@@ -667,29 +857,78 @@ const ISO_THEME_PALETTES = {
   },
 };
 
-function clampToIsometricFloor(x, y) {
-  const cx = 50;
-  const cy = 65.4;
-  const rx = 36;
-  const ry = 17.5;
-  const dx = x - cx;
-  const dy = y - cy;
-  const norm = Math.abs(dx) / rx + Math.abs(dy) / ry;
-  if (norm <= 1) {
-    return { x: Number(x.toFixed(2)), y: Number(y.toFixed(2)) };
-  }
-  return {
-    x: Number((cx + dx / norm).toFixed(2)),
-    y: Number((cy + dy / norm).toFixed(2)),
-  };
+function isSurfaceDef(def) {
+  return Boolean(def && (def.isSurface || SURFACE_SPECS[def.id]));
 }
 
-function clampToIsometricWall(x, y) {
-  let nx = clamp(x, 22, 78);
-  if (nx > 43 && nx < 50) nx = 43;
-  if (nx >= 50 && nx < 57) nx = 57;
-  const baseY = 45.4 + Math.abs(nx - 50) * 0.5;
-  const ny = clamp(y, baseY - 8.5, baseY - 3.5);
+function canItemSitOnSurface(def) {
+  if (!def || def.wallItem || isSurfaceDef(def)) return false;
+  return ![
+    'tower_deluxe',
+    'house_cozy',
+    'post_pink',
+    'post_olive',
+    'post_blue',
+    'bed_blue',
+    'bed_charcoal',
+    'bed_berry',
+    'bed_moss',
+  ].includes(def.id);
+}
+
+function computeSurfaceChildZ(host, childY) {
+  const hostZ = host.z || Math.round(host.y);
+  return hostZ + 15 + Math.max(0, Math.round(childY - (host.y - 20)));
+}
+
+function syncSurfaceChildrenZ(host) {
+  state.placedItems.forEach((child) => {
+    if (child.onSurfaceUid === host.uid) {
+      child.z = computeSurfaceChildZ(host, child.y);
+      (state.placedFoods || []).forEach((food) => {
+        if (food.hostUid === child.uid) {
+          food.z = child.z + 2;
+        }
+      });
+    }
+  });
+  (state.placedFoods || []).forEach((food) => {
+    if (food.hostUid === host.uid) {
+      food.z = computeSurfaceChildZ(host, food.y);
+    }
+  });
+}
+
+function clampToIsometricFloor(x, y, def = null) {
+  // Piso 10x10 tiles no canvas 260x260: vértice traseiro F_BACK=(50.0, 44.615), 1 tile = (4.6923, 2.34615)
+  const dx = x - 50.0;
+  const dy = y - 44.615;
+  const u = 0.5 * (dy / 2.34615 + dx / 4.6923);
+  const v = 0.5 * (dy / 2.34615 - dx / 4.6923);
+
+  const extraWallMargin = def
+    ? clamp((def.width * getItemRoomScale(def)) / 180, 0.15, 0.75)
+    : 0.25;
+  const minUV = 0.65 + extraWallMargin;
+  const maxUV = 9.5; // exatamente 0.5 tile da borda frontal
+
+  const cu = clamp(u, minUV, maxUV);
+  const cv = clamp(v, minUV, maxUV);
+  const nx = 50.0 + (cu - cv) * 4.6923;
+  const ny = 44.615 + (cu + cv) * 2.34615;
+  return { x: Number(nx.toFixed(2)), y: Number(ny.toFixed(2)) };
+}
+
+function clampToIsometricWall(x, y, def = null) {
+  let nx = clamp(x, 9, 91);
+  if (nx > 47 && nx < 50) nx = 47;
+  if (nx >= 50 && nx < 53) nx = 53;
+  const baseY = 44.62 + Math.abs(nx - 50) * 0.5;
+  const drawH = def ? Math.max(10, Math.round(def.height * getItemRoomScale(def))) : 48;
+  const itemHPct = (drawH / 600) * 100;
+  const minY = baseY - 38.5 + itemHPct;
+  const maxY = baseY - 2.5;
+  const ny = clamp(y, minY, maxY);
   return { x: Number(nx.toFixed(2)), y: Number(ny.toFixed(2)) };
 }
 
@@ -701,24 +940,38 @@ function getAutoWallFlip(itemId, x) {
 }
 
 function normalizePlacedItemsForIsometricRoom() {
-  const firstMigration = !state.isometricMigratedV2;
+  const uidMap = new Map(state.placedItems.map((p) => [p.uid, p]));
+
+  // Primeiro normaliza paredes, superfícies e itens no chão (sem superfície hospedeira)
   state.placedItems.forEach((placed) => {
     const def = getCatalogItem(placed.itemId);
     if (!def) return;
-    if (def.wallItem) {
-      const clamped = clampToIsometricWall(placed.x, placed.y);
-      placed.x = clamped.x;
-      placed.y = clamped.y;
-      if (firstMigration) {
-        placed.flip = getAutoWallFlip(placed.itemId, placed.x);
-      }
-    } else {
-      const clamped = clampToIsometricFloor(placed.x, placed.y);
-      placed.x = clamped.x;
-      placed.y = clamped.y;
+    if (placed.onSurfaceUid && !uidMap.has(placed.onSurfaceUid)) {
+      placed.onSurfaceUid = null;
     }
-    placed.z = Math.round(placed.y);
+    if (def.wallItem) {
+      const clamped = clampToIsometricWall(placed.x, placed.y, def);
+      placed.x = clamped.x;
+      placed.y = clamped.y;
+      placed.flip = getAutoWallFlip(placed.itemId, placed.x);
+      placed.z = Math.round(placed.y);
+    } else if (!placed.onSurfaceUid) {
+      const clamped = clampToIsometricFloor(placed.x, placed.y, def);
+      placed.x = clamped.x;
+      placed.y = clamped.y;
+      placed.z = Math.round(placed.y);
+    }
   });
+
+  // Depois garante o z-index dos itens apoiados em cima de superfícies válidas
+  state.placedItems.forEach((placed) => {
+    if (!placed.onSurfaceUid) return;
+    const host = uidMap.get(placed.onSurfaceUid);
+    if (host) {
+      placed.z = computeSurfaceChildZ(host, placed.y);
+    }
+  });
+
   state.isometricMigratedV2 = true;
 }
 
@@ -755,14 +1008,14 @@ function drawIsometricRoom() {
   ctx.imageSmoothingEnabled = false;
   const pal = ISO_THEME_PALETTES[state.roomTheme] || ISO_THEME_PALETTES.cozy;
 
-  // Vértices exatos 2:1 (dx = 104, dy = 52) com parede alta de 94u
-  const T_MID = { x: 130, y: 24 };
-  const T_LEFT = { x: 26, y: 76 };
-  const T_RIGHT = { x: 234, y: 76 };
-  const F_BACK = { x: 130, y: 118 };
-  const F_LEFT = { x: 26, y: 170 };
-  const F_RIGHT = { x: 234, y: 170 };
-  const F_FRONT = { x: 130, y: 222 };
+  // Vértices exatos 2:1 ampliados (dx = 122, dy = 61) ocupando todo o quarto
+  const T_MID = { x: 130, y: 10 };
+  const T_LEFT = { x: 8, y: 71 };
+  const T_RIGHT = { x: 252, y: 71 };
+  const F_BACK = { x: 130, y: 116 };
+  const F_LEFT = { x: 8, y: 177 };
+  const F_RIGHT = { x: 252, y: 177 };
+  const F_FRONT = { x: 130, y: 238 };
 
   // 1. Fundo suave ao redor do diorama
   ctx.fillStyle = pal.backdrop;
@@ -770,7 +1023,7 @@ function drawIsometricRoom() {
 
   if (state.roomTheme === 'halloween') {
     const stars = [
-      [22, 20], [52, 16], [86, 22], [176, 20], [202, 14], [242, 42], [18, 56], [244, 214], [24, 226],
+      [18, 18], [46, 14], [80, 20], [184, 16], [208, 12], [248, 34], [14, 48], [246, 220], [18, 232],
     ];
     stars.forEach(([sx, sy], i) => {
       ctx.fillStyle = i % 2 === 0 ? '#ffe699' : '#d9b8ff';
@@ -779,11 +1032,11 @@ function drawIsometricRoom() {
     // Lua crescente redonda
     ctx.fillStyle = '#ffe999';
     ctx.beginPath();
-    ctx.arc(220, 28, 10, 0, Math.PI * 2);
+    ctx.arc(234, 22, 9, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = pal.backdrop;
     ctx.beginPath();
-    ctx.arc(224, 25, 8, 0, Math.PI * 2);
+    ctx.arc(238, 19, 7, 0, Math.PI * 2);
     ctx.fill();
   } else {
     ctx.fillStyle = pal.backdropAccent;
@@ -798,10 +1051,10 @@ function drawIsometricRoom() {
   drawPoly(
     ctx,
     [
-      { x: F_LEFT.x - 4, y: F_LEFT.y + 14 },
-      { x: F_BACK.x, y: F_BACK.y + 16 },
-      { x: F_RIGHT.x + 4, y: F_RIGHT.y + 14 },
-      { x: F_FRONT.x, y: F_FRONT.y + 17 },
+      { x: F_LEFT.x - 3, y: F_LEFT.y + 11 },
+      { x: F_BACK.x, y: F_BACK.y + 12 },
+      { x: F_RIGHT.x + 3, y: F_RIGHT.y + 11 },
+      { x: F_FRONT.x, y: F_FRONT.y + 13 },
     ],
     'rgba(0, 0, 0, 0.13)'
   );
@@ -897,7 +1150,7 @@ function drawIsometricRoom() {
 
   ctx.strokeStyle = pal.floorLine;
   ctx.lineWidth = 1;
-  const tiles = 8;
+  const tiles = 10;
   for (let i = 1; i < tiles; i++) {
     const t = i / tiles;
     const p1 = isoLerpPt(F_BACK, F_LEFT, t);
@@ -1002,15 +1255,56 @@ function drawIsometricRoom() {
   drawPoly(ctx, [T_MID, T_RIGHT, F_RIGHT, F_BACK], null, pal.outline, 1.5);
 }
 
+function renderThemeChips() {
+  document.querySelectorAll('.theme-chip').forEach((btn) => {
+    const tId = btn.dataset.theme;
+    const tDef = ROOM_THEME_CATALOG.find((t) => t.id === tId);
+    if (!tDef) return;
+    const unlocked = state.unlockedThemes.includes(tId);
+    const isActive = state.roomTheme === tId;
+    btn.classList.toggle('active', isActive);
+    btn.classList.toggle('locked', !unlocked);
+    btn.textContent = unlocked ? tDef.chipLabel : `${tDef.chipLabel} 🔒${tDef.price}`;
+    btn.title = unlocked
+      ? `Usar ${tDef.name}`
+      : `Desbloquear ${tDef.name} por ${tDef.price} moedas`;
+  });
+}
+
 function applyRoomTheme(theme) {
+  if (!state.unlockedThemes.includes(theme)) {
+    state.unlockedThemes.push(theme);
+  }
   state.roomTheme = theme;
   document.body.classList.remove('theme-cozy', 'theme-pastel', 'theme-bamboo', 'theme-halloween');
   document.body.classList.add(`theme-${theme}`);
-  document.querySelectorAll('.theme-chip').forEach((btn) => {
-    btn.classList.toggle('active', btn.dataset.theme === theme);
-  });
+  renderThemeChips();
   drawIsometricRoom();
   saveState();
+}
+
+function buyOrApplyTheme(themeId) {
+  const tDef = ROOM_THEME_CATALOG.find((t) => t.id === themeId);
+  if (!tDef) return;
+  if (state.unlockedThemes.includes(themeId)) {
+    window.purrSound.playClick();
+    applyRoomTheme(themeId);
+    renderShop();
+    return;
+  }
+  if (state.coins < tDef.price) {
+    window.purrSound.playSad();
+    if (roomActors[0]) showRoomPetSpeech(roomActors[0], `Precisa de 🪙 ${tDef.price} moedas!`);
+    return;
+  }
+  state.coins -= tDef.price;
+  state.unlockedThemes.push(themeId);
+  window.purrSound.playCoin();
+  applyRoomTheme(themeId);
+  updateCoinsUI();
+  renderShop();
+  renderInventory();
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], `Tema novo: ${tDef.name}! 🎨✨`);
 }
 
 function selectPlacedItem(uid) {
@@ -1034,6 +1328,28 @@ function selectPlacedItem(uid) {
   toolbar.classList.remove('hidden');
 }
 
+function getItemRoomScale(def) {
+  if (!def) return 1.0;
+  if (def.animated || def.id === 'decor_eye_jar') return 0.24;
+  if (def.subCategory === 'potinho') return 0.65;
+  if (['bed_blue', 'bed_charcoal', 'bed_berry', 'bed_moss'].includes(def.id)) return 0.72;
+  if (def.id === 'house_cozy') return 1.12;
+  if (def.subCategory === 'janela') return 0.95;
+  if (def.id === 'shelf_wood') return 0.82;
+  if (['post_pink', 'post_olive', 'post_blue', 'scratch_low_white', 'scratch_low_wood', 'plant_tall'].includes(def.id)) {
+    return 0.85;
+  }
+  if (def.id === 'tower_deluxe') return 1.15;
+  if (def.id === 'plant_mini') return 1.0;
+  if (['art_stripes', 'art_abstract', 'art_plant'].includes(def.id)) return 0.85;
+  if (['art_cat_portrait', 'art_heart_grey'].includes(def.id)) return 1.4;
+  if (def.id === 'art_dog_golden') return 1.1;
+  if (['ball_sage', 'ball_indigo'].includes(def.id)) return 0.85;
+  if (['yarn_pink', 'yarn_blue'].includes(def.id)) return 1.3;
+  if (def.id === 'decor_candle') return 1.5;
+  return 1.0;
+}
+
 function renderRoom() {
   drawIsometricRoom();
   const layer = document.getElementById('roomFurnitureLayer');
@@ -1050,9 +1366,9 @@ function renderRoom() {
     wrap.style.top = `${placed.y}%`;
     wrap.style.zIndex = String(placed.z || Math.round(placed.y));
 
-    const scale = def.animated ? 0.56 : 1.38;
-    const drawW = Math.max(20, Math.round(def.width * scale));
-    const drawH = Math.max(20, Math.round(def.height * scale));
+    const scale = getItemRoomScale(def);
+    const drawW = Math.max(10, Math.round(def.width * scale));
+    const drawH = Math.max(10, Math.round(def.height * scale));
 
     if (def.animated) {
       const canvas = document.createElement('canvas');
@@ -1067,17 +1383,125 @@ function renderRoom() {
       img.width = drawW;
       img.height = drawH;
       img.alt = def.name;
+      img.draggable = false;
       if (placed.flip) img.style.transform = 'scaleX(-1)';
       wrap.appendChild(img);
     }
 
+    wrap.draggable = false;
+    wrap.addEventListener('dragstart', (e) => e.preventDefault());
     wrap.addEventListener('pointerdown', (e) => startDraggingItem(e, placed.uid));
+    layer.appendChild(wrap);
+  });
+
+  // Comidinhas servidas (em potinhos, mesas ou no chão)
+  (state.placedFoods || []).forEach((food) => {
+    const def = getCatalogItem(food.foodId);
+    if (!def) return;
+
+    const wrap = document.createElement('div');
+    wrap.className = 'placed-food';
+    wrap.dataset.foodUid = food.uid;
+    wrap.title = `${def.name} — Clique para chamar o pet!`;
+    wrap.style.left = `${food.x}%`;
+    wrap.style.top = `${food.y}%`;
+    wrap.style.zIndex = String(food.z || Math.round(food.y) + 1);
+
+    const size = food.inBowl ? 20 : 25;
+    const img = document.createElement('img');
+    img.src = def.image;
+    img.width = size;
+    img.height = size;
+    img.alt = def.name;
+    img.draggable = false;
+    wrap.appendChild(img);
+    wrap.draggable = false;
+    wrap.addEventListener('dragstart', (e) => e.preventDefault());
+
+    wrap.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (heldFood) {
+        placeHeldFoodInRoom(e.clientX, e.clientY, food.hostUid || null);
+        return;
+      }
+      assignNearestActorToFood(food);
+    });
     layer.appendChild(wrap);
   });
 }
 
+function clearSurfaceTargetHighlights() {
+  document.querySelectorAll('.placed-item.surface-target').forEach((el) => {
+    el.classList.remove('surface-target');
+  });
+}
+
+function findHostSurface(px, py, draggedPlaced, rect) {
+  if (!rect?.width || !rect?.height) return null;
+  const hosts = state.placedItems
+    .filter((h) => h.uid !== draggedPlaced.uid && SURFACE_SPECS[h.itemId])
+    .sort((a, b) => (b.z || Math.round(b.y)) - (a.z || Math.round(a.y)));
+
+  for (const host of hosts) {
+    const spec = SURFACE_SPECS[host.itemId];
+    const hostDef = getCatalogItem(host.itemId);
+    if (!hostDef) continue;
+
+    const scale = getItemRoomScale(hostDef);
+    const drawW = Math.max(10, Math.round(hostDef.width * scale));
+    const drawH = Math.max(10, Math.round(hostDef.height * scale));
+    const hostWPct = (drawW / rect.width) * 100;
+    const hostHPct = (drawH / rect.height) * 100;
+
+    const halfX = hostWPct * spec.xSpanFactor;
+    const minY = host.y - hostHPct * spec.maxUpFactor;
+    const maxY = host.y - hostHPct * spec.minUpFactor;
+    const hitPad = 1.6;
+
+    if (
+      px >= host.x - halfX - hitPad &&
+      px <= host.x + halfX + hitPad &&
+      py >= minY - hitPad &&
+      py <= maxY + hitPad
+    ) {
+      const snappedX = clamp(px, host.x - halfX, host.x + halfX);
+      let snappedY = clamp(py, minY, maxY);
+
+      if (Array.isArray(spec.tiers) && spec.tiers.length > 0 && hostHPct > 0) {
+        const upRatio = (host.y - snappedY) / hostHPct;
+        let bestTier = spec.tiers[0];
+        let bestDist = Infinity;
+        for (const t of spec.tiers) {
+          const dist = Math.abs(upRatio - t);
+          if (dist < bestDist) {
+            bestDist = dist;
+            bestTier = t;
+          }
+        }
+        snappedY = host.y - bestTier * hostHPct;
+      }
+
+      return {
+        host,
+        x: Number(snappedX.toFixed(2)),
+        y: Number(snappedY.toFixed(2)),
+      };
+    }
+  }
+  return null;
+}
+
 function startDraggingItem(e, uid) {
   e.stopPropagation();
+  if (heldFood) {
+    if (e.button === 0) {
+      e.preventDefault();
+      placeHeldFoodInRoom(e.clientX, e.clientY, uid);
+    }
+    return;
+  }
+  if (e.button !== undefined && e.button !== 0) return;
+  e.preventDefault();
   const placed = state.placedItems.find((p) => p.uid === uid);
   if (!placed) return;
 
@@ -1085,6 +1509,8 @@ function startDraggingItem(e, uid) {
   const canvasEl = document.getElementById('roomCanvas');
   const rect = canvasEl.getBoundingClientRect();
   const itemEl = e.currentTarget;
+  const clickPctX = ((e.clientX - rect.left) / rect.width) * 100;
+  const clickPctY = ((e.clientY - rect.top) / rect.height) * 100;
 
   dragState = {
     uid,
@@ -1092,21 +1518,34 @@ function startDraggingItem(e, uid) {
     itemEl,
     rect,
     def: getCatalogItem(placed.itemId),
+    grabOffsetX: placed.x - clickPctX,
+    grabOffsetY: placed.y - clickPctY,
   };
-  itemEl.setPointerCapture?.(e.pointerId);
+  document.body.classList.add('dragging-furniture');
+  try {
+    itemEl.setPointerCapture?.(e.pointerId);
+  } catch {
+    // fallback if synthetic or unsupported pointerId
+  }
 }
 
 function handleRoomPointerMove(e) {
+  updateHeldFoodCursorPos(e.clientX, e.clientY);
   if (!dragState) return;
-  const { placed, itemEl, rect, def } = dragState;
-  const px = ((e.clientX - rect.left) / rect.width) * 100;
-  const py = ((e.clientY - rect.top) / rect.height) * 100;
+  const { placed, itemEl, rect, def, grabOffsetX, grabOffsetY } = dragState;
+  const px = ((e.clientX - rect.left) / rect.width) * 100 + grabOffsetX;
+  const py = ((e.clientY - rect.top) / rect.height) * 100 + grabOffsetY;
+  const prevX = placed.x;
+  const prevY = placed.y;
+
+  clearSurfaceTargetHighlights();
 
   if (def?.wallItem) {
     const prevSide = placed.x < 50 ? 'left' : 'right';
-    const clamped = clampToIsometricWall(px, py);
+    const clamped = clampToIsometricWall(px, py, def);
     placed.x = clamped.x;
     placed.y = clamped.y;
+    placed.z = Math.round(placed.y);
     const nextSide = placed.x < 50 ? 'left' : 'right';
     if (prevSide !== nextSide) {
       placed.flip = getAutoWallFlip(placed.itemId, placed.x);
@@ -1115,21 +1554,85 @@ function handleRoomPointerMove(e) {
         mediaEl.style.transform = placed.flip ? 'scaleX(-1)' : '';
       }
     }
+  } else if (canItemSitOnSurface(def)) {
+    const surfaceHit = findHostSurface(px, py, placed, rect);
+    if (surfaceHit) {
+      placed.x = surfaceHit.x;
+      placed.y = surfaceHit.y;
+      placed.onSurfaceUid = surfaceHit.host.uid;
+      placed.z = computeSurfaceChildZ(surfaceHit.host, placed.y);
+      const hostEl = document.querySelector(`.placed-item[data-uid="${surfaceHit.host.uid}"]`);
+      hostEl?.classList.add('surface-target');
+    } else {
+      placed.onSurfaceUid = null;
+      const clamped = clampToIsometricFloor(px, py, def);
+      placed.x = clamped.x;
+      placed.y = clamped.y;
+      placed.z = Math.round(placed.y);
+    }
   } else {
-    const clamped = clampToIsometricFloor(px, py);
+    placed.onSurfaceUid = null;
+    const clamped = clampToIsometricFloor(px, py, def);
     placed.x = clamped.x;
     placed.y = clamped.y;
+    placed.z = Math.round(placed.y);
   }
 
-  placed.z = Math.round(placed.y);
   itemEl.style.left = `${placed.x}%`;
   itemEl.style.top = `${placed.y}%`;
   itemEl.style.zIndex = String(placed.z);
+
+  const deltaX = placed.x - prevX;
+  const deltaY = placed.y - prevY;
+  const movedHostUids = new Set([placed.uid]);
+
+  if (isSurfaceDef(def)) {
+    state.placedItems.forEach((child) => {
+      if (child.onSurfaceUid !== placed.uid) return;
+      movedHostUids.add(child.uid);
+      child.x = Number((child.x + deltaX).toFixed(2));
+      child.y = Number((child.y + deltaY).toFixed(2));
+      child.z = computeSurfaceChildZ(placed, child.y);
+      const childEl = document.querySelector(`.placed-item[data-uid="${child.uid}"]`);
+      if (childEl) {
+        childEl.style.left = `${child.x}%`;
+        childEl.style.top = `${child.y}%`;
+        childEl.style.zIndex = String(child.z);
+      }
+    });
+  }
+
+  (state.placedFoods || []).forEach((food) => {
+    if (!food.hostUid || !movedHostUids.has(food.hostUid)) return;
+    food.x = Number((food.x + deltaX).toFixed(2));
+    food.y = Number((food.y + deltaY).toFixed(2));
+    const hostItem = state.placedItems.find((p) => p.uid === food.hostUid);
+    food.z = hostItem
+      ? (isSurfaceDef(def) && food.hostUid === placed.uid
+        ? computeSurfaceChildZ(placed, food.y)
+        : (hostItem.z || Math.round(hostItem.y)) + 2)
+      : Math.round(food.y) + 1;
+    const foodEl = document.querySelector(`.placed-food[data-food-uid="${food.uid}"]`);
+    if (foodEl) {
+      foodEl.style.left = `${food.x}%`;
+      foodEl.style.top = `${food.y}%`;
+      foodEl.style.zIndex = String(food.z);
+    }
+  });
 }
 
-function stopDraggingItem() {
+function stopDraggingItem(e) {
   if (!dragState) return;
+  if (dragState.itemEl && e?.pointerId !== undefined) {
+    try {
+      dragState.itemEl.releasePointerCapture?.(e.pointerId);
+    } catch {
+      // ignore if capture already released
+    }
+  }
   dragState = null;
+  document.body.classList.remove('dragging-furniture');
+  clearSurfaceTargetHighlights();
   saveState();
 }
 
@@ -1144,21 +1647,21 @@ function placeItemInRoom(itemId) {
 
   if (def.wallItem) {
     const nativeSide = WALL_NATIVE_SIDE[itemId] || 'right';
-    const rawX = nativeSide === 'left' ? 26 + Math.random() * 14 : 60 + Math.random() * 14;
-    const baseY = 45.4 + Math.abs(rawX - 50) * 0.5;
-    const clamped = clampToIsometricWall(rawX, baseY - 5.5);
+    const rawX = nativeSide === 'left' ? 18 + Math.random() * 22 : 60 + Math.random() * 22;
+    const baseY = 44.62 + Math.abs(rawX - 50) * 0.5;
+    const clamped = clampToIsometricWall(rawX, baseY - 14, def);
     x = clamped.x;
     y = clamped.y;
     flip = getAutoWallFlip(itemId, x);
   } else {
-    const rawX = 32 + Math.random() * 36;
-    const rawY = 55 + Math.random() * 18;
-    const clamped = clampToIsometricFloor(rawX, rawY);
+    const rawX = 24 + Math.random() * 52;
+    const rawY = 58 + Math.random() * 22;
+    const clamped = clampToIsometricFloor(rawX, rawY, def);
     x = clamped.x;
     y = clamped.y;
   }
 
-  const entry = { uid, itemId, x, y, flip, z: Math.round(y) };
+  const entry = { uid, itemId, x, y, flip, z: Math.round(y), onSurfaceUid: null };
   state.placedItems.push(entry);
   selectedPlacedUid = uid;
 
@@ -1178,6 +1681,69 @@ function countPlacedOf(itemId) {
    LOJA & INVENTÁRIO
    ============================================================================ */
 
+function buildThemeSwatch(themeId) {
+  const pal = ISO_THEME_PALETTES[themeId] || ISO_THEME_PALETTES.cozy;
+  const wrap = document.createElement('div');
+  wrap.className = 'theme-swatch-preview';
+  wrap.style.background = pal.floorBase;
+
+  const leftWall = document.createElement('div');
+  leftWall.style.cssText = `position:absolute;left:0;top:0;width:50%;height:58%;background:${pal.wallLeft};border-right:1px solid ${pal.outline};`;
+  const rightWall = document.createElement('div');
+  rightWall.style.cssText = `position:absolute;right:0;top:0;width:50%;height:58%;background:${pal.wallRight};`;
+  const rug = document.createElement('div');
+  rug.style.cssText = `position:absolute;left:28%;bottom:8%;width:44%;height:26%;background:${pal.rugOuter};border:1px solid ${pal.outline};border-radius:3px;`;
+
+  wrap.appendChild(leftWall);
+  wrap.appendChild(rightWall);
+  wrap.appendChild(rug);
+  return wrap;
+}
+
+function renderThemeShopCards(grid) {
+  ROOM_THEME_CATALOG.forEach((tDef) => {
+    const card = document.createElement('div');
+    card.className = 'shop-card';
+
+    const preview = document.createElement('div');
+    preview.className = 'shop-preview';
+    preview.appendChild(buildThemeSwatch(tDef.id));
+
+    const title = document.createElement('div');
+    title.className = 'shop-title';
+    title.textContent = tDef.name;
+
+    const desc = document.createElement('div');
+    desc.className = 'shop-desc';
+    desc.textContent = tDef.description;
+
+    const btn = document.createElement('button');
+    btn.className = 'shop-action-btn';
+
+    const unlocked = state.unlockedThemes.includes(tDef.id);
+    const active = state.roomTheme === tDef.id;
+    if (active) {
+      btn.classList.add('equipped');
+      btn.textContent = '✓ Tema em Uso';
+      btn.disabled = true;
+    } else if (unlocked) {
+      btn.classList.add('owned');
+      btn.textContent = '🎨 Aplicar Tema';
+      btn.onclick = () => buyOrApplyTheme(tDef.id);
+    } else {
+      btn.innerHTML = `🪙 ${tDef.price} • Desbloquear`;
+      btn.disabled = state.coins < tDef.price;
+      btn.onclick = () => buyOrApplyTheme(tDef.id);
+    }
+
+    card.appendChild(preview);
+    card.appendChild(title);
+    card.appendChild(desc);
+    card.appendChild(btn);
+    grid.appendChild(card);
+  });
+}
+
 function renderShop() {
   const subBar = document.getElementById('shopSubfilters');
   subBar.classList.toggle('hidden', shopCategory !== 'furniture');
@@ -1195,8 +1761,14 @@ function renderShop() {
     list = catalog.items.filter((i) => i.category === 'food');
   } else if (shopCategory === 'cats') {
     list = catalog.cats;
+  } else if (shopCategory === 'hats') {
+    list = catalog.hats || [];
   } else if (shopCategory === 'pets') {
     list = catalog.pets;
+  }
+
+  if (shopCategory === 'furniture' && (shopSubFilter === 'all' || shopSubFilter === 'tema')) {
+    renderThemeShopCards(grid);
   }
 
   list.forEach((entry) => {
@@ -1214,6 +1786,16 @@ function renderShop() {
       cv.dataset.previewCat = entry.id;
       preview.appendChild(cv);
       loadImage(anim.src);
+    } else if (shopCategory === 'hats') {
+      const catDef = getCatDef(state.activeCat);
+      const anim = catDef ? getCatAnimationForState(catDef, 'idle') : null;
+      const cv = document.createElement('canvas');
+      cv.width = 68;
+      cv.height = 76;
+      cv.dataset.previewHat = entry.id;
+      preview.appendChild(cv);
+      if (anim) loadImage(anim.src);
+      loadImage(entry.image);
     } else if (shopCategory === 'pets') {
       const cv = document.createElement('canvas');
       cv.width = 64;
@@ -1270,6 +1852,35 @@ function renderShop() {
         btn.disabled = state.coins < entry.price;
         btn.onclick = () => buyCat(entry);
       }
+    } else if (shopCategory === 'hats') {
+      const owned = state.unlockedHats.includes(entry.id);
+      const equipped = state.activeHat === entry.id;
+      if (equipped) {
+        btn.classList.add('equipped');
+        btn.textContent = '✓ Usando (Tirar)';
+        btn.onclick = () => {
+          window.purrSound.playClick();
+          state.activeHat = null;
+          saveState();
+          renderShop();
+          renderInventory();
+        };
+      } else if (owned) {
+        btn.classList.add('owned');
+        btn.textContent = 'Equipar Chapéu';
+        btn.onclick = () => {
+          window.purrSound.playClick();
+          state.activeHat = entry.id;
+          loadImage(entry.image);
+          saveState();
+          renderShop();
+          renderInventory();
+        };
+      } else {
+        btn.innerHTML = `🪙 ${entry.price} • Comprar`;
+        btn.disabled = state.coins < entry.price;
+        btn.onclick = () => buyHat(entry);
+      }
     } else if (shopCategory === 'pets') {
       const owned = state.unlockedPets.includes(entry.id);
       const active = state.activePets.includes(entry.id);
@@ -1283,9 +1894,11 @@ function renderShop() {
         btn.onclick = () => buyPet(entry);
       }
     } else if (shopCategory === 'food') {
-      btn.innerHTML = `🪙 ${entry.price} • Servir`;
-      btn.disabled = state.coins < entry.price;
-      btn.onclick = () => buyFoodOrCoffee(entry);
+      const isHoldingThis = heldFood && heldFood.id === entry.id;
+      btn.innerHTML = isHoldingThis ? '✕ Soltar' : `🪙 ${entry.price} • Pegar`;
+      btn.disabled = !isHoldingThis && state.coins < entry.price;
+      if (isHoldingThis) btn.classList.add('active');
+      btn.onclick = (ev) => startHoldingFood(entry, ev);
     } else {
       const ownedCount = state.ownedItems[entry.id] || 0;
       btn.innerHTML =
@@ -1331,6 +1944,20 @@ function buyCat(catDef) {
   if (roomActors[0]) showRoomPetSpeech(roomActors[0], `Oi! Eu sou ${catDef.name}! 💖`);
 }
 
+function buyHat(hatDef) {
+  if (state.coins < hatDef.price || state.unlockedHats.includes(hatDef.id)) return;
+  state.coins -= hatDef.price;
+  state.unlockedHats.push(hatDef.id);
+  state.activeHat = hatDef.id;
+  loadImage(hatDef.image);
+  window.purrSound.playCoin();
+  saveState();
+  updateCoinsUI();
+  renderShop();
+  renderInventory();
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], `Amei o ${hatDef.name}! 🎩✨`);
+}
+
 function buyPet(petDef) {
   if (state.coins < petDef.price || state.unlockedPets.includes(petDef.id)) return;
   state.coins -= petDef.price;
@@ -1359,9 +1986,66 @@ function togglePetInRoom(petId) {
   renderInventory();
 }
 
-function buyFoodOrCoffee(item) {
-  if (state.coins < item.price) return;
-  state.coins -= item.price;
+function startHoldingFood(item, ev = null) {
+  if (!item) return;
+  if (heldFood && heldFood.id === item.id) {
+    cancelHeldFood();
+    return;
+  }
+  if (state.coins < item.price) {
+    window.purrSound.playClick();
+    showCompactSpeech('🪙 Moedinhas insuficientes!');
+    return;
+  }
+  window.purrSound.playClick();
+  heldFood = item;
+  const cursor = document.getElementById('heldFoodCursor');
+  const img = document.getElementById('heldFoodImg');
+  if (img) {
+    img.src = item.image;
+    img.alt = item.name;
+  }
+  if (cursor) {
+    if (ev && typeof ev.clientX === 'number' && typeof ev.clientY === 'number') {
+      cursor.style.left = `${ev.clientX}px`;
+      cursor.style.top = `${ev.clientY}px`;
+    }
+    cursor.classList.remove('hidden');
+  }
+  document.body.classList.add('holding-food');
+  if (roomActors[0]) {
+    showRoomPetSpeech(roomActors[0], `Oba! ${item.name} — dê pra mim, no potinho ou no chão! 😋`);
+  }
+  if (shopCategory === 'food') renderShop();
+}
+
+function cancelHeldFood() {
+  const wasHolding = Boolean(heldFood);
+  heldFood = null;
+  const cursor = document.getElementById('heldFoodCursor');
+  if (cursor) cursor.classList.add('hidden');
+  document.body.classList.remove('holding-food');
+  if (wasHolding && shopCategory === 'food') renderShop();
+}
+
+function updateHeldFoodCursorPos(clientX, clientY) {
+  if (!heldFood) return;
+  const cursor = document.getElementById('heldFoodCursor');
+  if (!cursor) return;
+  cursor.style.left = `${clientX}px`;
+  cursor.style.top = `${clientY}px`;
+}
+
+function consumeFoodByActor(actor, item, alreadyPaid = false) {
+  if (!actor || !item) return false;
+  if (!alreadyPaid) {
+    if (state.coins < item.price) {
+      cancelHeldFood();
+      return false;
+    }
+    state.coins -= item.price;
+  }
+
   window.purrSound.playMeow();
 
   if (item.buff?.type === 'coin_multiplier') {
@@ -1372,23 +2056,152 @@ function buyFoodOrCoffee(item) {
       name: item.name,
     };
     showCompactSpeech(`☕ ${item.buff.label} no próximo foco!`);
-    if (roomActors[0]) {
-      showRoomPetSpeech(roomActors[0], `☕ Bônus ${item.buff.label} ativo!`);
-      spawnRoomParticle(roomActors[0].x, roomActors[0].y - 12, '☕');
-    }
+    showRoomPetSpeech(actor, `☕ Bônus ${item.buff.label} ativo!`);
+    spawnRoomParticle(actor.x, actor.y - 12, '☕');
   } else {
-    if (roomActors[0]) {
-      showRoomPetSpeech(roomActors[0], `Nhac nhac! ${item.name} 😋`);
-      spawnRoomParticle(roomActors[0].x, roomActors[0].y - 12, '❤️');
-      spawnRoomParticle(roomActors[0].x + 5, roomActors[0].y - 15, '🐟');
-    }
-    showCompactSpeech('😋 Que delícia, miau!');
+    showRoomPetSpeech(actor, `Nhac nhac! ${item.name} 😋`);
+    spawnRoomParticle(actor.x, actor.y - 12, '❤️');
+    spawnRoomParticle(actor.x + 5, actor.y - 15, item.particle || '🐟');
+    showCompactSpeech(
+      actor.kind === 'cat' && actor.config?.id === 'cat_dino'
+        ? '🦖 Raaawr! Que delícia!'
+        : '😋 Que delícia, miau!'
+    );
   }
 
   saveState();
   updateCoinsUI();
   updateTimerUI();
   renderShop();
+  return true;
+}
+
+function findTargetBowl(px, py, clickedPlacedUid, rect) {
+  if (clickedPlacedUid) {
+    const clicked = state.placedItems.find((p) => p.uid === clickedPlacedUid);
+    const cDef = clicked ? getCatalogItem(clicked.itemId) : null;
+    if (cDef?.subCategory === 'potinho') return clicked;
+  }
+  if (!rect?.width || !rect?.height) return null;
+
+  const bowls = state.placedItems
+    .filter((p) => getCatalogItem(p.itemId)?.subCategory === 'potinho')
+    .sort((a, b) => (b.z || Math.round(b.y)) - (a.z || Math.round(a.y)));
+
+  for (const bowl of bowls) {
+    const def = getCatalogItem(bowl.itemId);
+    const scale = getItemRoomScale(def);
+    const drawW = Math.max(12, Math.round((def.width || 24) * scale));
+    const drawH = Math.max(12, Math.round((def.height || 24) * scale));
+    const halfWPct = Math.max(3.8, ((drawW / rect.width) * 100) * 0.75);
+    const hPct = Math.max(5.5, (drawH / rect.height) * 100);
+    if (
+      px >= bowl.x - halfWPct &&
+      px <= bowl.x + halfWPct &&
+      py >= bowl.y - hPct * 1.1 &&
+      py <= bowl.y + 2.5
+    ) {
+      return bowl;
+    }
+  }
+  return null;
+}
+
+function assignNearestActorToFood(foodEntry) {
+  if (!foodEntry || roomActors.length === 0) return null;
+  const available = roomActors.filter((a) => !a.targetFoodUid || a.targetFoodUid === foodEntry.uid);
+  const pool = available.length > 0 ? available : roomActors;
+  let best = pool[0];
+  let bestDist = Infinity;
+  for (const actor of pool) {
+    const d = Math.hypot(actor.x - foodEntry.x, actor.y - foodEntry.y);
+    if (d < bestDist) {
+      bestDist = d;
+      best = actor;
+    }
+  }
+  best.targetFoodUid = foodEntry.uid;
+  best.behavior = 'walk';
+  const target = clampToIsometricFloor(foodEntry.x, foodEntry.y + 1.2);
+  best.targetX = target.x;
+  best.targetY = target.y;
+  best.behaviorTimer = 9;
+  return best;
+}
+
+function placeHeldFoodInRoom(clientX, clientY, clickedPlacedUid = null) {
+  if (!heldFood) return false;
+  if (state.coins < heldFood.price) {
+    cancelHeldFood();
+    return false;
+  }
+
+  const roomCanvas = document.getElementById('roomCanvas');
+  const rect = roomCanvas.getBoundingClientRect();
+  if (!rect.width || !rect.height) return false;
+
+  const px = ((clientX - rect.left) / rect.width) * 100;
+  const py = ((clientY - rect.top) / rect.height) * 100;
+  const item = heldFood;
+
+  const bowl = findTargetBowl(px, py, clickedPlacedUid, rect);
+  const surfaceHit = bowl ? null : findHostSurface(px, py, { uid: '__held_food__' }, rect);
+
+  let fx;
+  let fy;
+  let fz;
+  let hostUid = null;
+  let inBowl = false;
+
+  if (bowl) {
+    hostUid = bowl.uid;
+    inBowl = true;
+    fx = bowl.x;
+    fy = Number((bowl.y - 1.4).toFixed(2));
+    fz = (bowl.z || Math.round(bowl.y)) + 2;
+  } else if (surfaceHit) {
+    hostUid = surfaceHit.host.uid;
+    fx = surfaceHit.x;
+    fy = surfaceHit.y;
+    fz = computeSurfaceChildZ(surfaceHit.host, fy);
+  } else {
+    const floorPos = clampToIsometricFloor(px, py, { width: 25, height: 25 });
+    fx = floorPos.x;
+    fy = floorPos.y;
+    fz = Math.round(fy) + 1;
+  }
+
+  state.coins -= item.price;
+  const foodEntry = {
+    uid: `food_${Date.now()}_${Math.floor(Math.random() * 10000)}`,
+    foodId: item.id,
+    x: fx,
+    y: fy,
+    z: fz,
+    hostUid,
+    inBowl,
+  };
+  state.placedFoods.push(foodEntry);
+  window.purrSound.playCoin();
+
+  cancelHeldFood();
+  saveState();
+  renderRoom();
+  updateCoinsUI();
+  renderShop();
+
+  const chosen = assignNearestActorToFood(foodEntry);
+  if (chosen) {
+    showRoomPetSpeech(
+      chosen,
+      inBowl
+        ? `Oba, ${item.name} no potinho! 🥣`
+        : surfaceHit
+        ? `Uau, ${item.name} na mesa! 😋`
+        : `Eba, ${item.name}! Tô indo comer! 🐾`
+    );
+  }
+  return true;
 }
 
 function renderInventory() {
@@ -1412,6 +2225,40 @@ function renderInventory() {
     };
     catsList.appendChild(btn);
   });
+
+  // Chapéus dos Gatinhos
+  const hatsList = document.getElementById('invHatsList');
+  if (hatsList) {
+    hatsList.innerHTML = '';
+    const noneBtn = document.createElement('button');
+    noneBtn.className = 'inv-pill-btn' + (!state.activeHat ? ' active' : '');
+    noneBtn.textContent = '✕ Sem Chapéu';
+    noneBtn.onclick = () => {
+      window.purrSound.playClick();
+      state.activeHat = null;
+      saveState();
+      renderInventory();
+      renderShop();
+    };
+    hatsList.appendChild(noneBtn);
+
+    state.unlockedHats.forEach((hid) => {
+      const def = getHatDef(hid);
+      if (!def) return;
+      const btn = document.createElement('button');
+      btn.className = 'inv-pill-btn' + (state.activeHat === hid ? ' active' : '');
+      btn.textContent = `🎩 ${def.name}` + (state.activeHat === hid ? ' ✓' : '');
+      btn.onclick = () => {
+        window.purrSound.playClick();
+        state.activeHat = hid;
+        loadImage(def.image);
+        saveState();
+        renderInventory();
+        renderShop();
+      };
+      hatsList.appendChild(btn);
+    });
+  }
 
   // Amigos Pets
   const petsList = document.getElementById('invPetsList');
@@ -1503,7 +2350,8 @@ function spawnCompactHeart() {
   const layer = document.getElementById('compactParticles');
   const p = document.createElement('span');
   p.className = 'fx-particle';
-  p.textContent = randomFrom(['❤️', '💖', '🐾', '✨']);
+  const isDino = state.activeCat === 'cat_dino';
+  p.textContent = randomFrom(isDino ? ['🦖', '🌵', '✨', '💚'] : ['❤️', '💖', '🐾', '✨']);
   p.style.left = `${compactPet.x + 32 + (Math.random() * 18 - 9)}px`;
   p.style.bottom = '54px';
   layer.appendChild(p);
@@ -1556,13 +2404,13 @@ function syncRoomActors() {
 
   const catDef = getCatDef(state.activeCat);
   if (catDef) {
-    roomActors.push(createRoomActor('main-cat', 'cat', catDef, 50, 64));
+    roomActors.push(createRoomActor('main-cat', 'cat', catDef, 50, 68));
   }
 
   state.activePets.forEach((pid, idx) => {
     const petDef = getPetDef(pid);
     if (petDef) {
-      const pos = clampToIsometricFloor(38 + idx * 14, 66);
+      const pos = clampToIsometricFloor(34 + idx * 16, 70);
       roomActors.push(createRoomActor(`pet-${pid}`, 'pet', petDef, pos.x, pos.y));
     }
   });
@@ -1579,8 +2427,9 @@ function createRoomActor(id, kind, config, startX, startY) {
   speechEl.className = 'room-pet-speech hidden';
 
   const canvas = document.createElement('canvas');
-  canvas.width = 76;
-  canvas.height = 76;
+  const box = getActorCanvasSize(kind, config);
+  canvas.width = box.w;
+  canvas.height = box.h;
 
   el.appendChild(speechEl);
   el.appendChild(canvas);
@@ -1604,9 +2453,35 @@ function createRoomActor(id, kind, config, startX, startY) {
 
   el.addEventListener('click', (e) => {
     e.stopPropagation();
-    window.purrSound.playPurr();
-    spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['❤️', '💖', '🐾']));
-    showRoomPetSpeech(actor, randomFrom(SPEECH_PHRASES.pet));
+    if (heldFood) {
+      const foodItem = heldFood;
+      cancelHeldFood();
+      consumeFoodByActor(actor, foodItem, false);
+      return;
+    }
+    if (actor.kind === 'cat') {
+      if (actor.config.id === 'cat_dino') {
+        window.purrSound.playClick();
+        spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🦖', '🌵', '✨', '💚']));
+        showRoomPetSpeech(actor, randomFrom(DINO_PHRASES));
+      } else {
+        window.purrSound.playPurr();
+        spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['❤️', '💖', '🐾']));
+        showRoomPetSpeech(actor, randomFrom(SPEECH_PHRASES.pet));
+      }
+    } else if (actor.config.id === 'pet_bunny') {
+      window.purrSound.playClick();
+      spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🥕', '🌸', '💖', '✨']));
+      showRoomPetSpeech(actor, randomFrom(['🐰💕', '🥕✨', '🌸🐰', '🍀💖', '✨🥕']));
+    } else if (actor.config.id === 'pet_zombie_hand') {
+      window.purrSound.playClick();
+      spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['✨', '🔮', '💜', '🕯️']));
+      showRoomPetSpeech(actor, randomFrom(['🖐️✨', '🔮💜', '🕯️🖐️', '💀✨', '✨🖤']));
+    } else {
+      window.purrSound.playClick();
+      spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🦴', '🐾', '💖', '✨']));
+      showRoomPetSpeech(actor, randomFrom(['🐶💖', '🦴✨', '🐾❤️']));
+    }
   });
 
   document.getElementById('roomPetsLayer').appendChild(el);
@@ -1672,47 +2547,55 @@ function updateCompactPet(dt) {
   const anim = getCatAnimationForState(catDef, behaviorToDraw);
   const frameIdx = Math.floor(animElapsed * (anim.fps || 5)) % anim.frames;
   const canvas = document.getElementById('compactPetCanvas');
-  drawSpriteSheetFrame(canvas, anim.src, anim.fw, anim.fh, frameIdx, compactPet.dir < 0);
+  drawCatFrameWithHat(
+    canvas,
+    anim,
+    frameIdx,
+    compactPet.dir < 0,
+    getActorSpriteScale('cat', catDef, true, anim.fw)
+  );
 }
 
 function updateRoomActors(dt) {
   if (appMode !== 'expanded') return;
 
   roomActors.forEach((actor) => {
-    let mood = actor.behavior;
     if (actor.kind === 'cat' && (petMood === 'cheer' || petMood === 'cry')) {
-      mood = petMood;
+      actor.targetFoodUid = null;
     } else {
-      actor.behaviorTimer -= dt;
-      if (actor.behaviorTimer <= 0) {
-        const roll = Math.random();
-        if (roll < 0.52) {
-          actor.behavior = 'walk';
-          const target = clampToIsometricFloor(
-            24 + Math.random() * 52,
-            51 + Math.random() * 26
-          );
-          actor.targetX = target.x;
-          actor.targetY = target.y;
-          actor.behaviorTimer = 3 + Math.random() * 3;
-        } else if (actor.kind === 'cat' && roll > 0.78) {
-          actor.behavior = 'sleep';
-          actor.behaviorTimer = 4 + Math.random() * 4;
-        } else {
-          actor.behavior = 'idle';
-          actor.behaviorTimer = 2.5 + Math.random() * 3;
-        }
+      let targetFood = actor.targetFoodUid
+        ? (state.placedFoods || []).find((f) => f.uid === actor.targetFoodUid)
+        : null;
+      if (actor.targetFoodUid && !targetFood) {
+        actor.targetFoodUid = null;
       }
 
-      if (actor.behavior === 'walk') {
-        const dx = actor.targetX - actor.x;
-        const dy = actor.targetY - actor.y;
+      if (targetFood) {
+        const walkTarget = clampToIsometricFloor(targetFood.x, targetFood.y + 1.2);
+        const dx = walkTarget.x - actor.x;
+        const dy = walkTarget.y - actor.y;
         const dist = Math.hypot(dx, dy);
-        if (dist < 1.2) {
+
+        if (dist < 2.2) {
+          const foodId = targetFood.foodId;
+          const eatenUid = targetFood.uid;
+          state.placedFoods = (state.placedFoods || []).filter((f) => f.uid !== eatenUid);
+          roomActors.forEach((a) => {
+            if (a.targetFoodUid === eatenUid) a.targetFoodUid = null;
+          });
           actor.behavior = 'idle';
+          actor.behaviorTimer = 2.0;
+          const foodDef = getCatalogItem(foodId);
+          renderRoom();
+          if (foodDef) {
+            consumeFoodByActor(actor, foodDef, true);
+          } else {
+            saveState();
+          }
         } else {
+          actor.behavior = 'walk';
           actor.dir = dx >= 0 ? 1 : -1;
-          const speed = 11 * dt;
+          const speed = 14 * dt;
           const next = clampToIsometricFloor(
             actor.x + (dx / dist) * speed,
             actor.y + (dy / dist) * speed * 0.65
@@ -1723,17 +2606,91 @@ function updateRoomActors(dt) {
           actor.el.style.top = `${actor.y}%`;
           actor.el.style.zIndex = String(Math.round(actor.y));
         }
+      } else {
+        actor.behaviorTimer -= dt;
+        if (actor.behaviorTimer <= 0) {
+          const untargetedFoods = (state.placedFoods || []).filter(
+            (f) => !roomActors.some((a) => a.targetFoodUid === f.uid)
+          );
+          if (untargetedFoods.length > 0 && Math.random() < 0.72) {
+            const chosenFood = randomFrom(untargetedFoods);
+            const walkTarget = clampToIsometricFloor(chosenFood.x, chosenFood.y + 1.2);
+            actor.targetFoodUid = chosenFood.uid;
+            actor.behavior = 'walk';
+            actor.targetX = walkTarget.x;
+            actor.targetY = walkTarget.y;
+            actor.behaviorTimer = 8;
+          } else {
+            const roll = Math.random();
+            if (roll < 0.52) {
+              actor.behavior = 'walk';
+              const target = clampToIsometricFloor(
+                18 + Math.random() * 64,
+                50 + Math.random() * 34
+              );
+              actor.targetX = target.x;
+              actor.targetY = target.y;
+              actor.behaviorTimer = 3 + Math.random() * 3;
+            } else if (actor.kind === 'cat' && roll > 0.78) {
+              actor.behavior = 'sleep';
+              actor.behaviorTimer = 4 + Math.random() * 4;
+            } else {
+              actor.behavior = 'idle';
+              actor.behaviorTimer = 2.5 + Math.random() * 3;
+            }
+          }
+        }
+
+        if (actor.behavior === 'walk' && !actor.targetFoodUid) {
+          const dx = actor.targetX - actor.x;
+          const dy = actor.targetY - actor.y;
+          const dist = Math.hypot(dx, dy);
+          if (dist < 1.2) {
+            actor.behavior = 'idle';
+          } else {
+            actor.dir = dx >= 0 ? 1 : -1;
+            const speed = 11 * dt;
+            const next = clampToIsometricFloor(
+              actor.x + (dx / dist) * speed,
+              actor.y + (dy / dist) * speed * 0.65
+            );
+            actor.x = next.x;
+            actor.y = next.y;
+            actor.el.style.left = `${actor.x}%`;
+            actor.el.style.top = `${actor.y}%`;
+            actor.el.style.zIndex = String(Math.round(actor.y));
+          }
+        }
       }
+    }
+
+    let mood = actor.behavior;
+    if (actor.kind === 'cat' && (petMood === 'cheer' || petMood === 'cry')) {
+      mood = petMood;
     }
 
     if (actor.kind === 'cat') {
       const anim = getCatAnimationForState(actor.config, mood);
       const frame = Math.floor(animElapsed * (anim.fps || 5)) % anim.frames;
-      drawSpriteSheetFrame(actor.canvas, anim.src, anim.fw, anim.fh, frame, actor.dir < 0);
+      drawCatFrameWithHat(
+        actor.canvas,
+        anim,
+        frame,
+        actor.dir < 0,
+        getActorSpriteScale('cat', actor.config, false, anim.fw)
+      );
     } else {
       const p = actor.config;
       const frame = Math.floor(animElapsed * (p.fps || 6)) % p.frames;
-      drawSpriteSheetFrame(actor.canvas, p.src, p.fw, p.fh, frame, actor.dir < 0);
+      drawSpriteSheetFrame(
+        actor.canvas,
+        p.src,
+        p.fw,
+        p.fh,
+        frame,
+        actor.dir < 0,
+        getActorSpriteScale('pet', p, false, p.fw)
+      );
     }
   });
 }
@@ -1755,7 +2712,18 @@ function updateAnimatedDecorAndPreviews() {
     if (!catDef) return;
     const anim = getCatAnimationForState(catDef, 'idle');
     const frame = Math.floor(animElapsed * (anim.fps || 5)) % anim.frames;
-    drawSpriteSheetFrame(cv, anim.src, anim.fw, anim.fh, frame, false);
+    const previewScale = anim.fw <= 32 ? 1.55 : (anim.fh >= 64 ? 0.8 : 1.3);
+    drawCatFrameWithHat(cv, anim, frame, false, previewScale, state.activeHat);
+  });
+
+  // Previews de chapéus no gatinho selecionado
+  document.querySelectorAll('canvas[data-preview-hat]').forEach((cv) => {
+    const catDef = getCatDef(state.activeCat);
+    if (!catDef) return;
+    const anim = getCatAnimationForState(catDef, 'idle');
+    const frame = Math.floor(animElapsed * (anim.fps || 5)) % anim.frames;
+    const previewScale = anim.fw <= 32 ? 1.85 : (anim.fh >= 64 ? 0.94 : 1.5);
+    drawCatFrameWithHat(cv, anim, frame, false, previewScale, cv.dataset.previewHat);
   });
 
   // Previews animados de pets na loja
@@ -1774,8 +2742,13 @@ function updateAnimatedDecorAndPreviews() {
 function bindEvents() {
   // Carinho no gatinho compacto
   document.getElementById('compactPetActor').addEventListener('click', () => {
-    window.purrSound.playPurr();
     spawnCompactHeart();
+    if (state.activeCat === 'cat_dino') {
+      window.purrSound.playClick();
+      showCompactSpeech(randomFrom(DINO_PHRASES));
+      return;
+    }
+    window.purrSound.playPurr();
     const pool = timer.phase === 'focus' ? SPEECH_PHRASES.focus : SPEECH_PHRASES.break;
     showCompactSpeech(randomFrom(pool));
   });
@@ -1821,9 +2794,10 @@ function bindEvents() {
     window.purrAPI?.snapToClock?.();
   });
   document.getElementById('closeAppBtn').addEventListener('click', () => {
+    window.purrSound.playClick();
     saveState(true);
-    if (window.purrAPI?.quitApp) {
-      window.purrAPI.quitApp();
+    if (window.purrAPI?.hideToTray) {
+      window.purrAPI.hideToTray();
     } else {
       setAppMode('compact');
     }
@@ -1838,24 +2812,51 @@ function bindEvents() {
   // Temas do Quarto
   document.querySelectorAll('.theme-chip').forEach((btn) => {
     btn.addEventListener('click', () => {
-      window.purrSound.playClick();
-      applyRoomTheme(btn.dataset.theme);
+      buyOrApplyTheme(btn.dataset.theme);
     });
   });
 
   // Drag & Drop no Quarto
   const roomCanvas = document.getElementById('roomCanvas');
   roomCanvas.addEventListener('pointerdown', (e) => {
-    if (
+    const isRoomBg =
       e.target === roomCanvas ||
       e.target.id === 'roomBgCanvas' ||
-      e.target.id === 'roomFurnitureLayer'
-    ) {
+      e.target.id === 'roomFurnitureLayer' ||
+      e.target.id === 'roomPetsLayer';
+
+    if (heldFood) {
+      if (e.button === 2) {
+        e.preventDefault();
+        cancelHeldFood();
+        return;
+      }
+      if (e.button === 0 && isRoomBg) {
+        e.stopPropagation();
+        placeHeldFoodInRoom(e.clientX, e.clientY, null);
+        return;
+      }
+    }
+
+    if (isRoomBg) {
       selectPlacedItem(null);
+    }
+  });
+  window.addEventListener('contextmenu', (e) => {
+    if (heldFood) {
+      e.preventDefault();
+      cancelHeldFood();
+    }
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && heldFood) {
+      cancelHeldFood();
     }
   });
   window.addEventListener('pointermove', handleRoomPointerMove);
   window.addEventListener('pointerup', stopDraggingItem);
+  window.addEventListener('pointercancel', stopDraggingItem);
+  window.addEventListener('blur', stopDraggingItem);
   window.addEventListener('resize', drawIsometricRoom);
 
   // Barra flutuante de item selecionado
@@ -1873,6 +2874,7 @@ function bindEvents() {
     window.purrSound.playClick();
     const maxZ = state.placedItems.reduce((m, p) => Math.max(m, p.z || 10), 10);
     item.z = maxZ + 1;
+    syncSurfaceChildrenZ(item);
     saveState();
     renderRoom();
   });
@@ -1889,13 +2891,48 @@ function bindEvents() {
     } else {
       item.z = minZ - 1;
     }
+    syncSurfaceChildrenZ(item);
     saveState();
     renderRoom();
   });
   document.getElementById('tbStoreBtn').addEventListener('click', () => {
     if (!selectedPlacedUid) return;
+    const removedUid = selectedPlacedUid;
     window.purrSound.playClick();
-    state.placedItems = state.placedItems.filter((p) => p.uid !== selectedPlacedUid);
+    state.placedItems = state.placedItems.filter((p) => p.uid !== removedUid);
+    state.placedItems.forEach((child) => {
+      if (child.onSurfaceUid === removedUid) {
+        const prevX = child.x;
+        const prevY = child.y;
+        child.onSurfaceUid = null;
+        const cDef = getCatalogItem(child.itemId);
+        const clamped = clampToIsometricFloor(child.x, child.y, cDef);
+        child.x = clamped.x;
+        child.y = clamped.y;
+        child.z = Math.round(child.y);
+        const shiftX = child.x - prevX;
+        const shiftY = child.y - prevY;
+        (state.placedFoods || []).forEach((food) => {
+          if (food.hostUid === child.uid) {
+            food.x = Number((food.x + shiftX).toFixed(2));
+            food.y = Number((food.y + shiftY).toFixed(2));
+            food.z = child.z + 2;
+          }
+        });
+      }
+    });
+    state.placedFoods = (state.placedFoods || []).map((food) => {
+      if (food.hostUid !== removedUid) return food;
+      const clamped = clampToIsometricFloor(food.x, food.y, { width: 25, height: 25 });
+      return {
+        ...food,
+        hostUid: null,
+        inBowl: false,
+        x: clamped.x,
+        y: clamped.y,
+        z: Math.round(clamped.y) + 1,
+      };
+    });
     selectPlacedItem(null);
     saveState();
     renderRoom();
@@ -1977,6 +3014,10 @@ function bindEvents() {
   document.getElementById('clearRoomBtn').addEventListener('click', () => {
     window.purrSound.playClick();
     state.placedItems = [];
+    state.placedFoods = [];
+    roomActors.forEach((a) => {
+      a.targetFoodUid = null;
+    });
     selectPlacedItem(null);
     saveState();
     renderRoom();
@@ -2051,10 +3092,14 @@ async function init() {
     setAppMode('compact');
   }
 
-  // Pré-carregar sprites do gato atual
+  // Pré-carregar sprites do gato atual e chapéu equipado
   const catDef = getCatDef(state.activeCat);
   if (catDef) {
     Object.values(catDef.animations).forEach((a) => loadImage(a.src));
+  }
+  if (state.activeHat) {
+    const hatDef = getHatDef(state.activeHat);
+    if (hatDef) loadImage(hatDef.image);
   }
 
   requestAnimationFrame(animationLoop);

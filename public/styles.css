@@ -142,8 +142,8 @@ input {
   position: absolute;
   bottom: 5px;
   left: 55px;
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 82px;
   cursor: pointer;
   z-index: 4;
   transition: transform 0.08s ease;
@@ -155,8 +155,8 @@ input {
 }
 
 .compact-pet-actor canvas {
-  width: 64px;
-  height: 64px;
+  width: 68px;
+  height: 82px;
   filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.25));
 }
 
@@ -596,7 +596,7 @@ input {
 .main-layout {
   flex: 1;
   display: grid;
-  grid-template-columns: 1.28fr 1fr;
+  grid-template-columns: 1.55fr 1fr;
   min-height: 0;
 }
 
@@ -646,6 +646,23 @@ input {
   background: var(--accent);
   color: #fff;
   border-color: var(--border-dark);
+}
+
+.theme-chip.locked {
+  opacity: 0.82;
+  border-style: dashed;
+  background: #f3e8dc;
+  color: #5c3d2e;
+}
+
+.theme-swatch-preview {
+  width: 56px;
+  height: 44px;
+  border-radius: 6px;
+  border: 2px solid #4e403b;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
 }
 
 .room-hint {
@@ -704,6 +721,7 @@ input {
   transform: translate(-50%, -100%);
   touch-action: none;
   pointer-events: auto;
+  -webkit-user-drag: none;
 }
 
 .placed-item:active {
@@ -714,12 +732,19 @@ input {
 .placed-item canvas {
   display: block;
   pointer-events: none;
+  -webkit-user-drag: none;
   filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.16));
 }
 
 .placed-item.selected {
   outline: 2px dashed var(--accent);
   outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.placed-item.surface-target {
+  outline: 2px dashed #6b9e4f;
+  outline-offset: 2px;
   border-radius: 6px;
 }
 
@@ -734,6 +759,10 @@ input {
 .room-pet canvas {
   display: block;
   filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.2));
+}
+
+body.dragging-furniture .room-pet {
+  pointer-events: none !important;
 }
 
 .room-pet-speech {
@@ -1179,8 +1208,8 @@ input {
    ========================================================= */
 .shop-categories {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 5px;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 4px;
 }
 
 .shop-cat-btn {
@@ -1188,9 +1217,10 @@ input {
   color: var(--text-main);
   border: 2px solid var(--border-mid);
   border-radius: 8px;
-  padding: 6px 3px;
-  font-size: 11px;
+  padding: 6px 2px;
+  font-size: 10.5px;
   font-weight: 800;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -1452,5 +1482,45 @@ input {
     opacity: 1;
     transform: translateX(-50%) scale(1);
   }
+}
+
+.held-food-cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 38px;
+  height: 38px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 9999;
+  filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.28));
+}
+
+.held-food-cursor img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+body.holding-food #roomCanvas {
+  cursor: copy;
+}
+
+.placed-food {
+  position: absolute;
+  transform: translate(-50%, -90%);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform 0.12s ease;
+}
+
+.placed-food:hover {
+  transform: translate(-50%, -96%) scale(1.08);
+}
+
+.placed-food img {
+  display: block;
+  pointer-events: none;
+  filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.22));
 }
 

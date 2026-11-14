@@ -20,7 +20,7 @@
 
       <!-- Gatinho passeando acima do relógio -->
       <div id="compactPetActor" class="compact-pet-actor" title="Clique para fazer carinho!">
-        <canvas id="compactPetCanvas" width="64" height="64"></canvas>
+        <canvas id="compactPetCanvas" width="68" height="82"></canvas>
       </div>
 
       <!-- Tapetinho / plataforma de apoio -->
@@ -113,7 +113,7 @@
         <button id="minimizeCompactBtn" class="hdr-btn hdr-accent" title="Minimizar para o Relógio">
           🐾 Modo Relógio
         </button>
-        <button id="closeAppBtn" class="hdr-btn hdr-danger" title="Sair do PurrModoro">✕</button>
+        <button id="closeAppBtn" class="hdr-btn hdr-danger" title="Fechar e recolher para a bandeja">✕</button>
       </div>
     </header>
 
@@ -273,13 +273,16 @@
           <div class="shop-categories">
             <button class="shop-cat-btn active" data-cat="furniture">🪑 Móveis</button>
             <button class="shop-cat-btn" data-cat="cats">🐱 Gatos</button>
+            <button class="shop-cat-btn" data-cat="hats">🎩 Chapéus</button>
             <button class="shop-cat-btn" data-cat="pets">🐶 Pets</button>
             <button class="shop-cat-btn" data-cat="food">☕ Café</button>
           </div>
 
           <div id="shopSubfilters" class="shop-subfilters">
             <button class="sub-chip active" data-sub="all">Todos</button>
+            <button class="sub-chip" data-sub="tema">🎨 Temas</button>
             <button class="sub-chip" data-sub="janela">Janelas</button>
+            <button class="sub-chip" data-sub="movel">Mesas & Estantes</button>
             <button class="sub-chip" data-sub="cama">Camas</button>
             <button class="sub-chip" data-sub="arranhador">Arranhadores</button>
             <button class="sub-chip" data-sub="planta">Plantas</button>
@@ -300,6 +303,11 @@
           </div>
 
           <div class="inv-section">
+            <h3>🎩 Chapéus dos Gatinhos</h3>
+            <div id="invHatsList" class="inv-mini-list"></div>
+          </div>
+
+          <div class="inv-section">
             <h3>🐶 Amigos Pets no Quarto</h3>
             <div id="invPetsList" class="inv-mini-list"></div>
           </div>
@@ -314,6 +322,10 @@
         </div>
       </aside>
     </main>
+  </div>
+
+  <div id="heldFoodCursor" class="held-food-cursor hidden">
+    <img id="heldFoodImg" src="" alt="" />
   </div>
 
   <script src="sound.js"></script>
