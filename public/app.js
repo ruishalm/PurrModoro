@@ -81,7 +81,7 @@ const ROOM_THEME_CATALOG = [
 const DEFAULT_STATE = {
   saveVersion: 2,
   coins: 100,
-  unlockedCats: ['cat_mochi'],
+  unlockedCats: ['cat_mochi', 'cat_dino'],
   activeCat: 'cat_mochi',
   unlockedHats: [],
   activeHat: null,
@@ -265,6 +265,9 @@ async function loadState() {
     placedItems: Array.isArray(saved.placedItems) ? saved.placedItems : [...DEFAULT_STATE.placedItems],
   };
   const savedThemes = Array.isArray(saved?.unlockedThemes) ? saved.unlockedThemes : ['cozy'];
+  state.unlockedCats = Array.from(
+    new Set(['cat_mochi', 'cat_dino', ...(Array.isArray(state.unlockedCats) ? state.unlockedCats : [])])
+  );
   state.unlockedThemes = Array.from(new Set(['cozy', ...savedThemes]));
   if (!state.unlockedThemes.includes(state.roomTheme)) {
     state.roomTheme = 'cozy';

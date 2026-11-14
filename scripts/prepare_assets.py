@@ -1179,7 +1179,8 @@ def prepare_items_and_catalog():
             "name": "Dino Sem Wi-Fi",
             "category": "cats",
             "subCategory": "skin",
-            "price": 115,
+            "price": 0,
+            "starter": True,
             "description": "Caiu a internet? Esse 'gatinho' pré-histórico pula cactos de procrastinação com você!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_dino_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
