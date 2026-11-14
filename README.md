@@ -1,6 +1,30 @@
 # PurrModoro 🐾🍅
 
-Um **Idle Game + Timer Pomodoro** em pixel art para Windows onde um gatinho fofo passeia em uma barrinha discreta perto do relógio enquanto você trabalha. A cada ciclo concluído você ganha moedinhas proporcionais ao tempo da task para desbloquear **móveis isométricos, decorações, outros gatinhos, amigos pets e cafézinhos**, organizando todo o quartinho em **diorama 2:1 com Drag & Drop livre**!
+Um **Idle Game + Timer Pomodoro** em pixel art para Windows onde seu gatinho (ou até o **Dino Sem Wi-Fi**!) passeia em uma barrinha discreta perto do relógio enquanto você trabalha. A cada ciclo concluído você ganha moedinhas proporcionais ao tempo da task para desbloquear **móveis isométricos, mesas e prateleiras, temas de quarto, outros gatinhos, chapéuzinhos, amigos pets e comidinhas interativas**, organizando todo o quartinho em **diorama 2:1 com Drag & Drop livre**!
+
+---
+
+## 📥 Download Direto (.exe para Windows)
+
+Quer usar sem precisar configurar nada? Baixe o executável pronto na página de Releases:
+
+👉 **[Baixar PurrModoro para Windows (.exe) — Releases](https://github.com/ruishalm/PurrModoro/releases/latest)**
+
+- **Instalador Windows (`PurrModoro Setup *.exe`)**: instala com assistente e cria atalhos na Área de Trabalho e no Menu Iniciar.
+- **Versão Portátil (`PurrModoro *.exe`)**: basta abrir e usar sem instalar nada.
+
+> **Aviso do Windows SmartScreen**: por ser um projeto indie sem certificado pago de código, o Windows pode exibir *"O Windows protegeu o computador"*. Clique em **"Mais informações" → "Executar assim mesmo"**.
+
+<details>
+<summary>🛠️ Quer gerar o <code>.exe</code> localmente a partir do código-fonte?</summary>
+
+```bash
+npm install
+npm install -D electron-builder
+npm run dist
+```
+Os executáveis (`Setup` e `Portable`) serão gerados automaticamente na pasta `dist/`.
+</details>
 
 ---
 
@@ -38,16 +62,23 @@ Um **Idle Game + Timer Pomodoro** em pixel art para Windows onde um gatinho fofo
   - Barrinha de apoio super fina (`6px`) para o gatinho parecer estar andando direto sobre a barra de tarefas.
   - Botão **`▸` Recolher**: esconde o card do timer e deixa praticamente **só o gatinho** na tela junto de uma micro-pílula discreta (`◂` expandir, relógio, Play/Pause e `🏠` Quarto).
   - Clicar no gatinho faz carinho nele com partículas de coração, ronronar e falinhas fofas.
-- **Quartinho Isométrico 2:1 com Drag & Drop Livre**:
-  - Diorama isométrico desenhado sob medida para combinar perfeitamente com os sprites isométricos da coleção.
+- **Quartinho Isométrico 2:1 (10×10) com Superfícies & Drag & Drop Livre**:
+  - Diorama isométrico expandido desenhado sob medida para combinar perfeitamente com os sprites isométricos da coleção.
+  - **Mesas & Prateleiras com Superfície Real**: arraste potinhos, plantinhas, luminárias e petiscos para cima de mesas e da prateleira de parede — tudo se move junto e respeita a profundidade (Z-order) automaticamente!
   - Janelas e quadros identificam automaticamente a **Parede Esquerda** e a **Parede Direita**, espelhando a perspectiva isométrica sozinhos ao arrastar de um lado para o outro!
-  - Barra flutuante para espelhar (`↔`), ajustar profundidade (`⬆ / ⬇`) e guardar no inventário (`📦`), além de **4 temas visuais** (*Cozy*, *Pastel*, *Bamboo* e *Noite*).
+  - Barra flutuante para espelhar (`↔`), ajustar profundidade (`⬆ / ⬇`) e guardar no inventário (`📦`), além de **4 temas desbloqueáveis por moedas** (*Cozy* inicial, *Pastel*, *Jardim Bamboo* e *Noite Mística*).
 - **Timer Pomodoro 100% Regulável & Recompensa por Tempo de Task**:
   - Regule livremente **Foco (1–180 min)**, **Pausa Curta (1–60 min)**, **Pausa Longa (1–90 min)** e **Ciclos/Longa (2–8)** — tudo salvo automaticamente!
   - Presets rápidos (*Clássico 25/5*, *Sprint 15/3*, *Deep 50/10*, *Leve 20/5*) e botões **`-5m / -1m / +1m / +5m`** ao vivo.
   - Se concluir o foco, o gatinho comemora com chuva de moedas; se desistir no meio, ele chora 😿.
-- **Lojinha Completa (4 Categorias)**:
-  - **Móveis & Decor**, **9 Gatinhos/Skins**, **Amigos Pets** (*Coelhinho*, *Golden Retriever* e *Mãozinha Zumbi*) e **Café & Comidinhas** (*Café Latte `+25%`* e *Cafeteira Moka `+50%`*).
+- **Lojinha Completa (5 Categorias • 77 Itens + Temas)**:
+  - **🛋️ Móveis & Decor (42 itens)**: móveis isométricos, superfícies, potinhos, luminárias e objetos animados.
+  - **🐱 Gatinhos & Companheiros (10 skins)**: 9 gatinhos fofos + o clássico **Dino Sem Wi-Fi** em pixel art completo!
+  - **🎩 Chapéus (10 acessórios)**: coroa, chapéu de mago, cartola, chapéu mestre cuca, headphone lo-fi, boina e mais — aparecem no **Modo Relógio**, no **Quarto** e na **Loja**.
+  - **🐾 Amigos Pets (3 pets)**: *Coelhinho*, *Golden Retriever* e *Mãozinha Zumbi* andando pelo quarto.
+  - **☕ Café & Comidinhas Interativas (12 itens)**:
+    - Ao clicar em **Pegar**, a comidinha **gruda no cursor**: entregue direto **na boquinha** do gatinho/pet, coloque em cima de um **potinho ou mesa**, ou deixe **no chão** para eles irem andando comer sozinhos!
+    - Bebidas com bônus de moedas (*Café Latte `+25%`*, *Bubble Tea de Taro `+35%`*, *Matcha Latte `+40%`* e *Cafeteira Moka `+50%`*) multiplicam a recompensa do próximo foco concluído.
 
 ### 🪙 Ganho de Moedas por Tempo de Task
 
@@ -76,10 +107,11 @@ A recompensa escala diretamente com a duração da sua task:
    ```
 2. Dê duplo-clique em **`install_purrmodoro.bat`** (ou rode no terminal):
    - Instala automaticamente o Electron (se ainda não estiver instalado).
-   - Cria o atalho **`PurrModoro`** com o ícone do gatinho na sua **Área de Trabalho** e no **Menu Iniciar**.
+   - Reseta o progresso de testes anterior para uma **instalação limpa do zero** (100 moedinhas iniciais, gatinho Mochi e itens básicos).
+   - Cria o atalho **`PurrModoro`** na **Área de Trabalho**, no **Menu Iniciar** e ativa **Iniciar com o Windows** automaticamente (pode ser desmarcado depois na bandeja).
    - Abre o PurrModoro perto do relógio sem deixar janela preta de prompt aberta.
 
-Para remover os atalhos depois (mantendo seu progresso salvo em `AppData`), basta rodar **`uninstall_purrmodoro.bat`**.
+Para remover os atalhos (incluindo o de inicialização) mantendo seu progresso atual salvo em `AppData`, basta rodar **`uninstall_purrmodoro.bat`**.
 
 ### Opção B — Via Terminal (`npm`)
 ```bash
@@ -98,7 +130,7 @@ npm install -D electron-builder && npm run dist
 
 > **Sem janela de CMD**: Para abrir direto quando quiser, use os atalhos criados ou **`start_purrmodoro.bat`**.
 
-> **Ícone na Bandeja (System Tray)**: O PurrModoro também fica na bandeja ao lado do relógio. Clique com o botão direito nele para alternar entre Modo Relógio / Quartinho, pausar o timer ou ligar/desligar *Sempre no Topo*.
+> **Ícone na Bandeja (System Tray) & Botão Fechar (`✕`)**: Ao clicar no **`✕`** para fechar, o PurrModoro **recolhe para a bandeja do sistema** mantendo seu timer rodando em segundo plano. Clique com o botão esquerdo no ícone perto do relógio para reabrir, ou com o botão direito para pausar o timer, alternar **Sempre no Topo**, ativar/desativar **Iniciar com o Windows** ou encerrar de vez (`🚪 Sair do PurrModoro`).
 
 ---
 
