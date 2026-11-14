@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>PurrModoro — Gatinho de Foco</title>
+  <link rel="icon" type="image/png" href="assets/ui/tray_icon.png" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body class="mode-compact theme-cozy">
+
+  <!-- =========================================================
+       MODO COMPACTO: WIDGET TRANSPARENTE PERTO DO RELÓGIO
+       ========================================================= -->
+  <div id="compactView" class="compact-view">
+    <div class="compact-stage">
+      <div id="compactSpeech" class="speech-bubble hidden"></div>
+      <div id="compactParticles" class="particles-layer"></div>
+
+      <!-- Gatinho passeando acima do relógio -->
+      <div id="compactPetActor" class="compact-pet-actor" title="Clique para fazer carinho!">
+        <canvas id="compactPetCanvas" width="64" height="64"></canvas>
+      </div>
+
+      <!-- Tapetinho / plataforma de apoio -->
+      <div class="compact-ledge">
+        <div class="ledge-pattern"></div>
+      </div>
+    </div>
+
+    <!-- Mini HUD lateral -->
+    <div class="compact-hud pixel-panel-cozy">
+      <div class="compact-drag-bar">
+        <span class="drag-grip" title="Arraste para mover">⠿ PurrModoro</span>
+        <div class="compact-top-badges">
+          <span class="coin-pill compact-coin" title="Suas moedinhas">
+            <span class="coin-dot"></span>
+            <span id="compactCoins">100</span>
+          </span>
+          <button id="compactExpandBtn" class="px-icon-btn" title="Abrir Quartinho & Loja">
+            <img src="assets/ui/btn_shop.png" alt="Loja" />
+          </button>
+          <button id="compactCollapseBtn" class="px-icon-btn px-mini-toggle" title="Recolher painel (deixar só o gatinho)">
+            ▸
+          </button>
+        </div>
+      </div>
+
+      <div class="compact-timer-row">
+        <div class="compact-phase-wrap">
+          <span id="compactPhaseLabel" class="phase-tag">🍅 FOCO</span>
+          <span id="compactBuffBadge" class="buff-mini hidden" title="Bônus de Café ativo">☕+25%</span>
+        </div>
+        <div id="compactTimerDisplay" class="compact-time">25:00</div>
+      </div>
+
+      <div class="compact-controls-row">
+        <button id="compactMinusBtn" class="px-icon-btn" title="Diminuir 1 min (Shift: -5 min)">
+          <img src="assets/ui/btn_minus.png" alt="-" />
+        </button>
+        <button id="compactPlayPauseBtn" class="px-icon-btn px-primary" title="Iniciar / Pausar">
+          <img id="compactPlayIcon" src="assets/ui/btn_play.png" alt="Play" />
+        </button>
+        <button id="compactPlusBtn" class="px-icon-btn" title="Aumentar 1 min (Shift: +5 min)">
+          <img src="assets/ui/btn_plus.png" alt="+" />
+        </button>
+        <button id="compactRoomBtn" class="compact-text-btn" title="Abrir Quartinho">
+          🏠 Quarto
+        </button>
+      </div>
+    </div>
+
+    <!-- Micro pílula discreta quando o timer está recolhido -->
+    <div id="compactMiniPill" class="compact-mini-pill pixel-panel-cozy hidden">
+      <div class="compact-mini-top">
+        <span class="drag-grip" title="Arraste para mover">⠿</span>
+        <button id="compactMiniExpandBtn" class="px-mini-btn" title="Mostrar painel do timer">◂</button>
+      </div>
+      <div id="compactMiniTime" class="compact-mini-time" title="Tempo restante">25:00</div>
+      <div class="compact-mini-actions">
+        <button id="compactMiniPlayBtn" class="px-mini-btn px-primary" title="Iniciar / Pausar">
+          <img id="compactMiniPlayIcon" src="assets/ui/btn_play.png" alt="Play" />
+        </button>
+        <button id="compactMiniRoomBtn" class="px-mini-btn" title="Abrir Quartinho & Loja">🏠</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================
+       MODO EXPANDIDO: QUARTINHO DRAG & DROP + TIMER + LOJINHA
+       ========================================================= -->
+  <div id="expandedView" class="expanded-view hidden">
+    <header class="app-header">
+      <div class="header-left drag-region">
+        <img src="assets/ui/tray_icon.png" alt="" class="header-cat-icon" />
+        <div class="header-titles">
+          <h1>PurrModoro</h1>
+          <span class="subtitle">Pomodoro Cozy & Quartinho do Gato</span>
+        </div>
+      </div>
+
+      <div class="header-right no-drag">
+        <div id="headerBuffPill" class="buff-pill hidden" title="Multiplicador de moedas no próximo ciclo de foco">
+          ☕ <span id="headerBuffText">+25%</span>
+        </div>
+        <div class="coin-pill header-coins" title="Moedas disponíveis">
+          <span class="coin-dot"></span>
+          <span id="headerCoins">100</span>
+        </div>
+        <button id="muteBtn" class="hdr-btn" title="Ativar/Silenciar Sons">🔊</button>
+        <button id="snapClockBtn" class="hdr-btn" title="Reposicionar perto do relógio">📍</button>
+        <button id="minimizeCompactBtn" class="hdr-btn hdr-accent" title="Minimizar para o Relógio">
+          🐾 Modo Relógio
+        </button>
+        <button id="closeAppBtn" class="hdr-btn hdr-danger" title="Sair do PurrModoro">✕</button>
+      </div>
+    </header>
+
+    <main class="main-layout">
+      <!-- LADO ESQUERDO: QUARTINHO DO GATO -->
+      <section class="room-section">
+        <div class="room-topbar">
+          <div class="theme-switcher" title="Escolha o estilo do quartinho">
+            <span class="label-sm">Tema:</span>
+            <button class="theme-chip active" data-theme="cozy">☕ Cozy</button>
+            <button class="theme-chip" data-theme="pastel">🌸 Pastel</button>
+            <button class="theme-chip" data-theme="bamboo">🎋 Bamboo</button>
+            <button class="theme-chip" data-theme="halloween">🎃 Noite</button>
+          </div>
+          <div class="room-hint">Arraste os móveis livremente! 🐾</div>
+        </div>
+
+        <div id="roomCanvas" class="room-canvas">
+          <!-- Diorama isométrico 2:1 desenhado dinamicamente por tema -->
+          <canvas id="roomBgCanvas" class="room-bg-canvas"></canvas>
+
+          <!-- Camada de Móveis & Decorações (Drag & Drop) -->
+          <div id="roomFurnitureLayer" class="room-furniture-layer"></div>
+
+          <!-- Camada de Pets vivos (Gato principal + Amigos) -->
+          <div id="roomPetsLayer" class="room-pets-layer"></div>
+
+          <!-- Partículas (corações, moedas, Zzz, comidinha) -->
+          <div id="roomFxLayer" class="room-fx-layer"></div>
+
+          <!-- Barra Flutuante ao selecionar um móvel -->
+          <div id="furnitureToolbar" class="furniture-toolbar hidden">
+            <span id="selectedItemName" class="tb-name">Móvel</span>
+            <button id="tbFlipBtn" class="tb-btn" title="Espelhar horizontalmente">↔ Virar</button>
+            <button id="tbFrontBtn" class="tb-btn" title="Trazer para frente">⬆</button>
+            <button id="tbBackBtn" class="tb-btn" title="Enviar para trás">⬇</button>
+            <button id="tbStoreBtn" class="tb-btn tb-warn" title="Guardar no inventário">📦 Guardar</button>
+          </div>
+
+          <!-- Banner de Conclusão de Ciclo -->
+          <div id="celebrationBanner" class="celebration-banner hidden">
+            <div class="cel-title">🎉 Ciclo Concluído!</div>
+            <div id="celSubtitle" class="cel-sub">Você ganhou +30 moedinhas!</div>
+            <button id="celNextBtn" class="px-btn px-btn-warm">Continuar 🐾</button>
+          </div>
+        </div>
+
+        <!-- Rodapé rápido do quarto -->
+        <div class="room-footer">
+          <span id="roomActiveCatText">🐱 Companheiro: <strong>Mochi Laranja</strong></span>
+          <span id="roomStatsText">🪑 2 móveis no quarto • 🔥 0 ciclos hoje</span>
+        </div>
+      </section>
+
+      <!-- LADO DIREITO: ABAS (TIMER / LOJINHA / MEU QUARTO) -->
+      <aside class="side-panel">
+        <nav class="side-tabs">
+          <button class="side-tab active" data-tab="timer">🍅 Timer</button>
+          <button class="side-tab" data-tab="shop">🛒 Lojinha</button>
+          <button class="side-tab" data-tab="inventory">🎒 Quarto</button>
+        </nav>
+
+        <!-- ABA 1: TIMER POMODORO REGULÁVEL -->
+        <div id="tab-timer" class="tab-content active">
+          <div class="phase-selector">
+            <button class="phase-btn active" data-phase="focus">🍅 Foco</button>
+            <button class="phase-btn" data-phase="shortBreak">☕ Pausa</button>
+            <button class="phase-btn" data-phase="longBreak">🌙 Longa</button>
+          </div>
+
+          <div class="timer-card">
+            <div id="expandedPhaseTag" class="timer-phase-heading">Hora de Focar!</div>
+            <div id="expandedTimerDisplay" class="timer-big-clock">25:00</div>
+            <div class="timer-progress-track">
+              <div id="timerProgressBar" class="timer-progress-fill"></div>
+            </div>
+
+            <div class="quick-adjust-row">
+              <button class="adj-btn" data-delta="-5">-5m</button>
+              <button class="adj-btn" data-delta="-1">-1m</button>
+              <span class="adj-label">Ajuste rápido</span>
+              <button class="adj-btn" data-delta="1">+1m</button>
+              <button class="adj-btn" data-delta="5">+5m</button>
+            </div>
+
+            <div id="rewardPreviewText" class="reward-preview">
+              Recompensa ao concluir: 🪙 <strong>+30 moedas</strong>
+            </div>
+
+            <div class="timer-main-actions">
+              <button id="mainPlayPauseBtn" class="px-btn px-btn-primary">▶ Iniciar Foco</button>
+              <button id="resetTimerBtn" class="px-btn px-btn-ghost" title="Reiniciar tempo atual">↺</button>
+              <button id="giveUpBtn" class="px-btn px-btn-danger hidden" title="Cancelar foco (o gatinho vai chorar!)">🏳️ Desistir</button>
+            </div>
+          </div>
+
+          <!-- CONFIGURAÇÃO REGULÁVEL DO POMODORO -->
+          <div class="settings-card">
+            <div class="settings-header">
+              <span>⚙️ Regular Pomodoro (minutos)</span>
+            </div>
+
+            <div class="presets-row">
+              <button class="preset-chip" data-f="25" data-s="5" data-l="15">Clássico 25/5</button>
+              <button class="preset-chip" data-f="15" data-s="3" data-l="10">Sprint 15/3</button>
+              <button class="preset-chip" data-f="50" data-s="10" data-l="20">Deep 50/10</button>
+              <button class="preset-chip" data-f="20" data-s="5" data-l="15">Leve 20/5</button>
+            </div>
+
+            <div class="settings-grid">
+              <div class="setting-field">
+                <label for="cfgFocus">🍅 Foco</label>
+                <div class="stepper">
+                  <button type="button" class="step-btn" aria-label="Diminuir foco" data-target="cfgFocus" data-step="-1">-</button>
+                  <input id="cfgFocus" type="number" min="1" max="180" value="25" />
+                  <button type="button" class="step-btn" aria-label="Aumentar foco" data-target="cfgFocus" data-step="1">+</button>
+                </div>
+              </div>
+
+              <div class="setting-field">
+                <label for="cfgShort">☕ Pausa Curta</label>
+                <div class="stepper">
+                  <button type="button" class="step-btn" aria-label="Diminuir pausa curta" data-target="cfgShort" data-step="-1">-</button>
+                  <input id="cfgShort" type="number" min="1" max="60" value="5" />
+                  <button type="button" class="step-btn" aria-label="Aumentar pausa curta" data-target="cfgShort" data-step="1">+</button>
+                </div>
+              </div>
+
+              <div class="setting-field">
+                <label for="cfgLong">🌙 Pausa Longa</label>
+                <div class="stepper">
+                  <button type="button" class="step-btn" aria-label="Diminuir pausa longa" data-target="cfgLong" data-step="-1">-</button>
+                  <input id="cfgLong" type="number" min="1" max="90" value="15" />
+                  <button type="button" class="step-btn" aria-label="Aumentar pausa longa" data-target="cfgLong" data-step="1">+</button>
+                </div>
+              </div>
+
+              <div class="setting-field">
+                <label for="cfgCycles">🔁 Ciclos/Longa</label>
+                <div class="stepper">
+                  <button type="button" class="step-btn" aria-label="Diminuir ciclos" data-target="cfgCycles" data-step="-1">-</button>
+                  <input id="cfgCycles" type="number" min="2" max="8" value="4" />
+                  <button type="button" class="step-btn" aria-label="Aumentar ciclos" data-target="cfgCycles" data-step="1">+</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cycle-dots-row">
+              <span>Progresso do ciclo:</span>
+              <div id="cycleDots" class="cycle-dots"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ABA 2: LOJINHA -->
+        <div id="tab-shop" class="tab-content">
+          <div class="shop-categories">
+            <button class="shop-cat-btn active" data-cat="furniture">🪑 Móveis</button>
+            <button class="shop-cat-btn" data-cat="cats">🐱 Gatos</button>
+            <button class="shop-cat-btn" data-cat="pets">🐶 Pets</button>
+            <button class="shop-cat-btn" data-cat="food">☕ Café</button>
+          </div>
+
+          <div id="shopSubfilters" class="shop-subfilters">
+            <button class="sub-chip active" data-sub="all">Todos</button>
+            <button class="sub-chip" data-sub="janela">Janelas</button>
+            <button class="sub-chip" data-sub="cama">Camas</button>
+            <button class="sub-chip" data-sub="arranhador">Arranhadores</button>
+            <button class="sub-chip" data-sub="planta">Plantas</button>
+            <button class="sub-chip" data-sub="quadro">Quadros</button>
+            <button class="sub-chip" data-sub="potinho">Potinhos</button>
+            <button class="sub-chip" data-sub="brinquedo">Brinquedos</button>
+            <button class="sub-chip" data-sub="halloween">Halloween</button>
+          </div>
+
+          <div id="shopGrid" class="shop-grid"></div>
+        </div>
+
+        <!-- ABA 3: MEU QUARTO & INVENTÁRIO -->
+        <div id="tab-inventory" class="tab-content">
+          <div class="inv-section">
+            <h3>🐱 Meus Gatinhos</h3>
+            <div id="invCatsList" class="inv-mini-list"></div>
+          </div>
+
+          <div class="inv-section">
+            <h3>🐶 Amigos Pets no Quarto</h3>
+            <div id="invPetsList" class="inv-mini-list"></div>
+          </div>
+
+          <div class="inv-section">
+            <div class="inv-section-head">
+              <h3>🪑 Móveis Comprados</h3>
+              <button id="clearRoomBtn" class="tiny-btn" title="Guardar todos os móveis no inventário">Guardar tudo</button>
+            </div>
+            <div id="invFurnitureGrid" class="inv-furniture-grid"></div>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script src="sound.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
+

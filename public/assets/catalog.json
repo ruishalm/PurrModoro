@@ -1,0 +1,984 @@
+{
+  "items": [
+    {
+      "id": "window_cream",
+      "name": "Janela Brisa Creme",
+      "category": "furniture",
+      "subCategory": "janela",
+      "price": 45,
+      "image": "assets/items/window_cream.png",
+      "width": 61,
+      "height": 95,
+      "wallItem": true,
+      "description": "Ilumina o cantinho com luz suave da manhã."
+    },
+    {
+      "id": "window_cocoa",
+      "name": "Janela Madeira Cacau",
+      "category": "furniture",
+      "subCategory": "janela",
+      "price": 50,
+      "image": "assets/items/window_cocoa.png",
+      "width": 61,
+      "height": 95,
+      "wallItem": true,
+      "description": "Moldura aconchegante estilo cafeteria."
+    },
+    {
+      "id": "window_grey",
+      "name": "Janela Nuvem Cinza",
+      "category": "furniture",
+      "subCategory": "janela",
+      "price": 45,
+      "image": "assets/items/window_grey.png",
+      "width": 61,
+      "height": 95,
+      "wallItem": true,
+      "description": "Visual moderno e calmo para dias chuvosos."
+    },
+    {
+      "id": "window_oak",
+      "name": "Janela Carvalho Quente",
+      "category": "furniture",
+      "subCategory": "janela",
+      "price": 55,
+      "image": "assets/items/window_oak.png",
+      "width": 61,
+      "height": 95,
+      "wallItem": true,
+      "description": "Madeira natural para um quarto acolhedor."
+    },
+    {
+      "id": "bed_blue",
+      "name": "Caminha Nuvem Azul",
+      "category": "furniture",
+      "subCategory": "cama",
+      "price": 60,
+      "image": "assets/items/bed_blue.png",
+      "width": 110,
+      "height": 82,
+      "wallItem": false,
+      "description": "Caminha macia azul-sereno para sonecas entre ciclos."
+    },
+    {
+      "id": "bed_charcoal",
+      "name": "Caminha Grafite",
+      "category": "furniture",
+      "subCategory": "cama",
+      "price": 60,
+      "image": "assets/items/bed_charcoal.png",
+      "width": 110,
+      "height": 82,
+      "wallItem": false,
+      "description": "Caminha escura elegante que combina com tudo."
+    },
+    {
+      "id": "bed_berry",
+      "name": "Caminha Vinho Rosé",
+      "category": "furniture",
+      "subCategory": "cama",
+      "price": 65,
+      "image": "assets/items/bed_berry.png",
+      "width": 110,
+      "height": 82,
+      "wallItem": false,
+      "description": "Aconchegante e quentinha no tom framboesa."
+    },
+    {
+      "id": "bed_moss",
+      "name": "Caminha Musgo Zen",
+      "category": "furniture",
+      "subCategory": "cama",
+      "price": 65,
+      "image": "assets/items/bed_moss.png",
+      "width": 110,
+      "height": 82,
+      "wallItem": false,
+      "description": "Inspirada em jardins tranquilos."
+    },
+    {
+      "id": "house_cozy",
+      "name": "Casinha Toca Azul",
+      "category": "furniture",
+      "subCategory": "cama",
+      "price": 95,
+      "image": "assets/items/house_cozy.png",
+      "width": 62,
+      "height": 54,
+      "wallItem": false,
+      "description": "Uma cabana privativa para o gatinho tirar cochilos."
+    },
+    {
+      "id": "post_pink",
+      "name": "Arranhador Torre Rosé",
+      "category": "furniture",
+      "subCategory": "arranhador",
+      "price": 75,
+      "image": "assets/items/post_pink.png",
+      "width": 64,
+      "height": 110,
+      "wallItem": false,
+      "description": "Plataforma alta rosa pastel com corda de sisal."
+    },
+    {
+      "id": "post_olive",
+      "name": "Arranhador Torre Oliva",
+      "category": "furniture",
+      "subCategory": "arranhador",
+      "price": 75,
+      "image": "assets/items/post_olive.png",
+      "width": 64,
+      "height": 110,
+      "wallItem": false,
+      "description": "Arranhador alto em tom verde-oliva."
+    },
+    {
+      "id": "post_blue",
+      "name": "Arranhador Torre Azul",
+      "category": "furniture",
+      "subCategory": "arranhador",
+      "price": 75,
+      "image": "assets/items/post_blue.png",
+      "width": 64,
+      "height": 110,
+      "wallItem": false,
+      "description": "Poste de sisal clássico com topo azulado."
+    },
+    {
+      "id": "scratch_low_white",
+      "name": "Arranhador Baixo Creme",
+      "category": "furniture",
+      "subCategory": "arranhador",
+      "price": 40,
+      "image": "assets/items/scratch_low_white.png",
+      "width": 55,
+      "height": 77,
+      "wallItem": false,
+      "description": "Compacto e fofo para afiar as unhas."
+    },
+    {
+      "id": "scratch_low_wood",
+      "name": "Arranhador Baixo Madeira",
+      "category": "furniture",
+      "subCategory": "arranhador",
+      "price": 40,
+      "image": "assets/items/scratch_low_wood.png",
+      "width": 55,
+      "height": 77,
+      "wallItem": false,
+      "description": "Base rústica de madeira natural."
+    },
+    {
+      "id": "tower_deluxe",
+      "name": "Mega Torre 4 Andares",
+      "category": "furniture",
+      "subCategory": "arranhador",
+      "price": 140,
+      "image": "assets/items/tower_deluxe.png",
+      "width": 52,
+      "height": 108,
+      "wallItem": false,
+      "description": "Torre luxuosa com pompons pendurados!"
+    },
+    {
+      "id": "shelf_wood",
+      "name": "Estante Aconchegante",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 110,
+      "image": "assets/items/shelf_wood.png",
+      "width": 100,
+      "height": 128,
+      "wallItem": false,
+      "description": "Prateleira de madeira clara para deixar o quarto organizado."
+    },
+    {
+      "id": "plant_mini",
+      "name": "Vasinho Suculenta",
+      "category": "furniture",
+      "subCategory": "planta",
+      "price": 25,
+      "image": "assets/items/plant_mini.png",
+      "width": 23,
+      "height": 29,
+      "wallItem": false,
+      "description": "Pequena plantinha segura para gatinhos."
+    },
+    {
+      "id": "plant_tall",
+      "name": "Planta Ficus Alta",
+      "category": "furniture",
+      "subCategory": "planta",
+      "price": 55,
+      "image": "assets/items/plant_tall.png",
+      "width": 45,
+      "height": 108,
+      "wallItem": false,
+      "description": "Traz vida e ar fresco para o cantinho de estudos."
+    },
+    {
+      "id": "art_stripes",
+      "name": "Quadro Listras Suaves",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 35,
+      "image": "assets/items/art_stripes.png",
+      "width": 41,
+      "height": 63,
+      "wallItem": true,
+      "description": "Arte minimalista para decorar a parede."
+    },
+    {
+      "id": "art_abstract",
+      "name": "Quadro Aquarela",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 35,
+      "image": "assets/items/art_abstract.png",
+      "width": 38,
+      "height": 62,
+      "wallItem": true,
+      "description": "Pintura abstrata em tons terrosos."
+    },
+    {
+      "id": "art_plant",
+      "name": "Quadro Botânico",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 40,
+      "image": "assets/items/art_plant.png",
+      "width": 39,
+      "height": 89,
+      "wallItem": true,
+      "description": "Ilustração de plantinha em moldura clara."
+    },
+    {
+      "id": "art_cat_portrait",
+      "name": "Retrato do Mochi",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 30,
+      "image": "assets/items/art_cat_portrait.png",
+      "width": 17,
+      "height": 32,
+      "wallItem": true,
+      "description": "Quadrinho pendurado do gatinho laranja."
+    },
+    {
+      "id": "art_heart_grey",
+      "name": "Quadrinho Coração",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 25,
+      "image": "assets/items/art_heart_grey.png",
+      "width": 17,
+      "height": 32,
+      "wallItem": true,
+      "description": "Demonstra todo o carinho pelo seu pet."
+    },
+    {
+      "id": "art_dog_golden",
+      "name": "Quadro Golden Amigo",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 45,
+      "image": "assets/items/art_dog_golden.png",
+      "width": 34,
+      "height": 45,
+      "wallItem": true,
+      "description": "Homenagem ao melhor amigo canino."
+    },
+    {
+      "id": "bowl_food_blue",
+      "name": "Potinho Ração Azul",
+      "category": "furniture",
+      "subCategory": "potinho",
+      "price": 25,
+      "image": "assets/items/bowl_food_blue.png",
+      "width": 43,
+      "height": 37,
+      "wallItem": false,
+      "description": "Sempre cheio de croquetes crocantes."
+    },
+    {
+      "id": "bowl_water_blue",
+      "name": "Potinho Água Azul",
+      "category": "furniture",
+      "subCategory": "potinho",
+      "price": 25,
+      "image": "assets/items/bowl_water_blue.png",
+      "width": 43,
+      "height": 37,
+      "wallItem": false,
+      "description": "Água fresquinha para manter a hidratação."
+    },
+    {
+      "id": "bowl_food_purple",
+      "name": "Potinho Ração Lilás",
+      "category": "furniture",
+      "subCategory": "potinho",
+      "price": 25,
+      "image": "assets/items/bowl_food_purple.png",
+      "width": 43,
+      "height": 37,
+      "wallItem": false,
+      "description": "Estilo lavanda super fofo."
+    },
+    {
+      "id": "bowl_water_mint",
+      "name": "Potinho Água Menta",
+      "category": "furniture",
+      "subCategory": "potinho",
+      "price": 25,
+      "image": "assets/items/bowl_water_mint.png",
+      "width": 43,
+      "height": 37,
+      "wallItem": false,
+      "description": "Tom verde-menta refrescante."
+    },
+    {
+      "id": "ball_sage",
+      "name": "Bolinha Sálvia",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 15,
+      "image": "assets/items/ball_sage.png",
+      "width": 22,
+      "height": 20,
+      "wallItem": false,
+      "description": "Ótima para empurrar pelo piso."
+    },
+    {
+      "id": "ball_indigo",
+      "name": "Bolinha Índigo",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 15,
+      "image": "assets/items/ball_indigo.png",
+      "width": 22,
+      "height": 20,
+      "wallItem": false,
+      "description": "Salta macio sem fazer barulho no foco."
+    },
+    {
+      "id": "yarn_pink",
+      "name": "Novelo de Lã Vinho",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 20,
+      "image": "assets/items/yarn_pink.png",
+      "width": 13,
+      "height": 13,
+      "wallItem": false,
+      "description": "Para desenrolar nas pausas."
+    },
+    {
+      "id": "yarn_blue",
+      "name": "Novelo de Lã Azul",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 20,
+      "image": "assets/items/yarn_blue.png",
+      "width": 13,
+      "height": 13,
+      "wallItem": false,
+      "description": "Fofinho e irresistível para patinhas."
+    },
+    {
+      "id": "toy_mouse_grey",
+      "name": "Ratinho de Pelúcia",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 30,
+      "image": "assets/items/toy_mouse_grey.png",
+      "width": 27,
+      "height": 16,
+      "wallItem": false,
+      "description": "O brinquedo favorito para caçar no intervalo."
+    },
+    {
+      "id": "toy_wand",
+      "name": "Varinha Guizo",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 30,
+      "image": "assets/items/toy_wand.png",
+      "width": 43,
+      "height": 14,
+      "wallItem": false,
+      "description": "Varinha de madeira clássica."
+    },
+    {
+      "id": "toy_bowtie",
+      "name": "Brinquedo Ossinho/Laço",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 20,
+      "image": "assets/items/toy_bowtie.png",
+      "width": 24,
+      "height": 12,
+      "wallItem": false,
+      "description": "Pequeno mimo decorativo."
+    },
+    {
+      "id": "decor_skull",
+      "name": "Caveirinha Gótica",
+      "category": "furniture",
+      "subCategory": "halloween",
+      "price": 45,
+      "image": "assets/items/decor_skull.png",
+      "width": 17,
+      "height": 18,
+      "wallItem": false,
+      "description": "Toque misterioso para o quarto noturno."
+    },
+    {
+      "id": "decor_candle",
+      "name": "Velinha Mística",
+      "category": "furniture",
+      "subCategory": "halloween",
+      "price": 30,
+      "image": "assets/items/decor_candle.png",
+      "width": 7,
+      "height": 12,
+      "wallItem": false,
+      "description": "Ilumina sessões noturnas de estudo."
+    },
+    {
+      "id": "toy_evil_mouse",
+      "name": "Rato Sombrio",
+      "category": "furniture",
+      "subCategory": "halloween",
+      "price": 40,
+      "image": "assets/items/toy_evil_mouse.png",
+      "width": 32,
+      "height": 22,
+      "wallItem": false,
+      "description": "Ratinho de pelúcia edição Halloween."
+    },
+    {
+      "id": "coffee_latte",
+      "name": "Café Latte Art",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 20,
+      "image": "assets/items/coffee_latte.png",
+      "width": 36,
+      "height": 30,
+      "wallItem": false,
+      "description": "Xícara quentinha: dá +25% de moedas no próximo ciclo de Foco!",
+      "buff": {
+        "type": "coin_multiplier",
+        "multiplier": 1.25,
+        "label": "+25% moedas"
+      }
+    },
+    {
+      "id": "coffee_moka",
+      "name": "Cafeteira Italiana Moka",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 35,
+      "image": "assets/items/coffee_moka.png",
+      "width": 54,
+      "height": 66,
+      "wallItem": false,
+      "description": "Café reforçado: dá +50% de moedas no próximo ciclo de Foco!",
+      "buff": {
+        "type": "coin_multiplier",
+        "multiplier": 1.5,
+        "label": "+50% moedas"
+      }
+    },
+    {
+      "id": "food_fish_plate",
+      "name": "Prato de Peixinho",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 15,
+      "image": "assets/items/food_fish_plate.png",
+      "width": 56,
+      "height": 28,
+      "wallItem": false,
+      "description": "Alimenta o gatinho na hora e deixa ele super feliz!",
+      "buff": {
+        "type": "treat",
+        "happiness": 25,
+        "label": "Carinho & Energia"
+      }
+    },
+    {
+      "id": "food_kibble_bag",
+      "name": "Ração Gourmet",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 18,
+      "image": "assets/items/food_kibble_bag.png",
+      "width": 32,
+      "height": 43,
+      "wallItem": false,
+      "description": "Enche a barriguinha e rende muito ronronar.",
+      "buff": {
+        "type": "treat",
+        "happiness": 25,
+        "label": "Carinho & Energia"
+      }
+    },
+    {
+      "id": "food_can_salmon",
+      "name": "Latinha de Salmão",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 12,
+      "image": "assets/items/food_can_salmon.png",
+      "width": 18,
+      "height": 18,
+      "wallItem": false,
+      "description": "Petisco cremoso para comemorar uma pausa.",
+      "buff": {
+        "type": "treat",
+        "happiness": 25,
+        "label": "Carinho & Energia"
+      }
+    },
+    {
+      "id": "food_drumstick",
+      "name": "Franguinho Assado",
+      "category": "food",
+      "subCategory": "comida",
+      "price": 15,
+      "image": "assets/items/food_drumstick.png",
+      "width": 24,
+      "height": 23,
+      "wallItem": false,
+      "description": "Lanche especial compartilhado com os pets.",
+      "buff": {
+        "type": "treat",
+        "happiness": 25,
+        "label": "Carinho & Energia"
+      }
+    },
+    {
+      "id": "decor_eye_jar",
+      "name": "Pote Mágico Animado",
+      "category": "furniture",
+      "subCategory": "halloween",
+      "price": 120,
+      "image": "assets/sprites/decor_eye_jar.png",
+      "width": 128,
+      "height": 128,
+      "animated": true,
+      "frames": 17,
+      "frameWidth": 128,
+      "frameHeight": 128,
+      "fps": 6,
+      "wallItem": false,
+      "description": "Frasco animado de Halloween que observa seu foco!"
+    }
+  ],
+  "cats": [
+    {
+      "id": "cat_mochi",
+      "name": "Mochi Laranja",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "starter": true,
+      "description": "Seu companheiro inicial! Abana o rabo e entra em caixinhas.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_mochi_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "box": {
+          "src": "assets/sprites/cat_mochi_box.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 4
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_cream_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_cream_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_cream_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_mochi_box",
+      "name": "Mochi na Caixa",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 45,
+      "description": "Trabalha com você escondido dentro da caixa de papelão favorita.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_mochi_box.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 4
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_curled_sleep.png",
+          "frames": 1,
+          "fw": 43,
+          "fh": 32,
+          "fps": 1
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_cream_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_cream_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_pochi_cream",
+      "name": "Pochi Creme",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 75,
+      "description": "Gatinho creme super expressivo: tira sonecas zZz e vibra quando você conclui!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_cream_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_cream_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_cream_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "cry": {
+          "src": "assets/sprites/cat_cream_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        }
+      },
+      "previewScale": 1.15
+    },
+    {
+      "id": "cat_frajola",
+      "name": "Frajola Tuxedo",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 90,
+      "description": "Elegante de smoking preto e branco, ótimo parceiro de produtividade.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_tuxedo_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_tuxedo_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_tuxedo_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "cry": {
+          "src": "assets/sprites/cat_tuxedo_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        }
+      },
+      "previewScale": 1.15
+    },
+    {
+      "id": "cat_white",
+      "name": "Neve Olhos Azuis",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 100,
+      "description": "Gatinho branquinho de olhos azuis brilhantes.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_white_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_curled_sleep.png",
+          "frames": 1,
+          "fw": 43,
+          "fh": 32,
+          "fps": 1
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_white_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "cry": {
+          "src": "assets/sprites/cat_cream_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        }
+      },
+      "previewScale": 1.15
+    },
+    {
+      "id": "cat_dracula",
+      "name": "Conde Miau-cula",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 120,
+      "description": "Capa de vampiro e presinhas fofas para estudar até de madrugada!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_dracula.png",
+          "frames": 6,
+          "fw": 32,
+          "fh": 32,
+          "fps": 5
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_tuxedo_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_dracula.png",
+          "frames": 6,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
+        "cry": {
+          "src": "assets/sprites/cat_vampire_angry.png",
+          "frames": 9,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_witch",
+      "name": "Bruxinho Voador",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 150,
+      "description": "Flutua na vassoura mágica com chapéu de bruxa perto do seu relógio!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_witch.png",
+          "frames": 6,
+          "fw": 48,
+          "fh": 64,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_curled_sleep.png",
+          "frames": 1,
+          "fw": 43,
+          "fh": 32,
+          "fps": 1
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_witch.png",
+          "frames": 6,
+          "fw": 48,
+          "fh": 64,
+          "fps": 9
+        },
+        "cry": {
+          "src": "assets/sprites/cat_cream_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        }
+      },
+      "previewScale": 1.25
+    },
+    {
+      "id": "cat_evil_box",
+      "name": "Sombra na Caixa",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 110,
+      "description": "Gatinho preto de olhos vermelhos vigiando sua produtividade da caixa.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_evil_box.png",
+          "frames": 12,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_tuxedo_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_evil_box.png",
+          "frames": 12,
+          "fw": 32,
+          "fh": 32,
+          "fps": 10
+        },
+        "cry": {
+          "src": "assets/sprites/cat_tuxedo_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_zombie",
+      "name": "Gato Zumbi Guloso",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 135,
+      "description": "Ama lanchinhos no potinho e não larga o foco por nada!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_zombie_eating.png",
+          "frames": 15,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_tuxedo_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_zombie_eating.png",
+          "frames": 15,
+          "fw": 32,
+          "fh": 32,
+          "fps": 10
+        },
+        "cry": {
+          "src": "assets/sprites/cat_tuxedo_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
+    }
+  ],
+  "pets": [
+    {
+      "id": "pet_bunny",
+      "name": "Coelhinho Saltitante",
+      "category": "pets",
+      "subCategory": "amigo",
+      "price": 85,
+      "description": "Um amiguinho coelho que fica pulando alegremente pelo quarto!",
+      "src": "assets/sprites/pet_bunny.png",
+      "frames": 8,
+      "fw": 32,
+      "fh": 32,
+      "fps": 7,
+      "scale": 2.0
+    },
+    {
+      "id": "pet_golden",
+      "name": "Golden Retriever",
+      "category": "pets",
+      "subCategory": "amigo",
+      "price": 130,
+      "description": "Cachorrinho dócil e leal que passeia fazendo companhia para o seu gato.",
+      "src": "assets/sprites/pet_golden.png",
+      "frames": 10,
+      "fw": 64,
+      "fh": 64,
+      "fps": 7,
+      "scale": 1.25
+    },
+    {
+      "id": "pet_zombie_hand",
+      "name": "Mãozinha Amiga",
+      "category": "pets",
+      "subCategory": "amigo",
+      "price": 95,
+      "description": "Bônus divertido de Halloween que caminha dando apoio moral!",
+      "src": "assets/sprites/pet_zombie_hand.png",
+      "frames": 25,
+      "fw": 32,
+      "fh": 32,
+      "fps": 9,
+      "scale": 2.0
+    }
+  ]
+}
