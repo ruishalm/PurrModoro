@@ -11,10 +11,12 @@ $icoPath = Join-Path $root 'public\assets\ui\tray_icon.ico'
 
 $desktopDir = [Environment]::GetFolderPath('Desktop')
 $programsDir = [Environment]::GetFolderPath('Programs')
+$startupDir = [Environment]::GetFolderPath('Startup')
 
 $targets = @(
   (Join-Path $desktopDir 'PurrModoro.lnk'),
-  (Join-Path $programsDir 'PurrModoro.lnk')
+  (Join-Path $programsDir 'PurrModoro.lnk'),
+  (Join-Path $startupDir 'PurrModoro.lnk')
 )
 
 if ($Uninstall) {
@@ -25,6 +27,16 @@ if ($Uninstall) {
     }
   }
   exit 0
+}
+
+# Limpa save/preferências antigos para que cada nova instalação comece do zero
+$userDataDir = Join-Path ([Environment]::GetFolderPath('ApplicationData')) 'purrmodoro'
+foreach ($f in @('purrmodoro-save.json', 'purrmodoro-prefs.json')) {
+  $filePath = Join-Path $userDataDir $f
+  if (Test-Path $filePath) {
+    Remove-Item $filePath -Force
+    Write-Host "Resetado estado anterior: $filePath"
+  }
 }
 
 $wsh = New-Object -ComObject WScript.Shell
@@ -46,3 +58,4 @@ foreach ($lnk in $targets) {
   $shortcut.Save()
   Write-Host "Atalho criado: $lnk"
 }
+
