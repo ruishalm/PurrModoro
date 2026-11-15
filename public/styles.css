@@ -996,8 +996,57 @@ body.dragging-furniture .room-pet {
 /* ABA TIMER */
 .phase-selector {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: 1fr 1fr 1fr auto;
   gap: 5px;
+  align-items: stretch;
+}
+
+.help-tip-btn {
+  position: relative;
+  min-width: 28px;
+  padding: 0 8px;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 2px solid var(--border-mid);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 900;
+  cursor: help;
+}
+
+.help-tip-btn:hover {
+  z-index: 40;
+  border-color: var(--border-dark);
+  background: #fff6e8;
+}
+
+.help-tip-btn[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  width: max-content;
+  max-width: 245px;
+  white-space: normal;
+  text-align: left;
+  line-height: 1.35;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: #3e2723;
+  color: #fffaf3;
+  border: 2px solid #2b1a16;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-3px);
+  transition: opacity 0.14s ease, transform 0.14s ease;
+}
+
+.help-tip-btn[data-tip]:hover::after {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .phase-btn {

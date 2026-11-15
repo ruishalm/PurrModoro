@@ -3115,8 +3115,23 @@ function bindEvents() {
   // Controles do Timer Expandido
   document.querySelectorAll('.phase-btn[data-phase]').forEach((btn) => {
     btn.addEventListener('click', () => {
+      const nextPhase = btn.dataset.phase;
       window.purrSound.playClick();
-      setPhase(btn.dataset.phase, true);
+      if (timer.running && nextPhase !== timer.phase) {
+        const isEn = getCurrentLang() === 'en';
+        const phaseNames = isEn
+          ? { focus: 'Focus', shortBreak: 'Short Break', longBreak: 'Long Break' }
+          : { focus: 'Foco', shortBreak: 'Pausa', longBreak: 'Pausa Longa' };
+        const msg = isEn
+          ? `⏳ A ${phaseNames[timer.phase]} timer is already running! Pause or Give Up before switching.`
+          : `⏳ Já existe um timer de ${phaseNames[timer.phase]} rodando! Pause ou dê Desistir antes de trocar.`;
+        if (roomActors[0]) showRoomPetSpeech(roomActors[0], msg, 4200);
+        showCompactSpeech(msg, 4200);
+        return;
+      }
+      if (nextPhase !== timer.phase) {
+        setPhase(nextPhase, true);
+      }
     });
   });
   document.getElementById('mainPlayPauseBtn').addEventListener('click', toggleTimer);
@@ -3747,6 +3762,13 @@ async function handleBuyCoinPack(pack) {
 function applyLanguageUI() {
   if (!window.purrCloud) return;
   const lang = getCurrentLang();
+  const helpBtn = document.getElementById('pomodoroHelpBtn');
+  if (helpBtn) {
+    helpBtn.dataset.tip =
+      lang === 'en'
+        ? 'Pomodoro Method: focus without distractions during Focus (e.g. 25m), rest during Short Break (5m), and every 4 cycles take a Long Break (15m) to recharge!'
+        : 'Método Pomodoro: foque sem distrações durante o Foco (ex: 25m), descanse na Pausa Curta (5m) e, a cada 4 ciclos, faça uma Pausa Longa (15m) para recarregar!';
+  }
   const map = [
     ['.header-titles .subtitle', 'appSubtitle'],
     ['.side-tab[data-tab="timer"]', 'tabTimer'],

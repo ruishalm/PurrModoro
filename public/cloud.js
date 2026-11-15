@@ -657,9 +657,7 @@
   }
 
   async function startCheckout(productId, lang = 'pt') {
-    const isHttpOrigin = typeof window !== 'undefined' && /^https?:/.test(window.location?.protocol || '');
     if (
-      isHttpOrigin &&
       ensureFirebaseInitialized() &&
       window.firebase?.functions &&
       window.firebase?.auth?.().currentUser
