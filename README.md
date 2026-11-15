@@ -1,12 +1,14 @@
 # PurrModoro 🐾🍅
 
-Um **Idle Game + Timer Pomodoro** em pixel art para Windows onde seu gatinho (ou até o **Dino Sem Wi-Fi**!) passeia em uma barrinha discreta perto do relógio enquanto você trabalha. A cada ciclo concluído você ganha moedinhas proporcionais ao tempo da task para desbloquear **móveis isométricos, mesas e prateleiras, temas de quarto, outros gatinhos, chapéuzinhos, amigos pets e comidinhas interativas**, organizando todo o quartinho em **diorama 2:1 com Drag & Drop livre**!
+Um **Idle Game + Timer Pomodoro** em pixel art para Windows e Web onde seu gatinho (ou até o **Dino Sem Wi-Fi**!) passeia em uma barrinha discreta perto do relógio enquanto você trabalha. A cada ciclo concluído você ganha moedinhas proporcionais ao tempo da task para desbloquear **móveis isométricos, mesas e prateleiras, temas de quarto, outros gatinhos, chapéuzinhos, amigos pets e comidinhas interativas**, organizando todo o quartinho em **diorama 2:1 com Drag & Drop livre** — com **Login Google, sincronização na nuvem (Firebase) e Ofensiva Diária**!
+
+🌐 **Jogue ou teste direto no navegador**: https://purrrmodoro.web.app
 
 ---
 
 ## 📥 Download & Instalação (Windows)
 
-### Opção 1 — Executável `.exe` Pronto — v0.1 Beta (`v0.1.0-beta`)
+### Opção 1 — Executável `.exe` Pronto — v0.2 Beta (`v0.2.0-beta`)
 
 Baixe e execute direto no Windows sem precisar de Node.js pela página de [GitHub Releases](https://github.com/ruishalm/PurrModoro/releases):
 
@@ -88,19 +90,23 @@ cd PurrModoro
   - Diorama isométrico expandido desenhado sob medida para combinar perfeitamente com os sprites isométricos da coleção.
   - **Mesas & Prateleiras com Superfície Real**: arraste potinhos, plantinhas, luminárias e petiscos para cima de mesas e da prateleira de parede — tudo se move junto e respeita a profundidade (Z-order) automaticamente!
   - Janelas e quadros identificam automaticamente a **Parede Esquerda** e a **Parede Direita**, espelhando a perspectiva isométrica sozinhos ao arrastar de um lado para o outro!
-  - Barra flutuante para espelhar (`↔`), ajustar profundidade (`⬆ / ⬇`) e guardar no inventário (`📦`), além de **4 temas desbloqueáveis por moedas** (*Cozy* inicial, *Pastel*, *Jardim Bamboo* e *Noite Mística*).
+  - Barra flutuante para espelhar (`↔`), ajustar profundidade (`⬆ / ⬇`) e guardar no inventário (`📦`), além de **5 temas desbloqueáveis** (*Cozy* inicial, *Pastel*, *Jardim Bamboo*, *Noite Mística* e o tema secreto *Galáxia Lo-Fi*).
 - **Timer Pomodoro 100% Regulável & Recompensa por Tempo de Task**:
   - Regule livremente **Foco (1–180 min)**, **Pausa Curta (1–60 min)**, **Pausa Longa (1–90 min)** e **Ciclos/Longa (2–8)** — tudo salvo automaticamente!
-  - Presets rápidos (*Clássico 25/5*, *Sprint 15/3*, *Deep 50/10*, *Leve 20/5*) e botões **`-5m / -1m / +1m / +5m`** ao vivo.
+  - Presets rápidos (*Clássico 25/5*, *Sprint 15/3*, *Deep 50/10*, *Leve 20/5*), botões **`-5m / -1m / +1m / +5m`** ao vivo, proteção contra cancelar um timer ativo ao clicar em outra fase e dica `?` explicando o método Pomodoro.
   - Se concluir o foco, o gatinho comemora com chuva de moedas; se desistir no meio, ele chora 😿.
-- **Lojinha Completa (5 Categorias • 77 Itens + Temas)**:
-  - **🛋️ Móveis & Decor (42 itens)**: móveis isométricos, superfícies, potinhos, luminárias e objetos animados.
-  - **🐱 Gatinhos & Companheiros (10 skins)**: 9 gatinhos fofos + o clássico **Dino Sem Wi-Fi** em pixel art completo!
-  - **🎩 Chapéus (10 acessórios)**: coroa, chapéu de mago, cartola, chapéu mestre cuca, headphone lo-fi, boina e mais — aparecem no **Modo Relógio**, no **Quarto** e na **Loja**.
+- **Lojinha Completa & 24 Brindes Secretos (116+ colecionáveis)**:
+  - **🛋️ Móveis & Decor (63 itens na loja/inventário, incluindo cafés e móveis animados)**: mesas com superfície real, luminárias, fliperama, bola de cristal, troféu, gramofone, bonsai sakura e mais.
+  - **🐱 Gatinhos & Companheiros (23 skins)**: incluindo **Dino Sem Wi-Fi**, **Matcha**, **Sakura**, **Blueberry**, **Lavender**, **Cocoa** e **7 skins secretas exclusivas de apoiador** (*Cyber*, *Galaxy*, *Gold*, *Sunset* e 3 *Dinos* especiais).
+  - **🎩 Chapéus (27 acessórios)**: coroa, chapéu de mago, cartola, chapéu Nuvem Mágica (brinde grátis de login Google!), além de **16 chapéus secretos de apoiador**.
   - **🐾 Amigos Pets (3 pets)**: *Coelhinho*, *Golden Retriever* e *Mãozinha Zumbi* andando pelo quarto.
-  - **☕ Café & Comidinhas Interativas (12 itens)**:
+  - **☕ Café & Comidinhas Interativas**:
     - Ao clicar em **Pegar**, a comidinha **gruda no cursor**: entregue direto **na boquinha** do gatinho/pet, coloque em cima de um **potinho ou mesa**, ou deixe **no chão** para eles irem andando comer sozinhos!
     - Bebidas com bônus de moedas (*Café Latte `+25%`*, *Bubble Tea de Taro `+35%`*, *Matcha Latte `+40%`* e *Cafeteira Moka `+50%`*) multiplicam a recompensa do próximo foco concluído.
+- **☁️ Conta Google, Sync na Nuvem, Ofensiva Diária & Apoiador**:
+  - **Login Google Real + Firestore**: salve seu quartinho na nuvem para jogar no PC e na Web com o mesmo progresso (e ganhe o **Chapéu Nuvem Mágica + 150 moedas** na primeira conexão!).
+  - **Ofensiva Diária**: resgate recompensas diárias crescentes por 7 dias com **Escudo de Ofensiva** (`freezeShields`).
+  - **Bilíngue (`🇧🇷 PT` / `🇺🇸 EN`)** e aba **💖 Apoiar** integrada ao Mercado Pago / Stripe para pacotes de moedas e assinatura mensal com os **24 drops secretos**.
 
 ### 🪙 Ganho de Moedas por Tempo de Task
 

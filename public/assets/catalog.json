@@ -489,7 +489,8 @@
         "type": "coin_multiplier",
         "multiplier": 1.5,
         "label": "+50% moedas"
-      }
+      },
+      "premiumOnly": true
     },
     {
       "id": "food_fish_plate",
@@ -498,8 +499,8 @@
       "subCategory": "comida",
       "price": 15,
       "image": "assets/items/food_fish_plate.png",
-      "width": 56,
-      "height": 28,
+      "width": 78,
+      "height": 39,
       "wallItem": false,
       "description": "Alimenta o gatinho na hora e deixa ele super feliz!",
       "buff": {
@@ -532,8 +533,8 @@
       "subCategory": "comida",
       "price": 12,
       "image": "assets/items/food_can_salmon.png",
-      "width": 18,
-      "height": 18,
+      "width": 36,
+      "height": 36,
       "wallItem": false,
       "description": "Petisco cremoso para comemorar uma pausa.",
       "buff": {
@@ -549,8 +550,8 @@
       "subCategory": "comida",
       "price": 15,
       "image": "assets/items/food_drumstick.png",
-      "width": 24,
-      "height": 23,
+      "width": 48,
+      "height": 46,
       "wallItem": false,
       "description": "Lanche especial compartilhado com os pets.",
       "buff": {
@@ -599,14 +600,32 @@
       "description": "Prateleira de parede que também funciona como apoio para plantinhas e mimos!"
     },
     {
+      "id": "food_catnip_freeze",
+      "name": "Picolé de Catnip Congelado",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 45,
+      "image": "assets/items/food_catnip_freeze.png",
+      "width": 42,
+      "height": 42,
+      "wallItem": false,
+      "particle": "❄️",
+      "buff": {
+        "type": "streak_freeze",
+        "freezes": 1,
+        "label": "+1 Escudo ❄️"
+      },
+      "description": "Protege sua ofensiva diária se você esquecer de abrir 1 dia!"
+    },
+    {
       "id": "coffee_boba",
       "name": "Bubble Tea de Taro",
       "category": "food",
       "subCategory": "cafe",
       "price": 25,
       "image": "assets/items/coffee_boba.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🧋",
       "buff": {
@@ -623,8 +642,8 @@
       "subCategory": "cafe",
       "price": 30,
       "image": "assets/items/coffee_matcha.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🍵",
       "buff": {
@@ -659,8 +678,8 @@
       "subCategory": "comida",
       "price": 22,
       "image": "assets/items/food_strawberry_cake.png",
-      "width": 28,
-      "height": 28,
+      "width": 44,
+      "height": 44,
       "wallItem": false,
       "particle": "🍰",
       "buff": {
@@ -677,8 +696,8 @@
       "subCategory": "comida",
       "price": 14,
       "image": "assets/items/food_onigiri.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🍙",
       "buff": {
@@ -686,7 +705,8 @@
         "happiness": 25,
         "label": "Lanchinho Zen"
       },
-      "description": "Bolinho de arroz com carinha fofa e algas crocantes!"
+      "description": "Bolinho de arroz com carinha fofa e algas crocantes!",
+      "premiumOnly": true
     },
     {
       "id": "food_ramen",
@@ -695,8 +715,8 @@
       "subCategory": "comida",
       "price": 24,
       "image": "assets/items/food_ramen.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🍜",
       "buff": {
@@ -704,7 +724,123 @@
         "happiness": 40,
         "label": "Barriga Quentinha"
       },
-      "description": "Tigela fumegante de lámen com ovo e naruto para recarregar energias!"
+      "description": "Tigela fumegante de lámen com ovo e naruto para recarregar energias!",
+      "premiumOnly": true
+    },
+    {
+      "id": "food_ice_cream_tub",
+      "name": "Pote de Sorvete",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 110,
+      "image": "assets/items/food_ice_cream_tub.png",
+      "width": 42,
+      "height": 42,
+      "wallItem": false,
+      "particle": "🍨",
+      "buff": {
+        "type": "streak_freeze",
+        "freezes": 3,
+        "label": "+3 Escudos ❄️"
+      },
+      "description": "Pote cremoso de sorvete: segura até 3 strikes (dias perdidos) da sua Ofensiva Diária!",
+      "premiumOnly": true
+    },
+    {
+      "id": "furn_sec_gold_trophy",
+      "name": "Troféu Foco Dourado",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 95,
+      "image": "assets/items/furn_sec_gold_trophy.png",
+      "width": 44,
+      "height": 36,
+      "wallItem": false,
+      "description": "Troféu reluzente de ouro maciço para coroar seu quarto!"
+    },
+    {
+      "id": "furn_sec_arcade",
+      "name": "Fliperama Retrô",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 135,
+      "image": "assets/items/furn_sec_arcade.png",
+      "width": 108,
+      "height": 108,
+      "wallItem": false,
+      "description": "Máquina arcade isométrica brilhante para relaxar nas pausas!"
+    },
+    {
+      "id": "furn_sec_sakura_bonsai",
+      "name": "Bonsai Sakura",
+      "category": "furniture",
+      "subCategory": "planta",
+      "price": 75,
+      "image": "assets/items/furn_sec_sakura_bonsai.png",
+      "width": 52,
+      "height": 42,
+      "wallItem": false,
+      "description": "Cerejeira miniatura em flor super serena para a mesa ou chão."
+    },
+    {
+      "id": "furn_sec_lava_lamp",
+      "name": "Lâmpada de Lava Mística",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 70,
+      "image": "assets/items/furn_sec_lava_lamp.png",
+      "width": 36,
+      "height": 42,
+      "wallItem": false,
+      "description": "Luminária retrô relaxante com bolhas roxas e rosas."
+    },
+    {
+      "id": "furn_sec_gramophone",
+      "name": "Vitrola Lo-Fi",
+      "category": "furniture",
+      "subCategory": "movel",
+      "price": 115,
+      "image": "assets/items/furn_sec_gramophone.png",
+      "width": 48,
+      "height": 52,
+      "wallItem": false,
+      "description": "Toca-discos isométrico de vinil com trompete dourado!"
+    },
+    {
+      "id": "furn_sec_crystal_ball",
+      "name": "Bola de Cristal",
+      "category": "furniture",
+      "subCategory": "halloween",
+      "price": 85,
+      "image": "assets/items/furn_sec_crystal_ball.png",
+      "width": 40,
+      "height": 34,
+      "wallItem": false,
+      "description": "Prevê um futuro cheio de produtividade e boas notas!"
+    },
+    {
+      "id": "furn_sec_plush_dev",
+      "name": "Pelúcia Dev Mascote",
+      "category": "furniture",
+      "subCategory": "brinquedo",
+      "price": 90,
+      "image": "assets/items/furn_sec_plush_dev.png",
+      "width": 36,
+      "height": 34,
+      "wallItem": false,
+      "description": "Gatinho de pelúcia fofo usando óculos de programador!"
+    },
+    {
+      "id": "furn_sec_neon_heart",
+      "name": "Placa Neon Coração",
+      "category": "furniture",
+      "subCategory": "quadro",
+      "price": 80,
+      "image": "assets/items/furn_sec_neon_heart.png",
+      "width": 48,
+      "height": 42,
+      "wallItem": true,
+      "description": "Letreiro neon brilhante rosa em perspectiva para a parede do quarto!"
     },
     {
       "id": "decor_eye_jar",
@@ -809,7 +945,8 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 2.0,
+      "premiumOnly": true
     },
     {
       "id": "cat_pochi_cream",
@@ -1004,7 +1141,8 @@
           "fps": 5
         }
       },
-      "previewScale": 1.45
+      "previewScale": 1.45,
+      "premiumOnly": true
     },
     {
       "id": "cat_evil_box",
@@ -1043,7 +1181,8 @@
           "fps": 5
         }
       },
-      "previewScale": 2.0
+      "previewScale": 2.0,
+      "premiumOnly": true
     },
     {
       "id": "cat_zombie",
@@ -1082,7 +1221,8 @@
           "fps": 5
         }
       },
-      "previewScale": 2.0
+      "previewScale": 2.0,
+      "premiumOnly": true
     },
     {
       "id": "cat_dino",
@@ -1123,6 +1263,527 @@
         }
       },
       "previewScale": 2.0
+    },
+    {
+      "id": "cat_dino_green",
+      "name": "Dino Verde Esmeralda",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 85,
+      "description": "O clássico dinossaurinho pré-histórico em verde esmeralda vibrante!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_dino_green_idle.png",
+          "frames": 8,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_dino_green_sleep.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_dino_green_cheer.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "cry": {
+          "src": "assets/sprites/cat_dino_green_cry.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sakura",
+      "name": "Mochi Sakura Rosa",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 95,
+      "description": "Pelagem cor de flor de cerejeira com orelhinhas doces!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sakura_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sakura_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sakura_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sakura_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_blueberry",
+      "name": "Mochi Azul Gelo",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 95,
+      "description": "Tom azul-celeste suave e tranquilo para dias focados.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_blueberry_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_blueberry_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_blueberry_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_blueberry_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_matcha",
+      "name": "Mochi Verde Matcha",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 100,
+      "description": "Gatinho verde-menta zen inspirado em casas de chá!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_matcha_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_matcha_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_matcha_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_matcha_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_lavender",
+      "name": "Mochi Lavanda",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 110,
+      "description": "Pelagem lilás sonhadora cheia de serenidade.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_lavender_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_lavender_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_lavender_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_lavender_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_galaxy",
+      "name": "Mochi Galáxia",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: pelagem cósmica roxo-anil cheia de mistério!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_galaxy_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_galaxy_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_galaxy_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_galaxy_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_gold",
+      "name": "Mochi Dourado",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: reluzente como ouro puro!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_gold_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_gold_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_gold_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_gold_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_cyber",
+      "name": "Mochi Cyber Neon",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: brilho ciano e magenta futurista!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_cyber_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_cyber_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_cyber_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_cyber_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_sunset",
+      "name": "Mochi Pôr-do-Sol",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: coral quente com reflexos dourados do entardecer!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_sunset_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_sunset_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_sunset_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_sunset_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_cocoa",
+      "name": "Mochi Cacau Quente",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 105,
+      "description": "Marrom achocolatado com patinhas de creme quentinho!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_cocoa_idle.png",
+          "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_cocoa_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_cocoa_cheer.png",
+          "frames": 2,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_cocoa_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_dino_pink",
+      "name": "Dino Algodão-Doce",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: Dino pré-histórico cor-de-rosa super fofo!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_dino_pink_idle.png",
+          "frames": 8,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_dino_pink_sleep.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_dino_pink_cheer.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_dino_pink_cry.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_dino_gold",
+      "name": "Dino Rei Dourado",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: T-Rex dourado lendário dos mestres do foco!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_dino_gold_idle.png",
+          "frames": 8,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_dino_gold_sleep.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_dino_gold_cheer.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_dino_gold_cry.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
+    },
+    {
+      "id": "cat_sec_dino_purple",
+      "name": "Dino Ametista",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 0,
+      "secret": true,
+      "supporterDrop": true,
+      "description": "Brinde Secreto: Dino místico em roxo ametista brilhante!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_sec_dino_purple_idle.png",
+          "frames": 8,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_sec_dino_purple_sleep.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_sec_dino_purple_cheer.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 7
+        },
+        "cry": {
+          "src": "assets/sprites/cat_sec_dino_purple_cry.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 5
+        }
+      },
+      "previewScale": 2.0
     }
   ],
   "pets": [
@@ -1138,7 +1799,8 @@
       "fw": 32,
       "fh": 32,
       "fps": 7,
-      "scale": 1.25
+      "scale": 1.25,
+      "premiumOnly": true
     },
     {
       "id": "pet_golden",
@@ -1152,7 +1814,8 @@
       "fw": 64,
       "fh": 64,
       "fps": 7,
-      "scale": 1.25
+      "scale": 1.25,
+      "premiumOnly": true
     },
     {
       "id": "pet_zombie_hand",
@@ -1166,7 +1829,8 @@
       "fw": 32,
       "fh": 32,
       "fps": 9,
-      "scale": 2.0
+      "scale": 2.0,
+      "premiumOnly": true
     }
   ],
   "hats": [
@@ -1279,6 +1943,226 @@
       "width": 24,
       "height": 20,
       "description": "Flutua brilhando sobre o gatinho mais disciplinado!"
+    },
+    {
+      "id": "hat_cloud_star",
+      "name": "Chapéu Nuvem Mágica",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_cloud_star.png",
+      "width": 24,
+      "height": 20,
+      "description": "Exclusivo de boas-vindas ao conectar sua conta Google na nuvem!",
+      "loginReward": true
+    },
+    {
+      "id": "hat_sec_astronaut",
+      "name": "Capacete Astronauta",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_astronaut.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: explore galáxias inteiras mantendo o foco!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_viking",
+      "name": "Elmo Viking Miau",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_viking.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: chifrinhos épicos para conquistar suas metas!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_pirate",
+      "name": "Chapéu de Pirata",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_pirate.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: ahoy! Navegando em águas tranquilas de foco!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_flower_crown",
+      "name": "Coroa de Flores",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_flower_crown.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: guirlanda delicada de primavera!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_rgb_ears",
+      "name": "Headset Gatinho RGB",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_rgb_ears.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: orelhinhas gamer neon que brilham!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_detective",
+      "name": "Chapéu de Detetive",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_detective.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: elementar, meu caro gatinho!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_party",
+      "name": "Chapéu de Festa",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_party.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: todo ciclo concluído merece confete!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_ufo",
+      "name": "Mini Disco Voador",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_ufo.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: abduzido pela concentração absoluta!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_propeller",
+      "name": "Boné de Hélice",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_propeller.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: hélice colorida girando ideias brilhantes!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_samurai",
+      "name": "Elmo Samurai",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_samurai.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: armadura Kabuto de guerreiro disciplinado!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_cowboy",
+      "name": "Chapéu Cowboy",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_cowboy.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: xerife das metas no Velho Oeste!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_devil_horns",
+      "name": "Chifrinhos Travessos",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_devil_horns.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: um toque travesso para virar a noite focando!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_unicorn",
+      "name": "Chifre de Unicórnio",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_unicorn.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: magia arco-íris e concentração pura!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_grad_cap",
+      "name": "Capelo de Formatura",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_grad_cap.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: PhD em Pomodoro e zero procrastinação!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_coffee_cup",
+      "name": "Xícara Equilibrada",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_coffee_cup.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: café quentinho equilibrado sem derramar!",
+      "secret": true,
+      "supporterDrop": true
+    },
+    {
+      "id": "hat_sec_sakura_pin",
+      "name": "Flor de Sakura",
+      "category": "hats",
+      "subCategory": "chapeu",
+      "price": 0,
+      "image": "assets/items/hat_sec_sakura_pin.png",
+      "width": 24,
+      "height": 20,
+      "description": "Brinde Secreto: florzinha de cerejeira super delicada!",
+      "secret": true,
+      "supporterDrop": true
     }
   ]
 }

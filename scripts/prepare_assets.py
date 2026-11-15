@@ -96,12 +96,18 @@ def _plot_mask(img: Image.Image, rows: list[str], palette: dict[str, tuple[int, 
                 px[px_x, py] = col
 
 
-def generate_dino_sprites(sprites_dir: Path):
-    """Gera as sprite sheets do Dino Sem Wi-Fi (idle, sleep, cheer, cry)."""
+def generate_dino_sprites(
+    sprites_dir: Path,
+    prefix: str = "cat_dino",
+    body_col: tuple[int, int, int, int] = (88, 92, 98, 255),
+    belly_col: tuple[int, int, int, int] = (132, 138, 146, 255),
+    outline_col: tuple[int, int, int, int] = (44, 42, 48, 255),
+):
+    """Gera as sprite sheets de Dino Sem Wi-Fi (idle, sleep, cheer, cry) com paleta customizável."""
     pal = {
-        "O": (44, 42, 48, 255),      # contorno escuro legível em tema claro e escuro
-        "B": (88, 92, 98, 255),      # corpo cinza clássico
-        "L": (132, 138, 146, 255),   # barriga/highlight
+        "O": outline_col,            # contorno escuro legível em tema claro e escuro
+        "B": body_col,               # corpo principal
+        "L": belly_col,              # barriga/highlight
         "E": (255, 255, 255, 255),   # olho branco
         "G": (95, 168, 88, 255),     # cacto verde
         "D": (62, 120, 58, 255),     # sombra do cacto
@@ -172,7 +178,7 @@ def generate_dino_sprites(sprites_dir: Path):
     ]
     for i, (bob_y, legs) in enumerate(idle_poses):
         _plot_mask(idle_strip, dino_upper + legs, pal, ox=i * 32 + 1, oy=7 + bob_y)
-    idle_strip.save(sprites_dir / "cat_dino_idle.png")
+    idle_strip.save(sprites_dir / f"{prefix}_idle.png")
 
     # 2. Sleep (4 frames, 32x32 — Dino deitadinho com Zzz)
     dino_sleep_body = [
@@ -198,7 +204,7 @@ def generate_dino_sprites(sprites_dir: Path):
         _plot_mask(sleep_strip, dino_sleep_body, pal, ox=i * 32 + 1, oy=by)
         if i >= 1:
             _plot_mask(sleep_strip, ["ZZZ", ".Z.", "ZZZ"], pal, ox=i * 32 + 24, oy=max(5, 12 - i * 2))
-    sleep_strip.save(sprites_dir / "cat_dino_sleep.png")
+    sleep_strip.save(sprites_dir / f"{prefix}_sleep.png")
 
     # 3. Cheer (4 frames, 32x32 — pulando cacto + brilhos!)
     cheer_strip = Image.new("RGBA", (32 * 4, 32), (0, 0, 0, 0))
@@ -217,7 +223,7 @@ def generate_dino_sprites(sprites_dir: Path):
         if i in (1, 2):
             _plot_mask(cheer_strip, [".Y.", "YYY", ".Y."], pal, ox=i * 32 + 3, oy=5)
             _plot_mask(cheer_strip, ["Y"], pal, ox=i * 32 + 28, oy=8)
-    cheer_strip.save(sprites_dir / "cat_dino_cheer.png")
+    cheer_strip.save(sprites_dir / f"{prefix}_cheer.png")
 
     # 4. Cry (4 frames, 32x32 — olhão assustado de Game Over + lágrima)
     dino_cry_upper = list(dino_upper)
@@ -231,7 +237,59 @@ def generate_dino_sprites(sprites_dir: Path):
         _plot_mask(cry_strip, ["T", "T"], pal, ox=i * 32 + 17, oy=by + 4 + (i % 2))
         if i % 2 == 0:
             _plot_mask(cry_strip, ["R.R", ".R.", "R.R"], pal, ox=i * 32 + 6, oy=3)
-    cry_strip.save(sprites_dir / "cat_dino_cry.png")
+    cry_strip.save(sprites_dir / f"{prefix}_cry.png")
+
+
+def _lerp_rgb(c1: tuple[int, int, int], c2: tuple[int, int, int], t: float) -> tuple[int, int, int]:
+    return (
+        int(round(c1[0] + (c2[0] - c1[0]) * t)),
+        int(round(c1[1] + (c2[1] - c1[1]) * t)),
+        int(round(c1[2] + (c2[2] - c1[2]) * t)),
+    )
+
+
+def recolor_cat_sheet(
+    src_name: str,
+    dest_name: str,
+    dark_rgb: tuple[int, int, int],
+    mid_rgb: tuple[int, int, int],
+    light_rgb: tuple[int, int, int],
+):
+    """Recoloriza apenas os tons quentes da pelagem mantendo contornos escuros, olhos e lágrimas."""
+    src_path = SPRITES_DIR / src_name
+    dest_path = SPRITES_DIR / dest_name
+    with Image.open(src_path).convert("RGBA") as img:
+        out = img.copy()
+        px = out.load()
+        w, h = out.size
+        for y in range(h):
+            for x in range(w):
+                r, g, b, a = px[x, y]
+                if a == 0:
+                    continue
+                lum = 0.299 * r + 0.587 * g + 0.114 * b
+                # Apenas pixels quentes da pelagem (exclui contorno escuro, branco puro e azul)
+                if r > b + 16 and lum >= 65:
+                    t = max(0.0, min(1.0, (lum - 75.0) / 155.0))
+                    if t < 0.5:
+                        nr, ng, nb = _lerp_rgb(dark_rgb, mid_rgb, t * 2.0)
+                    else:
+                        nr, ng, nb = _lerp_rgb(mid_rgb, light_rgb, (t - 0.5) * 2.0)
+                    px[x, y] = (nr, ng, nb, a)
+        out.save(dest_path)
+
+
+CAT_RECOLOR_PALETTES = {
+    "cat_sakura": ((196, 98, 134), (242, 162, 192), (255, 224, 236)),
+    "cat_blueberry": ((66, 114, 178), (124, 178, 234), (214, 238, 255)),
+    "cat_matcha": ((74, 132, 76), (134, 194, 120), (218, 244, 206)),
+    "cat_lavender": ((116, 86, 168), (176, 146, 224), (234, 220, 252)),
+    "cat_sec_galaxy": ((48, 34, 96), (112, 74, 198), (196, 166, 255)),
+    "cat_sec_gold": ((176, 118, 18), (236, 184, 52), (255, 240, 148)),
+    "cat_sec_cyber": ((24, 128, 138), (64, 212, 216), (255, 116, 214)),
+    "cat_sec_sunset": ((184, 58, 72), (244, 118, 86), (255, 204, 124)),
+    "cat_sec_cocoa": ((86, 52, 38), (144, 96, 70), (222, 186, 152)),
+}
 
 
 def prepare_sprites():
@@ -248,12 +306,47 @@ def prepare_sprites():
     copy_sprite("PetMobileFree/PetMobileFree/GoldenRetriver.png", "pet_golden.png")
     copy_sprite("FreeDemo/FreeDemo/BONUSZombieHand.png", "pet_zombie_hand.png")
     copy_sprite("CatPackHalloweenFREE/CatPackHalloweenFREE/EyeinJar/PNG/EyeinJar.png", "decor_eye_jar.png")
-    generate_dino_sprites(SPRITES_DIR)
+    generate_dino_sprites(SPRITES_DIR, "cat_dino")
+    generate_dino_sprites(
+        SPRITES_DIR,
+        "cat_dino_green",
+        body_col=(62, 166, 94, 255),
+        belly_col=(156, 224, 140, 255),
+        outline_col=(32, 68, 44, 255),
+    )
+    generate_dino_sprites(
+        SPRITES_DIR,
+        "cat_sec_dino_pink",
+        body_col=(238, 128, 174, 255),
+        belly_col=(255, 206, 226, 255),
+        outline_col=(82, 34, 58, 255),
+    )
+    generate_dino_sprites(
+        SPRITES_DIR,
+        "cat_sec_dino_gold",
+        body_col=(234, 178, 42, 255),
+        belly_col=(255, 238, 144, 255),
+        outline_col=(84, 54, 18, 255),
+    )
+    generate_dino_sprites(
+        SPRITES_DIR,
+        "cat_sec_dino_purple",
+        body_col=(146, 98, 214, 255),
+        belly_col=(214, 184, 252, 255),
+        outline_col=(48, 28, 86, 255),
+    )
 
     # Faixas verticais de FreeCats.png (Pochi Creme): cry (4), cheer (2), sleep (4)
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats.png", 0, 64, 4, 64, 64, "cat_cream_cry.png")
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats.png", 64, 128, 2, 64, 64, "cat_cream_cheer.png")
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats.png", 128, 192, 4, 64, 64, "cat_cream_sleep.png")
+
+    # Recolorizações em pixel art (loja + brindes secretos "Adote um Dev")
+    for cid, (dark_c, mid_c, light_c) in CAT_RECOLOR_PALETTES.items():
+        recolor_cat_sheet("cat_mochi_idle.png", f"{cid}_idle.png", dark_c, mid_c, light_c)
+        recolor_cat_sheet("cat_cream_sleep.png", f"{cid}_sleep.png", dark_c, mid_c, light_c)
+        recolor_cat_sheet("cat_cream_cheer.png", f"{cid}_cheer.png", dark_c, mid_c, light_c)
+        recolor_cat_sheet("cat_cream_cry.png", f"{cid}_cry.png", dark_c, mid_c, light_c)
 
     # Faixas verticais de FreeCats2.png (Frajola Tuxedo): 256x188
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats2.png", 0, 60, 4, 64, 64, "cat_tuxedo_cry.png")
@@ -478,9 +571,38 @@ def generate_procedural_foods(items_dir: Path) -> list[dict]:
         "r": (176, 48, 62, 255),     # sombra vermelha
         "S": (248, 166, 178, 255),   # bochecha / naruto rosa
         "E": (250, 210, 88, 255),    # gema do ovo
+        "I": (118, 214, 248, 255),   # picolé gelo
+        "i": (74, 166, 218, 255),    # sombra picolé gelo
+        "N": (204, 152, 98, 255),    # palito madeira
     }
 
     designs = [
+        {
+            "id": "food_catnip_freeze",
+            "name": "Picolé de Catnip Congelado",
+            "subCategory": "cafe",
+            "price": 45,
+            "particle": "❄️",
+            "buff": {"type": "streak_freeze", "freezes": 1, "label": "+1 Escudo ❄️"},
+            "description": "Protege sua ofensiva diária se você esquecer de abrir 1 dia!",
+            "rows": [
+                "......OOOOOO......",
+                "....OOIIIIIIOO....",
+                "...OIIWWIIIIiIO...",
+                "..OIIWGGOIIIIiIO..",
+                "..OIIGggGIIIIiIO..",
+                "..OIIIGGOIIIIiIO..",
+                "..OIIIIIIIIIIiIO..",
+                "..OIIIIIIIIIIiIO..",
+                "..OiiIIIIIIIIiIO..",
+                "...OiiiiiiiiiiO...",
+                "....OOOOOOOOOO....",
+                ".......ONNO.......",
+                ".......ONNO.......",
+                ".......ONNO.......",
+                "........OO........",
+            ],
+        },
         {
             "id": "coffee_boba",
             "name": "Bubble Tea de Taro",
@@ -624,17 +746,49 @@ def generate_procedural_foods(items_dir: Path) -> list[dict]:
                 "....OBBBBBBBBBO...",
             ],
         },
+        {
+            "id": "food_ice_cream_tub",
+            "name": "Pote de Sorvete",
+            "subCategory": "cafe",
+            "price": 110,
+            "particle": "🍨",
+            "buff": {"type": "streak_freeze", "freezes": 3, "label": "+3 Escudos ❄️"},
+            "description": "Pote cremoso de sorvete: segura até 3 strikes (dias perdidos) da sua Ofensiva Diária!",
+            "rows": [
+                "....OOOOOOOOOO....",
+                "...OWWPPPPPPWWO...",
+                "..OPPPPPPPPPPPPO..",
+                "..OOOOOOOOOOOOOO..",
+                "..OIIIIIIIIIIIIO..",
+                "..OIIWWIIIIIIiIO..",
+                "..OIIWWWWIIIIiIO..",
+                "..OIIPPWWPPIIiIO..",
+                "..OIIPPPPPPIIiIO..",
+                "..OIIIIIIIIIIiIO..",
+                "...OIIiiiiiiiIO...",
+                "...OIIIIIIIIiIO...",
+                "....OOOOOOOOOO....",
+            ],
+        },
     ]
 
     out = []
     for spec in designs:
-        img = Image.new("RGBA", (28, 28), (0, 0, 0, 0))
         rows = spec["rows"]
         mw = max(len(r) for r in rows)
         mh = len(rows)
-        ox = (28 - mw) // 2
-        oy = (28 - mh) // 2
-        _plot_mask(img, rows, base_pal, ox=ox, oy=oy)
+        if spec["id"] == "food_taiyaki":
+            img = Image.new("RGBA", (28, 28), (0, 0, 0, 0))
+            ox = (28 - mw) // 2
+            oy = (28 - mh) // 2
+            _plot_mask(img, rows, base_pal, ox=ox, oy=oy)
+        else:
+            raw_food = Image.new("RGBA", (mw, mh), (0, 0, 0, 0))
+            _plot_mask(raw_food, rows, base_pal, ox=0, oy=0)
+            scaled_food = raw_food.resize((mw * 2, mh * 2), Image.Resampling.NEAREST)
+            size = max(42, mw * 2 + 4, mh * 2 + 4)
+            img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+            img.paste(scaled_food, ((size - scaled_food.width) // 2, (size - scaled_food.height) // 2), scaled_food)
         dest = items_dir / f"{spec['id']}.png"
         img.save(dest)
         out.append({
@@ -644,8 +798,8 @@ def generate_procedural_foods(items_dir: Path) -> list[dict]:
             "subCategory": spec["subCategory"],
             "price": spec["price"],
             "image": f"assets/items/{spec['id']}.png",
-            "width": 28,
-            "height": 28,
+            "width": img.width,
+            "height": img.height,
             "wallItem": False,
             "particle": spec["particle"],
             "buff": spec["buff"],
@@ -677,6 +831,10 @@ def generate_procedural_hats(items_dir: Path) -> list[dict]:
         "A": (96, 184, 246, 255),    # azul fone lo-fi
         "a": (64, 138, 204, 255),    # sombra azul
         "H": (255, 244, 150, 255),   # brilho auréola
+        "B": (146, 214, 252, 255),   # azul celeste / vidro astronauta
+        "N": (82, 238, 178, 255),    # verde menta / neon / disco
+        "M": (196, 172, 132, 255),   # bege / metal claro / detetive
+        "m": (142, 118, 84, 255),    # sombra bege
     }
 
     hats = [
@@ -848,6 +1006,317 @@ def generate_procedural_hats(items_dir: Path) -> list[dict]:
                 "..OOOOyyyyyyOOOO..",
             ],
         },
+        {
+            "id": "hat_cloud_star",
+            "name": "Chapéu Nuvem Mágica",
+            "price": 0,
+            "loginReward": True,
+            "description": "Exclusivo de boas-vindas ao conectar sua conta Google na nuvem!",
+            "oy": 5,
+            "rows": [
+                "......OOOOOO......",
+                "....OOWWWWWWOO....",
+                "..OOWWWWWWWWWWOO..",
+                ".OWWWBBBWWYYWWWWO.",
+                ".OWWBBBBWYYYYWWWO.",
+                ".OWWWWWWWWYYWWWWO.",
+                "..OOOOOOOOOOOOOO..",
+            ],
+        },
+        # --- 8 CHAPÉUS SECRETOS (Adote um Dev) ---
+        {
+            "id": "hat_sec_astronaut",
+            "name": "Capacete Astronauta",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: explore galáxias inteiras mantendo o foco!",
+            "oy": 4,
+            "rows": [
+                "...OOOOOOOOOOOO...",
+                "..OWWWWWWWWWWWWO..",
+                ".OWWOOOOOOOOOOWWO.",
+                ".OWOBBBBBBBBBBOWO.",
+                ".OWOBWWBBBBBBBOWO.",
+                ".OWOBBBBBBBBBBOWO.",
+                ".OWWOOOOOOOOOOWWO.",
+                "..OCCCCCCCCCCCCO..",
+                "...OOOOOOOOOOOO...",
+            ],
+        },
+        {
+            "id": "hat_sec_viking",
+            "name": "Elmo Viking Miau",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: chifrinhos épicos para conquistar suas metas!",
+            "oy": 5,
+            "rows": [
+                "OO..............OO",
+                "OWO...OOOOOO...OWO",
+                "OWWO.OMMMMMMO.OWWO",
+                ".OWOOMMMMMMMMOOWO.",
+                "..OOOMmmYYmmMOOO..",
+                "...OMMMMMMMMMMO...",
+                "...OYYYYYYYYYYO...",
+                "...OOOOOOOOOOOO...",
+            ],
+        },
+        {
+            "id": "hat_sec_pirate",
+            "name": "Chapéu de Pirata",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: ahoy! Navegando em águas tranquilas de foco!",
+            "oy": 6,
+            "rows": [
+                "....OOOOOOOOOO....",
+                "..OOKKKKKKKKKKOO..",
+                ".OKKKKKKWWKKKKKKO.",
+                ".OKKKKKWWWWKKKKKO.",
+                "OOKKKKKKKKKKKKKKOO",
+                "OKKKKYYYYYYYYKKKKO",
+                ".OOOOOOOOOOOOOOOO.",
+            ],
+        },
+        {
+            "id": "hat_sec_flower_crown",
+            "name": "Coroa de Flores",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: guirlanda delicada de primavera!",
+            "oy": 8,
+            "rows": [
+                "..OO..OOOO..OO....",
+                ".OPPOOYYYYOOPPO...",
+                "OPWPOGGGGGGGOWPO..",
+                ".OPPOYYYYYYOPPO...",
+                "..OOGGGGGGGGOO....",
+            ],
+        },
+        {
+            "id": "hat_sec_rgb_ears",
+            "name": "Headset Gatinho RGB",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: orelhinhas gamer neon que brilham!",
+            "oy": 5,
+            "rows": [
+                ".OOO..........OOO.",
+                "OPNPO........OPNPO",
+                "OOKKKOOOOOOOOOKKOO",
+                ".OKKKKKKKKKKKKKKO.",
+                ".OKAOOOOOOOOOOAKO.",
+                "OKNO..........ONKO",
+                "OKKO..........OKKO",
+                ".OO............OO.",
+            ],
+        },
+        {
+            "id": "hat_sec_detective",
+            "name": "Chapéu de Detetive",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: elementar, meu caro gatinho!",
+            "oy": 7,
+            "rows": [
+                "....OOOOOOOOOO....",
+                "...OMMMMMMMMMMO...",
+                "..OMMMMmmmmMMMMO..",
+                "..OkkkkkkkkkkkkO..",
+                ".OOMMMMMMMMMMMMOO.",
+                "OMMMMMMmmmmMMMMMMO",
+                ".OOOOOOOOOOOOOOOO.",
+            ],
+        },
+        {
+            "id": "hat_sec_party",
+            "name": "Chapéu de Festa",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: todo ciclo concluído merece confete!",
+            "oy": 4,
+            "rows": [
+                ".......OOO........",
+                "......OYYYO.......",
+                ".......OAO........",
+                "......OAPAO.......",
+                ".....OANAAAO......",
+                "....OAAYYAAAO.....",
+                "...OAPAAAAAPAO....",
+                "..OOOOOOOOOOOOO...",
+            ],
+        },
+        {
+            "id": "hat_sec_ufo",
+            "name": "Mini Disco Voador",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: abduzido pela concentração absoluta!",
+            "oy": 5,
+            "rows": [
+                ".....OOOOOOOO.....",
+                "....OBBBBBBBBO....",
+                "....OBWWBBBBBO....",
+                "..OOKKKKKKKKKKOO..",
+                ".OKKNKKYKKNKKYKKO.",
+                "..OOOOOOOOOOOOOO..",
+            ],
+        },
+        {
+            "id": "hat_sec_propeller",
+            "name": "Boné de Hélice",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: hélice colorida girando ideias brilhantes!",
+            "oy": 4,
+            "rows": [
+                "...OOOOO..OOOOO...",
+                "..OYYYYYOOYYYYYO..",
+                "........OO........",
+                "....OOOOOOOOOO....",
+                "...ORRRAAAAGGGO...",
+                "..ORRRRAAAAAGGGO..",
+                "..OYYYYYYYYYYYYOO.",
+                "..OOOOOOOOOOOOOO..",
+            ],
+        },
+        {
+            "id": "hat_sec_samurai",
+            "name": "Elmo Samurai",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: armadura Kabuto de guerreiro disciplinado!",
+            "oy": 5,
+            "rows": [
+                "..OO..........OO..",
+                ".OYYO........OYYO.",
+                ".OYYO.OOOOOO.OYYO.",
+                "..OOOKKKKKKKKOOO..",
+                "..OKKRRRRRRRRKKO..",
+                ".OKKKKKKKKKKKKKKO.",
+                "OKkOOOOOOOOOOOOkkO",
+                "OO..............OO",
+            ],
+        },
+        {
+            "id": "hat_sec_cowboy",
+            "name": "Chapéu Cowboy",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: xerife das metas no Velho Oeste!",
+            "oy": 6,
+            "rows": [
+                ".....OOOOOOOO.....",
+                "....OMMMMMMMMO....",
+                "....OMMMmmMMMO....",
+                "....OKKRRRRKKO....",
+                ".OOOMMMMMMMMMMOOO.",
+                "OMMMMMMMMMMMMMMMMO",
+                ".OOOOOOOOOOOOOOOO.",
+            ],
+        },
+        {
+            "id": "hat_sec_devil_horns",
+            "name": "Chifrinhos Travessos",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: um toque travesso para virar a noite focando!",
+            "oy": 7,
+            "rows": [
+                "..OO..........OO..",
+                ".ORRO........ORRO.",
+                ".ORrRO......ORrRO.",
+                "..ORrRO....ORrRO..",
+                "...ORRRO..ORRRO...",
+                "...OOOOO..OOOOO...",
+            ],
+        },
+        {
+            "id": "hat_sec_unicorn",
+            "name": "Chifre de Unicórnio",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: magia arco-íris e concentração pura!",
+            "oy": 4,
+            "rows": [
+                ".......OO.......",
+                "......OYYO......",
+                "......OYHO......",
+                ".....OYYHYO.....",
+                ".....OYyYYO.....",
+                "....OPPYAANO....",
+                "....OOOOOOOO....",
+            ],
+        },
+        {
+            "id": "hat_sec_grad_cap",
+            "name": "Capelo de Formatura",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: PhD em Pomodoro e zero procrastinação!",
+            "oy": 6,
+            "rows": [
+                "...OOOOOOOOOOOO...",
+                "..OKKKKKKKKKKKKO..",
+                ".OKKKKKKYYKKKKKKO.",
+                "..OOOOOKKKYOOOOO..",
+                "....OKKKKKYKKO....",
+                "....OKKKKKYKKO....",
+                ".....OOOOOYYO.....",
+                "..........OO......",
+            ],
+        },
+        {
+            "id": "hat_sec_coffee_cup",
+            "name": "Xícara Equilibrada",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: café quentinho equilibrado sem derramar!",
+            "oy": 4,
+            "rows": [
+                ".....W....W.....",
+                "......W..W......",
+                "....OOOOOOOO....",
+                "...OWWWWWWWWOO..",
+                "...OWMMMMMMOWO..",
+                "...OWWWWWWWOWO..",
+                "....OWWWWWWOO...",
+                ".....OOOOOOO....",
+            ],
+        },
+        {
+            "id": "hat_sec_sakura_pin",
+            "name": "Flor de Sakura",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: florzinha de cerejeira super delicada!",
+            "oy": 6,
+            "rows": [
+                "....OO..OO....",
+                "...OPPOOPPO...",
+                "..OPPPYYPPPO..",
+                "..OPPYYYYPPO..",
+                "...OPPOOPPO...",
+                "....OOGGGO....",
+                "......OOO.....",
+            ],
+        },
     ]
 
     out = []
@@ -860,7 +1329,7 @@ def generate_procedural_hats(items_dir: Path) -> list[dict]:
         _plot_mask(img, rows, pal, ox=ox, oy=oy)
         dest = items_dir / f"{spec['id']}.png"
         img.save(dest)
-        out.append({
+        entry = {
             "id": spec["id"],
             "name": spec["name"],
             "category": "hats",
@@ -869,6 +1338,270 @@ def generate_procedural_hats(items_dir: Path) -> list[dict]:
             "image": f"assets/items/{spec['id']}.png",
             "width": 24,
             "height": 20,
+            "description": spec["description"],
+        }
+        if spec.get("secret"):
+            entry["secret"] = True
+            entry["supporterDrop"] = True
+        if spec.get("loginReward"):
+            entry["loginReward"] = True
+        out.append(entry)
+    return out
+
+
+def generate_secret_furniture(items_dir: Path) -> list[dict]:
+    """Gera 8 móveis extras inéditos disponíveis na loja normal do quarto."""
+    pal = {
+        "O": (48, 36, 40, 255),
+        "Y": (248, 202, 68, 255),
+        "y": (196, 138, 30, 255),
+        "W": (255, 250, 240, 255),
+        "K": (42, 40, 56, 255),
+        "k": (74, 70, 96, 255),
+        "P": (244, 134, 180, 255),
+        "p": (198, 84, 134, 255),
+        "V": (132, 88, 212, 255),
+        "v": (92, 54, 166, 255),
+        "A": (92, 204, 248, 255),
+        "N": (96, 232, 166, 255),
+        "R": (236, 82, 98, 255),
+        "M": (176, 120, 82, 255),
+        "m": (124, 80, 52, 255),
+        "G": (106, 174, 96, 255),
+    }
+
+    furns = [
+        {
+            "id": "furn_sec_gold_trophy",
+            "name": "Troféu Foco Dourado",
+            "subCategory": "brinquedo",
+            "price": 95,
+            "wallItem": False,
+            "description": "Troféu reluzente de ouro maciço para coroar seu quarto!",
+            "size": (32, 36),
+            "rows": [
+                "....OOOOOOOOOOOO....",
+                "..OOYYYYYYYYYYYYOO..",
+                ".OYYOYYYYWWYYYYOYYO.",
+                ".OYO.OYYYYYYYYO.OYO.",
+                ".OYYOOYYYYYYYYOOYYO.",
+                "..OO..OYYYYYYO..OO..",
+                ".......OYYYYO.......",
+                "........OYYO........",
+                ".......OYYYYO.......",
+                ".....OOMMMMMMOO.....",
+                "....OMMMMMMMMMMO....",
+                "....OOOOOOOOOOOO....",
+            ],
+        },
+        {
+            "id": "furn_sec_arcade",
+            "name": "Fliperama Retrô",
+            "subCategory": "movel",
+            "price": 135,
+            "wallItem": False,
+            "description": "Máquina arcade isométrica brilhante para relaxar nas pausas!",
+            "scale": 4,
+            "size": (92, 108),
+            "rows": [
+                "..........OOOOOO..........",
+                "........OOVVVVVVOO........",
+                "......OOVVYYYYYYVVOO......",
+                ".....OVVYYYYYYYYYYvvO.....",
+                ".....OVVOOYYYYYYOOVvO.....",
+                ".....OVVOKKKKKKKKOVvO.....",
+                ".....OVVOKAAAAAOKOVvO.....",
+                ".....OVVOKAANAOKKOVvO.....",
+                ".....OVVOKAAAAAOKOVvO.....",
+                ".....OVVOKKKKKKKKOVvO.....",
+                "....OVVVOOVVVVVVOOvvO.....",
+                "...OVVRRVVVVVVVVvvvVO.....",
+                "..OVVRRRRVVVVVVVvvvvO.....",
+                "..OOVVVVVVVVVVVVvvvvO.....",
+                "....OOVVVVVVVVVVvvvvO.....",
+                "....OVVVVVVVVVVVvvvvO.....",
+                "....OVVVVAAVVVVVvvvvO.....",
+                "....OVVVVAAVVVVVvvvvO.....",
+                "....OVVVVVVVVVVVvvvvO.....",
+                "....OVVVVVVVVVVVvvvvO.....",
+                ".....OOVVVVVVVVVvvOO......",
+                ".......OOVVVVVVVOO........",
+                ".........OOOOOOO..........",
+            ],
+        },
+        {
+            "id": "furn_sec_sakura_bonsai",
+            "name": "Bonsai Sakura",
+            "subCategory": "planta",
+            "price": 75,
+            "wallItem": False,
+            "description": "Cerejeira miniatura em flor super serena para a mesa ou chão.",
+            "size": (40, 42),
+            "rows": [
+                ".....OOOOO..OOOO........",
+                "...OOPPPPPPOPPPPO.......",
+                "..OPPWPPPPPWWPPPPO......",
+                ".OPPPPPPPPppPPPPpPO.....",
+                ".OPPPpPPPOOOOPPpPPO.....",
+                "..OOOOO.OMMMO.OOOO......",
+                "........OMmMO...........",
+                ".......OMMmMMO..........",
+                "......OMMMmMMO..........",
+                "....OOOMMMMMMOOO........",
+                "...OKKKKKKKKKKKKO.......",
+                "...OKkKKKKKKKKkKO.......",
+                "....OOOOOOOOOOOO........",
+            ],
+        },
+        {
+            "id": "furn_sec_lava_lamp",
+            "name": "Lâmpada de Lava Mística",
+            "subCategory": "movel",
+            "price": 70,
+            "wallItem": False,
+            "description": "Luminária retrô relaxante com bolhas roxas e rosas.",
+            "size": (28, 42),
+            "rows": [
+                "......OOOO......",
+                ".....OKKKKO.....",
+                ".....OVVVVO.....",
+                "....OVPPVVVO....",
+                "....OVPPVVVO....",
+                "...OVVVPPVVVO...",
+                "...OVVVVVPPVO...",
+                "...OVPPVVVVVO...",
+                "....OVVVVVVO....",
+                "....OKKKKKKO....",
+                "...OKKKKKKKKO...",
+                "...OOOOOOOOOO...",
+            ],
+        },
+        {
+            "id": "furn_sec_gramophone",
+            "name": "Vitrola Lo-Fi",
+            "subCategory": "movel",
+            "price": 115,
+            "wallItem": False,
+            "description": "Toca-discos isométrico de vinil com trompete dourado!",
+            "size": (48, 52),
+            "rows": [
+                "............OOOOOO....",
+                "..........OOYYYYYYO...",
+                ".........OYYWWWWYYYO..",
+                "........OYYYYYYYYYYO..",
+                "........OYYYYYYOOOO...",
+                ".........OOOOYYYO.....",
+                ".............OYYO.....",
+                "......OOOOOOOOYYOO....",
+                "....OOMMMMMMMMOYMMOO..",
+                "..OOMMMMKKKKMMMMMMMmO.",
+                ".OMMMMMKKKKKKMMMMMmmO.",
+                ".OMMMOOOKYYKOOOMMmmmO.",
+                ".OMmO..OMMMMOOOMmmmmO.",
+                "..OOOMMMMMMMMOOmmmmO..",
+                "....OOMMMMMMMOmmmOO...",
+                "......OOMMMMMOmOO.....",
+                "........OOOOOOO.......",
+            ],
+        },
+        {
+            "id": "furn_sec_crystal_ball",
+            "name": "Bola de Cristal",
+            "subCategory": "halloween",
+            "price": 85,
+            "wallItem": False,
+            "description": "Prevê um futuro cheio de produtividade e boas notas!",
+            "size": (32, 34),
+            "rows": [
+                ".....OOOOOOOO.....",
+                "...OOAAAAAAAOOO...",
+                "..OAAWWAAAAAAAOO..",
+                ".OAAWAAAAAAAAVVOO.",
+                ".OAAAAAAAAAAVVVVO.",
+                ".OAAAAVVVVVVVVVVO.",
+                "..OOAAVVVVVVVVOO..",
+                "...OOKKKKKKKKOO...",
+                "...OYYYYYYYYYYO...",
+                "..OOKKKKKKKKKKOO..",
+                "..OOOOOOOOOOOOOO..",
+            ],
+        },
+        {
+            "id": "furn_sec_plush_dev",
+            "name": "Pelúcia Dev Mascote",
+            "subCategory": "brinquedo",
+            "price": 90,
+            "wallItem": False,
+            "description": "Gatinho de pelúcia fofo usando óculos de programador!",
+            "size": (34, 34),
+            "rows": [
+                "..OO........OO..",
+                ".OPPO......OPPO.",
+                ".OWWOOOOOOOOOWO.",
+                "OWWWWWWWWWWWWWWO",
+                "OWOKKKOOWOKKKOWO",
+                "OWOKAKOOWOKAKOWO",
+                "OWWWWWOWOWWWWWWO",
+                ".OWWWPPPPPPWWWO.",
+                ".OWWWWWWWWWWWWO.",
+                "..OOOOOOOOOOOO..",
+            ],
+        },
+        {
+            "id": "furn_sec_neon_heart",
+            "name": "Placa Neon Coração",
+            "subCategory": "quadro",
+            "price": 80,
+            "wallItem": True,
+            "description": "Letreiro neon brilhante rosa em perspectiva para a parede do quarto!",
+            "size": (44, 42),
+            "rows": [
+                "...............OOOOO..",
+                "............OOOKKKKKO.",
+                ".........OOOKKKKKKKKO.",
+                "......OOOKKPPPKKPPPKO.",
+                "...OOOKKKPPWWPPPPPPKO.",
+                ".OOKKKKKKPWPPPPPPPPKO.",
+                ".OKKKKKKKPPPPPPPPpPKO.",
+                ".OKKPPPKKKPPPPPPpPPKO.",
+                ".OKPPWPPKKKPPPPpPKKKO.",
+                ".OKPPPPPPKKKPPpPKKKO..",
+                ".OKPPPPPPPPKKpPKKKO...",
+                ".OKKPPPPPPPPpPKKKO....",
+                "..OKKKPPPPpPPKKKO.....",
+                "...OKKKKPPKKKKOO......",
+                "....OKKKKKKKOO........",
+                ".....OOOOOOO..........",
+            ],
+        },
+    ]
+
+    out = []
+    for spec in furns:
+        tw, th = spec["size"]
+        scale_factor = int(spec.get("scale", 2))
+        rows = spec["rows"]
+        mw = max(len(r) for r in rows)
+        mh = len(rows)
+        raw_img = Image.new("RGBA", (mw, mh), (0, 0, 0, 0))
+        _plot_mask(raw_img, rows, pal, 0, 0)
+        scaled = raw_img.resize((mw * scale_factor, mh * scale_factor), Image.Resampling.NEAREST)
+        canvas = Image.new("RGBA", (max(tw, mw * scale_factor + 4), max(th, mh * scale_factor + 4)), (0, 0, 0, 0))
+        cx = (canvas.width - scaled.width) // 2
+        cy = (canvas.height - scaled.height) // 2
+        canvas.paste(scaled, (cx, cy), scaled)
+        dest = items_dir / f"{spec['id']}.png"
+        canvas.save(dest)
+        out.append({
+            "id": spec["id"],
+            "name": spec["name"],
+            "category": "furniture",
+            "subCategory": spec["subCategory"],
+            "price": spec["price"],
+            "image": f"assets/items/{spec['id']}.png",
+            "width": canvas.width,
+            "height": canvas.height,
+            "wallItem": spec["wallItem"],
             "description": spec["description"],
         })
     return out
@@ -989,6 +1722,16 @@ def prepare_items_and_catalog():
         dest = ITEMS_DIR / f"{item_id}.png"
         clear_rects = [(0, 100, 6, 108)] if item_id == "tower_deluxe" else None
         w, h = crop_save(src_rel, rect, dest, clear_corner_rects=clear_rects)
+        if item_id in ("food_can_salmon", "food_drumstick"):
+            with Image.open(dest) as fimg:
+                resized = fimg.resize((fimg.width * 2, fimg.height * 2), Image.Resampling.NEAREST)
+                resized.save(dest)
+                w, h = resized.size
+        elif item_id == "food_fish_plate":
+            with Image.open(dest) as fimg:
+                resized = fimg.resize((round(fimg.width * 1.4), round(fimg.height * 1.4)), Image.Resampling.NEAREST)
+                resized.save(dest)
+                w, h = resized.size
         entry = {
             "id": item_id,
             "name": name,
@@ -1015,6 +1758,8 @@ def prepare_items_and_catalog():
     items_catalog.extend(generate_procedural_surfaces(ITEMS_DIR))
     # Comidinhas e bebidas extras em pixel art
     items_catalog.extend(generate_procedural_foods(ITEMS_DIR))
+    # 8 móveis secretos exclusivos de drops ("Adote um Dev")
+    items_catalog.extend(generate_secret_furniture(ITEMS_DIR))
 
     # Item animado especial de Halloween: Olho no Pote
     items_catalog.append({
@@ -1190,6 +1935,217 @@ def prepare_items_and_catalog():
             },
             "previewScale": 2.0,
         },
+        {
+            "id": "cat_dino_green",
+            "name": "Dino Verde Esmeralda",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 85,
+            "description": "O clássico dinossaurinho pré-histórico em verde esmeralda vibrante!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_dino_green_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "sleep": {"src": "assets/sprites/cat_dino_green_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_dino_green_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
+                "cry": {"src": "assets/sprites/cat_dino_green_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
+            },
+            "previewScale": 2.0,
+        },
+        # --- NOVAS PELAGENS COLORIDAS (Loja Normal) ---
+        {
+            "id": "cat_sakura",
+            "name": "Mochi Sakura Rosa",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 95,
+            "description": "Pelagem cor de flor de cerejeira com orelhinhas doces!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sakura_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_sakura_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sakura_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_sakura_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_blueberry",
+            "name": "Mochi Azul Gelo",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 95,
+            "description": "Tom azul-celeste suave e tranquilo para dias focados.",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_blueberry_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_blueberry_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_blueberry_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_blueberry_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_matcha",
+            "name": "Mochi Verde Matcha",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 100,
+            "description": "Gatinho verde-menta zen inspirado em casas de chá!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_matcha_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_matcha_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_matcha_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_matcha_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_lavender",
+            "name": "Mochi Lavanda",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 110,
+            "description": "Pelagem lilás sonhadora cheia de serenidade.",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_lavender_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_lavender_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_lavender_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_lavender_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        # --- 8 GATINHOS & DINOS SECRETOS (Adote um Dev) ---
+        {
+            "id": "cat_sec_galaxy",
+            "name": "Mochi Galáxia",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: pelagem cósmica roxo-anil cheia de mistério!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_galaxy_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_sec_galaxy_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_galaxy_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_sec_galaxy_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_gold",
+            "name": "Mochi Dourado",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: reluzente como ouro puro!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_gold_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_sec_gold_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_gold_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_sec_gold_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_cyber",
+            "name": "Mochi Cyber Neon",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: brilho ciano e magenta futurista!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_cyber_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_sec_cyber_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_cyber_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_sec_cyber_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_sunset",
+            "name": "Mochi Pôr-do-Sol",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: coral quente com reflexos dourados do entardecer!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_sunset_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_sec_sunset_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_sunset_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_sec_sunset_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_cocoa",
+            "name": "Mochi Cacau Quente",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 105,
+            "description": "Marrom achocolatado com patinhas de creme quentinho!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_cocoa_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "sleep": {"src": "assets/sprites/cat_sec_cocoa_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_cocoa_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_sec_cocoa_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_dino_pink",
+            "name": "Dino Algodão-Doce",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: Dino pré-histórico cor-de-rosa super fofo!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_dino_pink_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "sleep": {"src": "assets/sprites/cat_sec_dino_pink_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_dino_pink_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
+                "cry": {"src": "assets/sprites/cat_sec_dino_pink_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_dino_gold",
+            "name": "Dino Rei Dourado",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: T-Rex dourado lendário dos mestres do foco!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_dino_gold_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "sleep": {"src": "assets/sprites/cat_sec_dino_gold_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_dino_gold_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
+                "cry": {"src": "assets/sprites/cat_sec_dino_gold_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
+            },
+            "previewScale": 2.0,
+        },
+        {
+            "id": "cat_sec_dino_purple",
+            "name": "Dino Ametista",
+            "category": "cats",
+            "subCategory": "skin",
+            "price": 0,
+            "secret": True,
+            "supporterDrop": True,
+            "description": "Brinde Secreto: Dino místico em roxo ametista brilhante!",
+            "animations": {
+                "idle": {"src": "assets/sprites/cat_sec_dino_purple_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "sleep": {"src": "assets/sprites/cat_sec_dino_purple_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_sec_dino_purple_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
+                "cry": {"src": "assets/sprites/cat_sec_dino_purple_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
+            },
+            "previewScale": 2.0,
+        },
     ]
 
     # --- CHAPÉUS & ACESSÓRIOS ---
@@ -1240,6 +2196,24 @@ def prepare_items_and_catalog():
             "scale": 2.0,
         },
     ]
+
+    premium_only_ids = {
+        "cat_mochi_box",
+        "cat_evil_box",
+        "cat_zombie",
+        "cat_witch",
+        "pet_bunny",
+        "pet_golden",
+        "pet_zombie_hand",
+        "coffee_moka",
+        "food_ramen",
+        "food_onigiri",
+        "food_ice_cream_tub",
+    }
+    for col in (items_catalog, cats_catalog, pets_catalog):
+        for entry in col:
+            if entry.get("id") in premium_only_ids:
+                entry["premiumOnly"] = True
 
     catalog = {
         "items": items_catalog,

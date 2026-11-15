@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('purrAPI', {
   saveState: (state) => ipcRenderer.invoke('save-state', state),
   hideToTray: () => ipcRenderer.invoke('hide-to-tray'),
   quitApp: () => ipcRenderer.invoke('quit-app'),
+  googleSignIn: () => ipcRenderer.invoke('purr:google-sign-in'),
   onTrayAction: (callback) => {
     const listener = (_event, action) => callback(action);
     ipcRenderer.on('tray-action', listener);
