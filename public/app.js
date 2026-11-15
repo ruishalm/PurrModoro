@@ -76,6 +76,16 @@ const ROOM_THEME_CATALOG = [
     starter: false,
     description: 'Quarto noturno estrelado com lua crescente e clima de bruxinha!',
   },
+  {
+    id: 'starlight',
+    secretId: 'theme_sec_starlight',
+    name: 'Tema Galáxia Lo-Fi',
+    chipLabel: '🌌 Galáxia',
+    price: 0,
+    starter: false,
+    secret: true,
+    description: 'Brinde Secreto: quarto cósmico estrelado em azul-noite e neon lo-fi!',
+  },
 ];
 
 const DEFAULT_STATE = {
@@ -111,6 +121,21 @@ const DEFAULT_STATE = {
     cyclesCompleted: 0,
     totalFocusMinutes: 0,
   },
+  streak: {
+    current: 0,
+    best: 0,
+    lastClaimDate: null,
+    freezeShields: 0,
+  },
+  cloudUser: null,
+  supporter: {
+    active: false,
+    since: null,
+    lastClaimMonth: null,
+  },
+  unlockedSecretIds: [],
+  loginPromptShownCount: 0,
+  lang: null,
   muted: false,
 };
 
@@ -193,13 +218,24 @@ const compactPet = {
    ============================================================================ */
 
 function getCatalogItem(id) {
-  return (
+  const direct =
     catalog.items.find((i) => i.id === id) ||
     catalog.cats.find((c) => c.id === id) ||
     catalog.pets.find((p) => p.id === id) ||
-    (catalog.hats || []).find((h) => h.id === id) ||
-    null
-  );
+    (catalog.hats || []).find((h) => h.id === id);
+  if (direct) return direct;
+
+  const secretTheme = ROOM_THEME_CATALOG.find((t) => t.secretId && t.secretId === id);
+  if (secretTheme) {
+    return {
+      id: secretTheme.secretId,
+      themeId: secretTheme.id,
+      name: `${secretTheme.name} (Quarto)`,
+      description: secretTheme.description,
+      secret: true,
+    };
+  }
+  return null;
 }
 
 function getCatDef(id) {
@@ -261,6 +297,17 @@ async function loadState() {
     isometricMigratedV2: Boolean(saved.isometricMigratedV2),
     timerConfig: { ...DEFAULT_STATE.timerConfig, ...(saved.timerConfig || {}) },
     stats: { ...DEFAULT_STATE.stats, ...(saved.stats || {}) },
+    streak: { ...DEFAULT_STATE.streak, ...(saved.streak || {}) },
+    supporter: { ...DEFAULT_STATE.supporter, ...(saved.supporter || {}) },
+    unlockedSecretIds: Array.isArray(saved.unlockedSecretIds) ? saved.unlockedSecretIds : [],
+    cloudUser:
+      saved.cloudUser &&
+      saved.cloudUser.provider !== 'cloud-local' &&
+      saved.cloudUser.email !== 'miau.player@gmail.com'
+        ? saved.cloudUser
+        : null,
+    loginPromptShownCount: Number(saved.loginPromptShownCount) || 0,
+    lang: saved.lang === 'en' || saved.lang === 'pt' ? saved.lang : null,
     ownedItems: saved.ownedItems || { ...DEFAULT_STATE.ownedItems },
     placedItems: Array.isArray(saved.placedItems) ? saved.placedItems : [...DEFAULT_STATE.placedItems],
   };
@@ -291,6 +338,9 @@ function saveState(immediate = false) {
     }
     if (window.purrAPI?.saveState) {
       window.purrAPI.saveState(state).catch(() => {});
+    }
+    if (state.cloudUser && window.purrCloud?.syncStateToCloud) {
+      window.purrCloud.syncStateToCloud(state).catch(() => {});
     }
   };
 
@@ -357,6 +407,25 @@ const CAT_HEAD_ANCHORS = {
   'cat_dino_cry.png': { x: 20, y: 7, bob: [0, 1, 0, 1] },
 };
 
+function resolveCatHeadAnchor(sheetName, fw = 32) {
+  if (CAT_HEAD_ANCHORS[sheetName]) return CAT_HEAD_ANCHORS[sheetName];
+  if (sheetName.includes('_dino')) {
+    if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_dino_sleep.png'];
+    if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_dino_cheer.png'];
+    if (sheetName.endsWith('_cry.png')) return CAT_HEAD_ANCHORS['cat_dino_cry.png'];
+    return CAT_HEAD_ANCHORS['cat_dino_idle.png'];
+  }
+  if (sheetName.endsWith('_idle.png')) return CAT_HEAD_ANCHORS['cat_mochi_idle.png'];
+  if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_cream_sleep.png'];
+  if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_cream_cheer.png'];
+  if (sheetName.endsWith('_cry.png')) return CAT_HEAD_ANCHORS['cat_cream_cry.png'];
+  return { x: fw / 2, y: 4, bob: [0] };
+}
+
+function isDinoId(id) {
+  return String(id || '').includes('dino');
+}
+
 function drawCatFrameWithHat(canvas, anim, frameIndex, flip = false, customScale = null, hatIdOverride = undefined) {
   drawSpriteSheetFrame(canvas, anim.src, anim.fw, anim.fh, frameIndex, flip, customScale);
   const hatId = hatIdOverride !== undefined ? hatIdOverride : state.activeHat;
@@ -375,7 +444,7 @@ function drawCatFrameWithHat(canvas, anim, frameIndex, flip = false, customScale
   const dy = canvas.height - dh;
 
   const sheetName = anim.src.split('/').pop();
-  const anchor = CAT_HEAD_ANCHORS[sheetName] || { x: anim.fw / 2, y: 4, bob: [0] };
+  const anchor = resolveCatHeadAnchor(sheetName, anim.fw);
   const bobArr = anchor.bob || [0];
   const bobY = bobArr[frameIndex % bobArr.length] || 0;
   const headCanvasX = dx + anchor.x * drawScale;
@@ -657,6 +726,17 @@ function completeCycle() {
   updateCoinsUI();
   updateTimerUI();
   renderShop();
+
+  // Convite fofo "Me leva com você?! *-*" após concluir ciclos (2º ciclo ou a cada 4 ciclos se ainda não logado)
+  if (
+    finishedPhase === 'focus' &&
+    !state.cloudUser &&
+    (state.stats.cyclesCompleted === 2 || state.stats.cyclesCompleted % 4 === 0)
+  ) {
+    setTimeout(() => {
+      if (!state.cloudUser) openLoginPromptModal(true);
+    }, 1100);
+  }
 }
 
 function setPetMood(mood, durationMs = 4000) {
@@ -858,6 +938,24 @@ const ISO_THEME_PALETTES = {
     rugInner: '#5d3e7a',
     outline: '#120b20',
   },
+  starlight: {
+    backdrop: '#0a1026',
+    backdropAccent: 'rgba(56, 189, 248, 0.16)',
+    wallLeft: '#18244d',
+    wallRight: '#111a38',
+    wallStripe: 'rgba(125, 211, 252, 0.10)',
+    wallCut: '#2d3f7a',
+    wallCap: '#3e5499',
+    baseboardLeft: '#2d3f7a',
+    baseboardRight: '#212f5e',
+    floorBase: '#202954',
+    floorLine: 'rgba(8, 12, 32, 0.45)',
+    floorEdgeLeft: '#151c3b',
+    floorEdgeRight: '#0f142b',
+    rugOuter: '#38bdf8',
+    rugInner: '#7c3aed',
+    outline: '#070b1a',
+  },
 };
 
 function isSurfaceDef(def) {
@@ -1041,6 +1139,25 @@ function drawIsometricRoom() {
     ctx.beginPath();
     ctx.arc(238, 19, 7, 0, Math.PI * 2);
     ctx.fill();
+  } else if (state.roomTheme === 'starlight') {
+    const cosmicStars = [
+      [14, 16], [42, 28], [76, 12], [112, 24], [156, 14], [198, 26], [242, 42],
+      [18, 56], [248, 196], [16, 214], [228, 232], [38, 244], [210, 12],
+    ];
+    cosmicStars.forEach(([sx, sy], i) => {
+      ctx.fillStyle = i % 3 === 0 ? '#38bdf8' : (i % 3 === 1 ? '#f472b6' : '#fef08a');
+      ctx.fillRect(sx, sy, 2, 2);
+    });
+    // Planetinha anelado lo-fi no canto superior direito
+    ctx.fillStyle = '#a78bfa';
+    ctx.beginPath();
+    ctx.arc(230, 24, 8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#38bdf8';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(230, 24, 13, 4, -0.32, 0, Math.PI * 2);
+    ctx.stroke();
   } else {
     ctx.fillStyle = pal.backdropAccent;
     for (let gx = 10; gx < W; gx += 20) {
@@ -1258,12 +1375,25 @@ function drawIsometricRoom() {
   drawPoly(ctx, [T_MID, T_RIGHT, F_RIGHT, F_BACK], null, pal.outline, 1.5);
 }
 
+function isThemeUnlocked(tDef) {
+  if (!tDef) return false;
+  return (
+    state.unlockedThemes.includes(tDef.id) ||
+    Boolean(tDef.secretId && (state.unlockedSecretIds || []).includes(tDef.secretId))
+  );
+}
+
 function renderThemeChips() {
   document.querySelectorAll('.theme-chip').forEach((btn) => {
     const tId = btn.dataset.theme;
     const tDef = ROOM_THEME_CATALOG.find((t) => t.id === tId);
     if (!tDef) return;
-    const unlocked = state.unlockedThemes.includes(tId);
+    const unlocked = isThemeUnlocked(tDef);
+    if (tDef.secret && !unlocked) {
+      btn.classList.add('hidden');
+      return;
+    }
+    btn.classList.remove('hidden');
     const isActive = state.roomTheme === tId;
     btn.classList.toggle('active', isActive);
     btn.classList.toggle('locked', !unlocked);
@@ -1279,7 +1409,7 @@ function applyRoomTheme(theme) {
     state.unlockedThemes.push(theme);
   }
   state.roomTheme = theme;
-  document.body.classList.remove('theme-cozy', 'theme-pastel', 'theme-bamboo', 'theme-halloween');
+  document.body.classList.remove('theme-cozy', 'theme-pastel', 'theme-bamboo', 'theme-halloween', 'theme-starlight');
   document.body.classList.add(`theme-${theme}`);
   renderThemeChips();
   drawIsometricRoom();
@@ -1289,10 +1419,15 @@ function applyRoomTheme(theme) {
 function buyOrApplyTheme(themeId) {
   const tDef = ROOM_THEME_CATALOG.find((t) => t.id === themeId);
   if (!tDef) return;
-  if (state.unlockedThemes.includes(themeId)) {
+  if (isThemeUnlocked(tDef)) {
     window.purrSound.playClick();
     applyRoomTheme(themeId);
     renderShop();
+    return;
+  }
+  if (tDef.secret) {
+    window.purrSound.playSad();
+    if (roomActors[0]) showRoomPetSpeech(roomActors[0], '🔒 Tema secreto do clube Adote um Dev!');
     return;
   }
   if (state.coins < tDef.price) {
@@ -1705,6 +1840,9 @@ function buildThemeSwatch(themeId) {
 
 function renderThemeShopCards(grid) {
   ROOM_THEME_CATALOG.forEach((tDef) => {
+    const unlocked = isThemeUnlocked(tDef);
+    if (tDef.secret && !unlocked) return;
+
     const card = document.createElement('div');
     card.className = 'shop-card';
     card.title = `${tDef.name} — ${tDef.description}`;
@@ -1724,7 +1862,6 @@ function renderThemeShopCards(grid) {
     const btn = document.createElement('button');
     btn.className = 'shop-action-btn';
 
-    const unlocked = state.unlockedThemes.includes(tDef.id);
     const active = state.roomTheme === tDef.id;
     if (active) {
       btn.classList.add('equipped');
@@ -1774,6 +1911,9 @@ function renderShop() {
   if (shopCategory === 'furniture' && (shopSubFilter === 'all' || shopSubFilter === 'tema')) {
     renderThemeShopCards(grid);
   }
+
+  const isSecretUnlocked = (entry) => (state.unlockedSecretIds || []).includes(entry.id);
+  list = list.filter((entry) => !entry.secret || isSecretUnlocked(entry));
 
   list.forEach((entry) => {
     const card = document.createElement('div');
@@ -1883,6 +2023,10 @@ function renderShop() {
           renderShop();
           renderInventory();
         };
+      } else if (entry.loginReward) {
+        btn.classList.add('owned');
+        btn.textContent = '☁️ Login Google (Grátis)';
+        btn.onclick = () => openLoginPromptModal(false);
       } else {
         btn.innerHTML = `🪙 ${entry.price} • Comprar`;
         btn.disabled = state.coins < entry.price;
@@ -2065,12 +2209,19 @@ function consumeFoodByActor(actor, item, alreadyPaid = false) {
     showCompactSpeech(`☕ ${item.buff.label} no próximo foco!`);
     showRoomPetSpeech(actor, `☕ Bônus ${item.buff.label} ativo!`);
     spawnRoomParticle(actor.x, actor.y - 12, '☕');
+  } else if (item.buff?.type === 'streak_freeze') {
+    if (!state.streak) state.streak = { current: 0, best: 0, lastClaimDate: null, freezeShields: 0 };
+    state.streak.freezeShields = (state.streak.freezeShields || 0) + (item.buff.freezes || 1);
+    showCompactSpeech(`❄️ +1 Escudo de Ofensiva!`);
+    showRoomPetSpeech(actor, `❄️ Ofensiva protegida (${state.streak.freezeShields} escudos)!`);
+    spawnRoomParticle(actor.x, actor.y - 12, '❄️');
+    if (typeof renderStreakUI === 'function') renderStreakUI();
   } else {
     showRoomPetSpeech(actor, `Nhac nhac! ${item.name} 😋`);
     spawnRoomParticle(actor.x, actor.y - 12, '❤️');
     spawnRoomParticle(actor.x + 5, actor.y - 15, item.particle || '🐟');
     showCompactSpeech(
-      actor.kind === 'cat' && actor.config?.id === 'cat_dino'
+      actor.kind === 'cat' && isDinoId(actor.config?.id)
         ? '🦖 Raaawr! Que delícia!'
         : '😋 Que delícia, miau!'
     );
@@ -2361,7 +2512,7 @@ function spawnCompactHeart() {
   const layer = document.getElementById('compactParticles');
   const p = document.createElement('span');
   p.className = 'fx-particle';
-  const isDino = state.activeCat === 'cat_dino';
+  const isDino = isDinoId(state.activeCat);
   p.textContent = randomFrom(isDino ? ['🦖', '🌵', '✨', '💚'] : ['❤️', '💖', '🐾', '✨']);
   p.style.left = `${compactPet.x + 32 + (Math.random() * 18 - 9)}px`;
   p.style.bottom = '54px';
@@ -2471,7 +2622,7 @@ function createRoomActor(id, kind, config, startX, startY) {
       return;
     }
     if (actor.kind === 'cat') {
-      if (actor.config.id === 'cat_dino') {
+      if (isDinoId(actor.config.id)) {
         window.purrSound.playClick();
         spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🦖', '🌵', '✨', '💚']));
         showRoomPetSpeech(actor, randomFrom(DINO_PHRASES));
@@ -2754,7 +2905,7 @@ function bindEvents() {
   // Carinho no gatinho compacto
   document.getElementById('compactPetActor').addEventListener('click', () => {
     spawnCompactHeart();
-    if (state.activeCat === 'cat_dino') {
+    if (isDinoId(state.activeCat)) {
       window.purrSound.playClick();
       showCompactSpeech(randomFrom(DINO_PHRASES));
       return;
@@ -3032,6 +3183,66 @@ function bindEvents() {
     updateTimerUI();
   });
 
+  // Ofensiva Diária, Conta Google, Idioma, "Adote um Dev" & Banner Web
+  document.getElementById('streakHeaderBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    openStreakModal();
+  });
+  document.getElementById('compactStreakBadge')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    if (appMode === 'compact') setAppMode('expanded');
+    openStreakModal();
+  });
+  document.getElementById('closeStreakModalBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    closeStreakModal();
+  });
+  document.getElementById('claimDailyStreakBtn')?.addEventListener('click', claimDailyStreak);
+
+  document.getElementById('accountHeaderBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    openLoginPromptModal(false);
+  });
+  document.getElementById('closeLoginModalBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    closeLoginPromptModal();
+  });
+  document.getElementById('loginLaterBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    closeLoginPromptModal();
+  });
+  document.getElementById('googleSignInBtn')?.addEventListener('click', handleGoogleSignIn);
+  document.getElementById('syncCloudNowBtn')?.addEventListener('click', syncCloudNow);
+  document.getElementById('googleSignOutBtn')?.addEventListener('click', handleGoogleSignOut);
+
+  document.getElementById('langToggleBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    const cur = getCurrentLang();
+    state.lang = cur === 'pt' ? 'en' : 'pt';
+    saveState(true);
+    applyLanguageUI();
+  });
+
+  document.getElementById('subscribeDevBtn')?.addEventListener('click', handleSubscribeAdoptDev);
+  document.getElementById('claimMonthlyDropBtn')?.addEventListener('click', claimMonthlySupporterDropUI);
+  document.getElementById('webBannerCloseBtn')?.addEventListener('click', () => {
+    document.getElementById('webPromoBanner')?.classList.add('hidden');
+  });
+  document.getElementById('updateAvailableBtn')?.addEventListener('click', () => {
+    const url = latestUpdateInfo?.url || window.purrCloud?.GITHUB_RELEASES_URL;
+    if (url) window.open(url, '_blank', 'noopener');
+  });
+
+  // Fechar modais ao clicar fora do card
+  ['streakModal', 'loginPromptModal'].forEach((mid) => {
+    document.getElementById(mid)?.addEventListener('click', (ev) => {
+      if (ev.target?.id === mid) {
+        if (mid === 'streakModal') closeStreakModal();
+        else closeLoginPromptModal();
+      }
+    });
+  });
+
   // Eventos vindos da Bandeja do Windows (Electron)
   window.purrAPI?.onTrayAction?.((action) => {
     if (action === 'toggle-timer') {
@@ -3073,6 +3284,545 @@ function switchSideTab(tabName) {
   });
   if (tabName === 'shop') renderShop();
   if (tabName === 'inventory') renderInventory();
+  if (tabName === 'support') renderSupportTab();
+}
+
+/* ============================================================================
+   OFENSIVA DIÁRIA (DUOLINGO), CONTA GOOGLE, UPDATES, i18n & "ADOTE UM DEV"
+   ============================================================================ */
+
+let latestUpdateInfo = null;
+
+function getCurrentLang() {
+  return window.purrCloud ? window.purrCloud.getLang(state) : (state.lang || 'pt');
+}
+
+function tc(key) {
+  return window.purrCloud ? window.purrCloud.t(key, getCurrentLang()) : key;
+}
+
+function normalizeStreakOnBoot() {
+  if (!window.purrCloud) return;
+  if (!state.streak) state.streak = { current: 0, best: 0, lastClaimDate: null, freezeShields: 0 };
+  const today = window.purrCloud.getTodayISO();
+  const last = state.streak.lastClaimDate;
+  if (!last || last === today) return;
+
+  const diff = window.purrCloud.diffDaysISO(last, today);
+  if (diff <= 1) return;
+
+  const missedDays = diff - 1;
+  const shields = state.streak.freezeShields || 0;
+  if (shields >= missedDays && state.streak.current > 0) {
+    state.streak.freezeShields = shields - missedDays;
+    // Atualiza última data para ontem para manter a ofensiva protegida hoje
+    const yest = new Date();
+    yest.setDate(yest.getDate() - 1);
+    const yStr = `${yest.getFullYear()}-${String(yest.getMonth() + 1).padStart(2, '0')}-${String(yest.getDate()).padStart(2, '0')}`;
+    state.streak.lastClaimDate = yStr;
+    saveState();
+    setTimeout(() => {
+      showCompactSpeech('❄️ Catnip Congelado salvou sua ofensiva!');
+    }, 900);
+  } else if (diff > 1) {
+    state.streak.current = 0;
+    saveState();
+  }
+}
+
+function renderStreakUI() {
+  const s = state.streak || { current: 0, best: 0, lastClaimDate: null, freezeShields: 0 };
+  const today = window.purrCloud ? window.purrCloud.getTodayISO() : '';
+  const claimedToday = s.lastClaimDate === today;
+
+  const headerCnt = document.getElementById('headerStreakCount');
+  if (headerCnt) headerCnt.textContent = String(s.current || 0);
+  const compactBadge = document.getElementById('compactStreakBadge');
+  if (compactBadge) {
+    compactBadge.textContent = `🔥${s.current || 0}`;
+    compactBadge.style.opacity = claimedToday ? '1' : '0.82';
+  }
+
+  const big = document.getElementById('streakCurrentBig');
+  if (big) big.textContent = String(s.current || 0);
+  const shieldsEl = document.getElementById('streakShieldsCount');
+  if (shieldsEl) shieldsEl.textContent = String(s.freezeShields || 0);
+
+  const track = document.getElementById('streakDaysTrack');
+  if (track && window.purrCloud) {
+    track.innerHTML = '';
+    const rewards = window.purrCloud.STREAK_DAY_REWARDS;
+    const completedMod = (s.current || 0) % 7;
+    const activeCycleDone = (s.current || 0) > 0 && completedMod === 0 && claimedToday ? 7 : completedMod;
+
+    rewards.forEach((amt, idx) => {
+      const tile = document.createElement('div');
+      const isDone = idx < activeCycleDone;
+      const isToday = !claimedToday && idx === activeCycleDone;
+      tile.className = 'streak-day-tile' + (isDone ? ' done' : '') + (isToday ? ' today' : '');
+      tile.innerHTML = `<span>D${idx + 1}</span><span>${isDone ? '🔥' : '🪙'}</span><strong>+${amt}</strong>`;
+      track.appendChild(tile);
+    });
+  }
+
+  const claimBtn = document.getElementById('claimDailyStreakBtn');
+  if (claimBtn) {
+    claimBtn.disabled = claimedToday;
+    claimBtn.textContent = claimedToday ? tc('streakClaimedBtn') : tc('streakClaimBtn');
+  }
+  const hint = document.getElementById('streakFreezeHint');
+  if (hint) hint.textContent = tc('streakBuyShieldHint');
+}
+
+function openStreakModal() {
+  renderStreakUI();
+  document.getElementById('streakModal')?.classList.remove('hidden');
+}
+
+function closeStreakModal() {
+  document.getElementById('streakModal')?.classList.add('hidden');
+}
+
+function claimDailyStreak() {
+  if (!window.purrCloud) return;
+  if (!state.streak) state.streak = { current: 0, best: 0, lastClaimDate: null, freezeShields: 0 };
+  const today = window.purrCloud.getTodayISO();
+  if (state.streak.lastClaimDate === today) return;
+
+  const rewards = window.purrCloud.STREAK_DAY_REWARDS;
+  const dayIdx = (state.streak.current || 0) % rewards.length;
+  const coinsEarned = rewards[dayIdx];
+
+  state.streak.current = (state.streak.current || 0) + 1;
+  state.streak.best = Math.max(state.streak.best || 0, state.streak.current);
+  state.streak.lastClaimDate = today;
+  state.coins += coinsEarned;
+
+  window.purrSound.playCoin();
+  spawnCoinRain();
+  saveState(true);
+  updateCoinsUI();
+  renderStreakUI();
+  renderShop();
+  if (roomActors[0]) {
+    showRoomPetSpeech(roomActors[0], `🔥 ${state.streak.current} dias! +${coinsEarned} 🪙!`);
+  }
+  showCompactSpeech(`🔥 Dia ${state.streak.current}: +${coinsEarned} 🪙!`);
+}
+
+function updateAccountHeaderUI() {
+  const btn = document.getElementById('accountHeaderBtn');
+  if (!btn) return;
+  if (state.cloudUser) {
+    btn.classList.add('connected');
+    const shortName = String(state.cloudUser.name || 'Nuvem').split(' ')[0];
+    btn.textContent = `☁️ ${shortName}`;
+    btn.title = `${state.cloudUser.email || shortName} — Sincronizado na nuvem!`;
+  } else {
+    btn.classList.remove('connected');
+    btn.textContent = tc('loginChipDisconnected');
+    btn.title = tc('loginModalDesc');
+  }
+
+  const formArea = document.getElementById('loginFormArea');
+  const connArea = document.getElementById('loginConnectedArea');
+  const userCard = document.getElementById('loginUserCard');
+  if (formArea && connArea) {
+    formArea.classList.toggle('hidden', Boolean(state.cloudUser));
+    connArea.classList.toggle('hidden', !state.cloudUser);
+  }
+  if (userCard && state.cloudUser) {
+    userCard.innerHTML = `✅ Conectado como <strong>${state.cloudUser.name}</strong> (${state.cloudUser.email})<br><small>Último backup: ${new Date(state.cloudUser.syncedAt || Date.now()).toLocaleString()}</small>`;
+  }
+}
+
+function openLoginPromptModal(fromAutoPopup = false) {
+  if (fromAutoPopup) {
+    state.loginPromptShownCount = (state.loginPromptShownCount || 0) + 1;
+    saveState();
+  }
+  updateAccountHeaderUI();
+  const cv = document.getElementById('loginModalCatCanvas');
+  if (cv) cv.dataset.previewHat = 'hat_cloud_star';
+  document.getElementById('loginPromptModal')?.classList.remove('hidden');
+}
+
+function closeLoginPromptModal() {
+  const cv = document.getElementById('loginModalCatCanvas');
+  if (cv) delete cv.dataset.previewHat;
+  document.getElementById('loginPromptModal')?.classList.add('hidden');
+}
+
+async function handleGoogleSignIn() {
+  if (!window.purrCloud) return;
+  const btn = document.getElementById('googleSignInBtn');
+  if (btn) btn.disabled = true;
+  let user;
+  try {
+    user = await window.purrCloud.signInWithGoogle();
+  } finally {
+    if (btn) btn.disabled = false;
+  }
+
+  if (!user || user.error || !user.uid) {
+    const errMsg = `⚠️ ${user?.error || 'Login Google cancelado.'}`;
+    if (roomActors[0]) showRoomPetSpeech(roomActors[0], errMsg, 4500);
+    showCompactSpeech(errMsg, 4500);
+    return;
+  }
+  state.cloudUser = user;
+
+  // Primeiro puxa gatinhos, chapéus, móveis e moedas que já estejam salvos na nuvem
+  const pullRes = await window.purrCloud.pullFromCloudIntoState(state);
+
+  let bonusMsg = pullRes.merged
+    ? '☁️ Conta e gatinhos sincronizados da nuvem!'
+    : '☁️ Conta conectada na nuvem!';
+  if (!state.unlockedHats.includes('hat_cloud_star')) {
+    state.unlockedHats.push('hat_cloud_star');
+    state.activeHat = 'hat_cloud_star';
+    state.coins += 150;
+    const hatDef = getHatDef('hat_cloud_star');
+    if (hatDef) loadImage(hatDef.image);
+    bonusMsg = '☁️ Conectado! Você ganhou Chapéu Nuvem Mágica + 150 🪙!';
+    spawnCoinRain();
+    window.purrSound.playTimerComplete();
+  } else {
+    window.purrSound.playCoin();
+  }
+
+  const syncRes = await window.purrCloud.syncStateToCloud(state);
+  if (syncRes.syncedAt) state.cloudUser.syncedAt = syncRes.syncedAt;
+  normalizePlacedItemsForIsometricRoom();
+  applyRoomTheme(state.roomTheme || 'cozy');
+  syncRoomActors();
+  saveState(true);
+  updateCoinsUI();
+  updateAccountHeaderUI();
+  renderStreakUI();
+  renderInventory();
+  renderShop();
+  renderSupportTab();
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], bonusMsg);
+  showCompactSpeech('☁️ Conta salva na nuvem!');
+}
+
+async function syncCloudNow() {
+  if (!state.cloudUser || !window.purrCloud) return;
+  const res = await window.purrCloud.pullAndSyncCloudState(state);
+  if (res.ok) {
+    state.cloudUser.syncedAt = res.syncedAt;
+    normalizePlacedItemsForIsometricRoom();
+    applyRoomTheme(state.roomTheme || 'cozy');
+    syncRoomActors();
+    saveState(true);
+    updateCoinsUI();
+    updateAccountHeaderUI();
+    renderStreakUI();
+    renderInventory();
+    renderShop();
+    renderSupportTab();
+    window.purrSound.playCoin();
+    if (roomActors[0]) showRoomPetSpeech(roomActors[0], '☁️ Perfil e gatinhos sincronizados!');
+  }
+}
+
+async function handleGoogleSignOut() {
+  window.purrSound.playClick();
+  if (state.cloudUser?.uid && state.cloudUser?.provider === 'firebase-google') {
+    try {
+      await window.purrCloud?.syncStateToCloud?.(state);
+    } catch {}
+  }
+  await window.purrCloud?.signOutFromCloud?.();
+  const prevLang = state.lang;
+  const prevMuted = state.muted;
+  const fresh = structuredClone(DEFAULT_STATE);
+  fresh.lang = prevLang;
+  fresh.muted = prevMuted;
+  state = fresh;
+  applyRoomTheme(state.roomTheme || 'cozy');
+  renderThemeChips();
+  syncRoomActors();
+  saveState(true);
+  updateTimerUI();
+  updateCoinsUI();
+  updateAccountHeaderUI();
+  renderStreakUI();
+  renderInventory();
+  renderShop();
+  renderSupportTab();
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], '👋 Conta desconectada! Tudo resetado para o modo local.');
+}
+
+function requireLoginForPurchase() {
+  if (state.cloudUser) return true;
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], tc('supportLoginRequired'));
+  openLoginPromptModal(false);
+  return false;
+}
+
+function getCurrentYearMonth() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+}
+
+function renderSupportTab() {
+  if (!window.purrCloud) return;
+  const lang = getCurrentLang();
+  const plan = window.purrCloud.SUPPORTER_PLAN;
+  const unlockedCount = (state.unlockedSecretIds || []).length;
+  const totalPool = window.purrCloud.SUPPORTER_SECRET_POOL.length;
+
+  const badge = document.getElementById('supportPriceBadge');
+  if (badge) badge.textContent = window.purrCloud.formatPrice(plan, lang);
+  const counter = document.getElementById('supporterDropsCounter');
+  if (counter) counter.textContent = `${unlockedCount}/${totalPool}`;
+  const bar = document.getElementById('supporterProgressBar');
+  if (bar) bar.style.width = `${Math.round((unlockedCount / totalPool) * 100)}%`;
+  const gw = document.getElementById('supportGatewayHint');
+  if (gw) gw.textContent = lang === 'en' ? tc('supportGatewayEn') : tc('supportGatewayPt');
+
+  const subBtn = document.getElementById('subscribeDevBtn');
+  const claimBtn = document.getElementById('claimMonthlyDropBtn');
+  const statusEl = document.getElementById('supporterStatusText');
+  const curMonth = getCurrentYearMonth();
+  const sup = state.supporter || { active: false, lastClaimMonth: null };
+  const canClaimThisMonth = Boolean(sup.active && sup.lastClaimMonth !== curMonth);
+
+  if (subBtn && claimBtn && statusEl) {
+    if (sup.active) {
+      subBtn.textContent = lang === 'en' ? '✓ Adopt a Dev Active 💖' : '✓ Assinatura Adote um Dev Ativa 💖';
+      subBtn.disabled = true;
+      claimBtn.classList.toggle('hidden', !canClaimThisMonth);
+      claimBtn.textContent = tc('supportClaimMonthlyBtn');
+      statusEl.textContent = canClaimThisMonth
+        ? '🎁 Seu brinde secreto deste mês está pronto para abrir!'
+        : `✓ Brinde do mês (${curMonth}) já resgatado! Próximo drop secreto no próximo mês.`;
+    } else {
+      subBtn.disabled = false;
+      subBtn.textContent = `${tc('supportSubscribeBtn')} (${window.purrCloud.formatPrice(plan, lang)})`;
+      claimBtn.classList.add('hidden');
+      statusEl.textContent = 'Ao assinar, você libera na hora +500 🪙 e 1 dos 24 brindes ocultos!';
+    }
+  }
+
+  // Pacotes de Moedas
+  const packsGrid = document.getElementById('coinPacksGrid');
+  if (packsGrid) {
+    packsGrid.innerHTML = '';
+    window.purrCloud.COIN_PACKS.forEach((pack) => {
+      const card = document.createElement('div');
+      card.className = 'coin-pack-card' + (pack.popular ? ' popular' : '');
+      const packName = lang === 'en' ? pack.nameEn : pack.namePt;
+      const priceLabel = window.purrCloud.formatPrice(pack, lang);
+      card.innerHTML = `
+        <div class="coin-pack-emoji">${pack.emoji}</div>
+        <div class="coin-pack-amount">+${pack.coins} 🪙</div>
+        <div class="coin-pack-name">${packName}</div>
+      `;
+      const btn = document.createElement('button');
+      btn.className = 'tiny-btn';
+      btn.style.width = '100%';
+      btn.textContent = priceLabel;
+      btn.onclick = () => handleBuyCoinPack(pack);
+      card.appendChild(btn);
+      packsGrid.appendChild(card);
+    });
+  }
+
+  // Brindes Secretos Desbloqueados (ocultos até o jogador ganhar!)
+  const secTag = document.getElementById('secretUnlockedCountTag');
+  if (secTag) secTag.textContent = `${unlockedCount}/${totalPool}`;
+  const secGrid = document.getElementById('secretCollectionGrid');
+  if (secGrid) {
+    secGrid.innerHTML = '';
+    if (unlockedCount === 0) {
+      secGrid.innerHTML = '<span class="label-sm">🔒 Coleção secreta oculta — assine Adote um Dev para revelar 1 item inédito por mês!</span>';
+    } else {
+      (state.unlockedSecretIds || []).forEach((sid) => {
+        const entry = getCatalogItem(sid);
+        if (!entry) return;
+        const pill = document.createElement('span');
+        pill.className = 'inv-pill-btn active';
+        pill.title = entry.description || entry.name;
+        pill.textContent = `✨ ${entry.name}`;
+        secGrid.appendChild(pill);
+      });
+    }
+  }
+}
+
+function claimMonthlySupporterDropUI() {
+  if (!window.purrCloud) return;
+  const curMonth = getCurrentYearMonth();
+  if (!state.supporter?.active || state.supporter.lastClaimMonth === curMonth) return;
+
+  state.supporter.lastClaimMonth = curMonth;
+  state.coins += window.purrCloud.SUPPORTER_PLAN.monthlyCoins;
+  const drop = window.purrCloud.grantNextSecretDrop(state, catalog);
+  window.purrSound.playTimerComplete();
+  spawnCoinRain();
+  if (drop?.kind === 'theme') {
+    applyRoomTheme(drop.themeId || 'starlight');
+  } else {
+    renderThemeChips();
+  }
+  saveState(true);
+  updateCoinsUI();
+  renderShop();
+  renderInventory();
+  renderSupportTab();
+
+  const dropName = drop?.entry?.name || 'Bônus VIP';
+  if (roomActors[0]) {
+    showRoomPetSpeech(roomActors[0], `🎁 +500 🪙 & Brinde Secreto: ${dropName}! 💖`);
+  }
+  showCompactSpeech(`🎁 Brinde VIP: ${dropName}!`);
+}
+
+async function handleSubscribeAdoptDev() {
+  if (!requireLoginForPurchase()) return;
+  if (state.supporter?.active) return;
+
+  if (window.purrCloud?.startCheckout) {
+    const res = await window.purrCloud.startCheckout(window.purrCloud.SUPPORTER_PLAN.id, getCurrentLang());
+    if (res.ok && res.checkoutUrl) {
+      if (window.purrAPI?.openExternal) {
+        window.purrAPI.openExternal(res.checkoutUrl);
+      } else {
+        window.open(res.checkoutUrl, '_blank', 'noopener');
+      }
+      if (roomActors[0]) {
+        showRoomPetSpeech(roomActors[0], '💳 Checkout aberto! Assim que aprovar, seu brinde entra na nuvem!');
+      }
+      return;
+    }
+    if (!res.fallback) {
+      if (roomActors[0]) showRoomPetSpeech(roomActors[0], `⚠️ ${res.error || 'Não foi possível abrir o checkout agora.'}`);
+      return;
+    }
+  }
+
+  state.supporter = {
+    active: true,
+    since: new Date().toISOString(),
+    lastClaimMonth: null,
+  };
+  claimMonthlySupporterDropUI();
+}
+
+async function handleBuyCoinPack(pack) {
+  if (!requireLoginForPurchase()) return;
+
+  if (window.purrCloud?.startCheckout) {
+    const res = await window.purrCloud.startCheckout(pack.id, getCurrentLang());
+    if (res.ok && res.checkoutUrl) {
+      if (window.purrAPI?.openExternal) {
+        window.purrAPI.openExternal(res.checkoutUrl);
+      } else {
+        window.open(res.checkoutUrl, '_blank', 'noopener');
+      }
+      if (roomActors[0]) {
+        showRoomPetSpeech(roomActors[0], '💳 Checkout Mercado Pago aberto! Boas compras 🪙!');
+      }
+      return;
+    }
+    if (!res.fallback) {
+      if (roomActors[0]) showRoomPetSpeech(roomActors[0], `⚠️ ${res.error || 'Não foi possível abrir o checkout agora.'}`);
+      return;
+    }
+  }
+
+  state.coins += pack.coins;
+  window.purrSound.playCoin();
+  spawnCoinRain();
+  saveState(true);
+  updateCoinsUI();
+  renderShop();
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], `🪙 +${pack.coins} moedas creditadas!`);
+  showCompactSpeech(`🪙 +${pack.coins} moedas!`);
+}
+
+function applyLanguageUI() {
+  if (!window.purrCloud) return;
+  const lang = getCurrentLang();
+  const map = [
+    ['.header-titles .subtitle', 'appSubtitle'],
+    ['.side-tab[data-tab="timer"]', 'tabTimer'],
+    ['.side-tab[data-tab="shop"]', 'tabShop'],
+    ['.side-tab[data-tab="inventory"]', 'tabInventory'],
+    ['.side-tab[data-tab="support"]', 'tabSupport'],
+    ['.phase-btn[data-phase="focus"]', 'phaseFocus'],
+    ['.phase-btn[data-phase="shortBreak"]', 'phaseShortBreak'],
+    ['.phase-btn[data-phase="longBreak"]', 'phaseLongBreak'],
+    ['#minimizeCompactBtn', 'modeClockBtn'],
+    ['#langToggleBtn', 'langLabel'],
+    ['#webBannerText', 'webBannerText'],
+    ['#webDownloadExeBtn', 'webBannerBtn'],
+    ['#webHeroTitle', 'webHeroTitle'],
+    ['#webHeroSubtitle', 'webHeroSubtitle'],
+    ['#webHeroDownloadBtn', 'webHeroDownloadBtn'],
+    ['#webHeroReleasesBtn', 'webHeroReleasesBtn'],
+    ['#webFeature1Title', 'webFeature1Title'],
+    ['#webFeature1Desc', 'webFeature1Desc'],
+    ['#webFeature2Title', 'webFeature2Title'],
+    ['#webFeature2Desc', 'webFeature2Desc'],
+    ['#webFeature3Title', 'webFeature3Title'],
+    ['#webFeature3Desc', 'webFeature3Desc'],
+    ['#webFeature4Title', 'webFeature4Title'],
+    ['#webFeature4Desc', 'webFeature4Desc'],
+    ['#streakModalTitle', 'streakTitle'],
+    ['#streakModalSubtitle', 'streakSubtitle'],
+    ['#loginModalTitle', 'loginModalTitle'],
+    ['#loginModalDesc', 'loginModalDesc'],
+    ['#googleSignInBtn', 'loginGoogleBtn'],
+    ['#loginLaterBtn', 'loginLaterBtn'],
+    ['#syncCloudNowBtn', 'loginSyncNowBtn'],
+    ['#googleSignOutBtn', 'loginLogoutBtn'],
+    ['#supportHeroTitle', 'supportHeroTitle'],
+    ['#supportHeroDesc', 'supportHeroDesc'],
+    ['#supportPacksTitle', 'supportPacksTitle'],
+    ['#supporterCollectionLabel', 'supporterDropsProgress'],
+  ];
+
+  map.forEach(([sel, key]) => {
+    const el = document.querySelector(sel);
+    if (el) el.textContent = tc(key);
+  });
+
+  document.querySelectorAll('.coin-pill').forEach((el) => {
+    const tip = tc('coinTip');
+    el.setAttribute('title', tip);
+    el.setAttribute('data-tip', tip);
+  });
+
+  updateAccountHeaderUI();
+  renderStreakUI();
+  renderSupportTab();
+}
+
+function initWebPromoBanner() {
+  const banner = document.getElementById('webPromoBanner');
+  if (!window.purrAPI?.isElectron) {
+    document.body.classList.add('is-web-browser');
+    if (banner) banner.classList.remove('hidden');
+    document.getElementById('webLandingHero')?.classList.remove('hidden');
+    document.getElementById('webLandingFooter')?.classList.remove('hidden');
+  }
+}
+
+async function checkAppUpdates() {
+  if (!window.purrCloud) return;
+  const info = await window.purrCloud.checkLatestRelease(window.purrCloud.APP_VERSION);
+  if (!info) return;
+  latestUpdateInfo = info;
+  const btn = document.getElementById('updateAvailableBtn');
+  if (btn) {
+    btn.classList.remove('hidden');
+    btn.textContent = `✨ ${info.version}`;
+    btn.title = `Nova versão ${info.version} disponível! Clique para baixar.`;
+  }
 }
 
 async function init() {
@@ -3081,6 +3831,7 @@ async function init() {
 
   await loadState();
   normalizePlacedItemsForIsometricRoom();
+  normalizeStreakOnBoot();
   window.purrSound.muted = Boolean(state.muted);
   document.getElementById('muteBtn').textContent = state.muted ? '🔇' : '🔊';
 
@@ -3090,11 +3841,34 @@ async function init() {
   updateCoinsUI();
   updateTimerUI();
   bindEvents();
+  applyLanguageUI();
+  initWebPromoBanner();
+  checkAppUpdates();
+  if (state.cloudUser && window.purrCloud?.pullAndSyncCloudState) {
+    window.purrCloud.pullAndSyncCloudState(state).then((res) => {
+      if (res?.merged) {
+        normalizePlacedItemsForIsometricRoom();
+        applyRoomTheme(state.roomTheme || 'cozy');
+        syncRoomActors();
+        updateCoinsUI();
+        updateAccountHeaderUI();
+        renderStreakUI();
+        renderInventory();
+        renderShop();
+        renderSupportTab();
+        saveState(true);
+      }
+    }).catch(() => {});
+  }
   setCompactCollapsed(Boolean(state.compactCollapsed), Boolean(window.purrAPI?.isElectron));
 
   // Em navegador comum (sem Electron), abre direto no modo expandido com dica
   if (!window.purrAPI?.isElectron) {
     setAppMode('expanded');
+    if (window.location.search.includes('electron_auth=1')) {
+      state.cloudUser = null;
+      openLoginPromptModal(false);
+    }
   } else {
     setAppMode('compact');
   }

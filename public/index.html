@@ -3,12 +3,33 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.gstatic.com https://apis.google.com https://accounts.google.com https://*.firebaseapp.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://apis.google.com https://api.github.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com;" />
   <title>PurrModoro — Gatinho de Foco</title>
   <link rel="icon" type="image/png" href="assets/ui/tray_icon.png" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="mode-compact theme-cozy">
+
+  <!-- HERO DO MINI SITE WEB (visível apenas no navegador) -->
+  <section id="webLandingHero" class="web-landing-hero hidden">
+    <div class="web-hero-head">
+      <img src="assets/ui/tray_icon.png" alt="PurrModoro" class="web-hero-icon" />
+      <div class="web-hero-text">
+        <h2 id="webHeroTitle">PurrModoro — Seu Gatinho de Foco em Pixel Art 🐾</h2>
+        <p id="webHeroSubtitle">
+          Teste o quartinho isométrico e o timer Pomodoro aqui mesmo no navegador! No app de Windows (.exe), seu gatinho caminha livre perto do relógio da bandeja, inicia junto com o PC e sincroniza tudo na nuvem.
+        </p>
+      </div>
+    </div>
+    <div class="web-hero-actions">
+      <a id="webHeroDownloadBtn" class="px-btn px-btn-primary web-dl-link" href="https://github.com/ruishalm/Purrmodoro/releases/latest/download/PurrModoro-Setup.exe" target="_blank" rel="noopener">
+        ⬇️ Baixar para Windows (.exe) — Grátis
+      </a>
+      <a id="webHeroReleasesBtn" class="px-btn px-btn-ghost web-dl-link" href="https://github.com/ruishalm/Purrmodoro/releases" target="_blank" rel="noopener">
+        📦 Ver Versão &amp; Notas no GitHub
+      </a>
+    </div>
+  </section>
 
   <!-- =========================================================
        MODO COMPACTO: WIDGET TRANSPARENTE PERTO DO RELÓGIO
@@ -50,7 +71,10 @@
       <div class="compact-timer-row">
         <div class="compact-phase-wrap">
           <span id="compactPhaseLabel" class="phase-tag">🍅 FOCO</span>
-          <span id="compactBuffBadge" class="buff-mini hidden" title="Bônus de Café ativo">☕+25%</span>
+          <div class="compact-mini-tags">
+            <span id="compactStreakBadge" class="streak-mini" title="Ofensiva diária — clique para resgatar!">🔥0</span>
+            <span id="compactBuffBadge" class="buff-mini hidden" title="Bônus de Café ativo">☕+25%</span>
+          </div>
         </div>
         <div id="compactTimerDisplay" class="compact-time">25:00</div>
       </div>
@@ -101,13 +125,23 @@
       </div>
 
       <div class="header-right no-drag">
+        <button id="updateAvailableBtn" class="hdr-btn hdr-update hidden" title="Há uma nova versão do PurrModoro no GitHub!">
+          ✨ Nova versão!
+        </button>
         <div id="headerBuffPill" class="buff-pill hidden" title="Multiplicador de moedas no próximo ciclo de foco">
           ☕ <span id="headerBuffText">+25%</span>
         </div>
+        <button id="streakHeaderBtn" class="hdr-btn hdr-streak" title="Ofensiva Diária (estilo Duolingo) — ganhe moedas todo dia!">
+          🔥 <span id="headerStreakCount">0</span>
+        </button>
+        <button id="accountHeaderBtn" class="hdr-btn hdr-cloud" title="Entrar com Google para salvar na nuvem e ganhar o Chapéu Nuvem Mágica!">
+          ☁️ Entrar
+        </button>
         <div class="coin-pill header-coins" title="Para ganhar moedas, use o timer em suas tarefas!" data-tip="Para ganhar moedas, use o timer em suas tarefas!">
           <span class="coin-dot"></span>
           <span id="headerCoins">100</span>
         </div>
+        <button id="langToggleBtn" class="hdr-btn" title="Alternar idioma / Switch language (PT-BR / EN-US)">🇧🇷 PT</button>
         <button id="muteBtn" class="hdr-btn" title="Ativar/Silenciar Sons">🔊</button>
         <button id="minimizeCompactBtn" class="hdr-btn hdr-accent" title="Minimizar para o Modo Relógio perto da hora">
           🐾 Modo Relógio
@@ -115,6 +149,20 @@
         <button id="closeAppBtn" class="hdr-btn hdr-danger" title="Fechar e recolher para a bandeja">✕</button>
       </div>
     </header>
+
+    <!-- MINI SITE DE APRESENTAÇÃO WEB (aparece quando aberto no navegador) -->
+    <div id="webPromoBanner" class="web-promo-banner hidden">
+      <div class="web-promo-copy">
+        <strong>🌐 PurrModoro Web Preview:</strong>
+        <span id="webBannerText">Versão Web de Apresentação! Quer o gatinho livre em cima do relógio do Windows e iniciando com o PC?</span>
+      </div>
+      <div class="web-promo-actions">
+        <a id="webDownloadExeBtn" class="px-btn px-btn-primary web-dl-link" href="https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Setup.exe" target="_blank" rel="noopener">
+          ⬇️ Baixar PurrModoro (.exe)
+        </a>
+        <button id="webBannerCloseBtn" class="tiny-btn" title="Ocultar aviso">✕</button>
+      </div>
+    </div>
 
     <main class="main-layout">
       <!-- LADO ESQUERDO: QUARTINHO DO GATO -->
@@ -126,6 +174,7 @@
             <button class="theme-chip" data-theme="pastel" title="Aplicar tema Pastel doce (desbloqueável na loja)">🌸 Pastel</button>
             <button class="theme-chip" data-theme="bamboo" title="Aplicar tema Jardim Bamboo (desbloqueável na loja)">🎋 Bamboo</button>
             <button class="theme-chip" data-theme="halloween" title="Aplicar tema Noite Mística / Halloween (desbloqueável na loja)">🎃 Noite</button>
+            <button class="theme-chip hidden" data-theme="starlight" title="Aplicar tema secreto Galáxia Lo-Fi">🌌 Galáxia</button>
           </div>
           <div class="room-hint">Arraste os móveis livremente! 🐾</div>
         </div>
@@ -173,6 +222,7 @@
           <button class="side-tab active" data-tab="timer" title="Configurar e acompanhar seu Timer Pomodoro">🍅 Timer</button>
           <button class="side-tab" data-tab="shop" title="Comprar móveis, gatinhos, chapéus, pets e comidinhas">🛒 Lojinha</button>
           <button class="side-tab" data-tab="inventory" title="Equipar seus gatinhos, chapéus, pets e móveis comprados">🎒 Quarto</button>
+          <button class="side-tab" data-tab="support" title="Assinatura Adote um Dev (24 brindes secretos!) e pacotes de moedas">💖 Apoiar</button>
         </nav>
 
         <!-- ABA 1: TIMER POMODORO REGULÁVEL -->
@@ -319,16 +369,146 @@
             <div id="invFurnitureGrid" class="inv-furniture-grid"></div>
           </div>
         </div>
+
+        <!-- ABA 4: ADOTE UM DEV & MOEDAS -->
+        <div id="tab-support" class="tab-content">
+          <div class="support-hero-card">
+            <div class="support-hero-top">
+              <h3 id="supportHeroTitle">💖 Adote um Dev (Clube VIP)</h3>
+              <span id="supportPriceBadge" class="support-price-pill">R$ 14,90/mês</span>
+            </div>
+            <p id="supportHeroDesc" class="support-hero-desc">
+              +500 🪙 todo mês + 1 Brinde Secreto Exclusivo aleatório de uma coleção oculta com 24 itens (2 anos sem repetir!)
+            </p>
+            <div class="support-progress-wrap">
+              <div class="support-progress-labels">
+                <span id="supporterCollectionLabel">Coleção Secreta Adote um Dev</span>
+                <strong id="supporterDropsCounter">0/24</strong>
+              </div>
+              <div class="timer-progress-track">
+                <div id="supporterProgressBar" class="timer-progress-fill" style="width: 0%"></div>
+              </div>
+            </div>
+            <div class="support-actions-col">
+              <button id="subscribeDevBtn" class="px-btn px-btn-primary">💖 Assinar Adote um Dev</button>
+              <button id="claimMonthlyDropBtn" class="px-btn px-btn-ghost hidden">🎁 Abrir Brinde Mensal (+500 🪙)</button>
+            </div>
+            <div id="supporterStatusText" class="label-sm"></div>
+            <div id="supportGatewayHint" class="support-gateway-note">
+              Pagamento em R$ via Mercado Pago (PIX ou Cartão)
+            </div>
+          </div>
+
+          <div class="inv-section">
+            <h3 id="supportPacksTitle">🪙 Pacotes Avulsos de Moedinhas</h3>
+            <div id="coinPacksGrid" class="coin-packs-grid"></div>
+          </div>
+
+          <div class="inv-section">
+            <div class="inv-section-head">
+              <h3>🎁 Meus Brindes Secretos Recebidos</h3>
+              <span id="secretUnlockedCountTag" class="label-sm">0/24</span>
+            </div>
+            <div id="secretCollectionGrid" class="inv-mini-list"></div>
+          </div>
+        </div>
       </aside>
     </main>
+  </div>
+
+  <!-- RODAPÉ DE DESTAQUES DO MINI SITE WEB (visível apenas no navegador) -->
+  <footer id="webLandingFooter" class="web-landing-footer hidden">
+    <div class="web-feature-grid">
+      <div class="web-feature-card">
+        <strong id="webFeature1Title">🐾 Modo Relógio no Windows</strong>
+        <span id="webFeature1Desc">O gatinho caminha acima da hora do sistema sem atrapalhar e inicia com o Windows.</span>
+      </div>
+      <div class="web-feature-card">
+        <strong id="webFeature2Title">🏠 Quartinho Isométrico Cozy</strong>
+        <span id="webFeature2Desc">Ganhe moedas focando nas tarefas e compre móveis, quadros, comidas e temas do quarto.</span>
+      </div>
+      <div class="web-feature-card">
+        <strong id="webFeature3Title">🔥 Ofensiva Diária &amp; Nuvem</strong>
+        <span id="webFeature3Desc">Entre com Google, ganhe o Chapéu Nuvem Mágica + 150 🪙 e mantenha sua sequência ativa.</span>
+      </div>
+      <div class="web-feature-card">
+        <strong id="webFeature4Title">💖 23 Bichinhos &amp; 27 Chapéus</strong>
+        <span id="webFeature4Desc">Inclui Dino Verde, novas cores gratuitas e clube Adote um Dev com 24 brindes secretos.</span>
+      </div>
+    </div>
+    <div class="web-footer-meta">
+      PurrModoro v0.1.0-beta • Feito com ❤️ e café ☕ • <a href="https://github.com/ruishalm/Purrmodoro" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </footer>
+
+  <!-- MODAL DE OFENSIVA DIÁRIA (ESTILO DUOLINGO) -->
+  <div id="streakModal" class="purr-modal hidden">
+    <div class="purr-modal-card">
+      <div class="purr-modal-head">
+        <h3 id="streakModalTitle">🔥 Ofensiva Diária</h3>
+        <button id="closeStreakModalBtn" class="tiny-btn" title="Fechar">✕</button>
+      </div>
+      <p id="streakModalSubtitle" class="purr-modal-desc">
+        Volte todo dia para manter o foguinho aceso e ganhar mais moedinhas!
+      </p>
+      <div class="streak-summary-bar">
+        <div class="streak-big-num">🔥 <span id="streakCurrentBig">0</span> <small id="streakDaysLabel">dias</small></div>
+        <div class="streak-shield-pill" title="Protege automaticamente sua ofensiva se você esquecer de abrir 1 dia!">
+          ❄️ <span id="streakShieldsLabelText">Escudos:</span> <strong id="streakShieldsCount">0</strong>
+        </div>
+      </div>
+      <div id="streakDaysTrack" class="streak-days-track"></div>
+      <button id="claimDailyStreakBtn" class="px-btn px-btn-primary">🎁 Resgatar Moedinhas de Hoje</button>
+      <div id="streakFreezeHint" class="label-sm"></div>
+    </div>
+  </div>
+
+  <!-- MODAL "ME LEVA COM VOCÊ?! *-*" + LOGIN GOOGLE -->
+  <div id="loginPromptModal" class="purr-modal hidden">
+    <div class="purr-modal-card">
+      <div class="purr-modal-head">
+        <h3 id="loginModalTitle">Me leva com você?! *-*</h3>
+        <button id="closeLoginModalBtn" class="tiny-btn" title="Fechar">✕</button>
+      </div>
+      <div class="login-hero-row">
+        <canvas id="loginModalCatCanvas" width="76" height="76" class="login-cat-preview"></canvas>
+        <div class="login-reward-box">
+          <img src="assets/items/hat_cloud_star.png" alt="Chapéu Nuvem Mágica" />
+          <div>
+            <strong>🎁 Brinde de Login Grátis</strong>
+            <div class="label-sm">Chapéu Nuvem Mágica ☁️⭐ + 150 🪙</div>
+          </div>
+        </div>
+      </div>
+      <p id="loginModalDesc" class="purr-modal-desc">
+        Conecte sua conta Google grátis para salvar seu quartinho na nuvem, abrir em qualquer PC e ganhar na hora o Chapéu Nuvem Mágica ☁️⭐ + 150 🪙!
+      </p>
+      <div id="loginFormArea" class="login-form-area">
+        <button id="googleSignInBtn" class="px-btn px-btn-primary">☁️ Entrar com Google & Ganhar Chapéu</button>
+        <button id="loginLaterBtn" class="px-btn px-btn-ghost">Talvez depois</button>
+      </div>
+      <div id="loginConnectedArea" class="login-connected-area hidden">
+        <div id="loginUserCard" class="login-user-card"></div>
+        <div class="login-connected-actions">
+          <button id="syncCloudNowBtn" class="px-btn px-btn-primary">🔄 Sincronizar Agora</button>
+          <button id="googleSignOutBtn" class="px-btn px-btn-danger">Sair da conta</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="heldFoodCursor" class="held-food-cursor hidden">
     <img id="heldFoodImg" src="" alt="" />
   </div>
 
-  <script src="sound.js"></script>
-  <script src="app.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-auth-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-functions-compat.js"></script>
+  <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics-compat.js"></script>
+  <script src="sound.js?v=20261114b"></script>
+  <script src="cloud.js?v=20261114b"></script>
+  <script src="app.js?v=20261114b"></script>
 </body>
 </html>
 

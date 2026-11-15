@@ -1,0 +1,324 @@
+rules_version = '2';
+
+// =============================================================================
+// Assumed Data Model
+// =============================================================================
+//
+// Collection: users
+// Document ID: {userId} (must match Firebase Auth UID: request.auth.uid)
+// Access: Owner-only get, create, and update. Listing all users and client
+//         deletes are explicitly denied.
+// Fields:
+//   - uid: string (required, immutable, must equal userId / request.auth.uid)
+//   - displayName: string (optional, <= 120 chars) or null
+//   - email: string (optional, <= 200 chars) or null
+//   - updatedAt: string (ISO 8601 UTC timestamp, 19..40 chars) or timestamp (required)
+//   - coins: int (required, >= 0, <= 10000000; create <= 1000; update <= old + 1000)
+//   - unlockedCats: list (required, 1..100 items)
+//   - activeCat: string (required, 1..64 chars, must be in unlockedCats)
+//   - unlockedHats: list (required, 0..100 items)
+//   - activeHat: string (1..64 chars, must be in unlockedHats) or null (required)
+//   - unlockedPets: list (required, 0..50 items)
+//   - activePets: list (required, 0..20 items)
+//   - unlockedThemes: list (required, 1..30 items)
+//   - roomTheme: string (required, 1..64 chars, must be in unlockedThemes)
+//   - ownedItems: map (required, 0..200 entries)
+//   - placedItems: list (required, 0..200 items)
+//   - streak: map (required, exact keys: current, best, lastClaimDate, freezeShields)
+//       - current: int (0..100000)
+//       - best: int (0..100000)
+//       - lastClaimDate: string (YYYY-MM-DD, 10 chars) or null
+//       - freezeShields: int (0..1000)
+//   - supporter: map (required, exact keys: active, since, lastClaimMonth)
+//       - active: bool (must be false on create; immutable to clients on update)
+//       - since: string (ISO 8601, 19..40 chars), timestamp, or null (must be null on create; immutable to clients)
+//       - lastClaimMonth: string (YYYY-MM, 7 chars) or null (must be null on create; immutable to clients)
+//   - unlockedSecretIds: list (required, 0..50 items; empty on create; immutable to clients on update)
+//   - stats: map (required, exact keys: cyclesCompleted, totalFocusMinutes)
+//       - cyclesCompleted: int (0..1000000)
+//       - totalFocusMinutes: int (0..100000000)
+//
+// Collection: purchases
+// Document ID: {purchaseId} (payment provider transaction/event ID)
+// Access: Authenticated owner can read (get/list with uid == request.auth.uid filter).
+//         All client writes (create, update, delete) are denied; written exclusively
+//         by Firebase Cloud Functions webhooks via Admin SDK.
+// Fields (written server-side):
+//   - uid: string (owner Firebase Auth UID)
+//   - productId: string
+//   - coins: int
+//   - createdAt: string (ISO 8601)
+//
+// Collection: app_config
+// Document ID: {docId} (e.g., live_events, version_info)
+// Access: Explicitly requested public read access (allow read: if true;) so the
+//         desktop/web client can check version info and live events before sign-in.
+//         Contains NO PII. All client writes are denied (allow write: if false;).
+//
+// =============================================================================
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // Helper Functions
+    // =========================================================================
+
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isDocOwner() {
+      return isAuthenticated() && request.auth.uid == resource.data.uid;
+    }
+
+    function uidUnchanged() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == request.auth.uid;
+    }
+
+    function uidNotModified() {
+      return !('uid' in request.resource.data) ||
+        request.resource.data.uid == resource.data.uid;
+    }
+
+    function hasRequiredFields(fields) {
+      return request.resource.data.keys().hasAll(fields);
+    }
+
+    function hasOnlyAllowedFields(fields) {
+      return request.resource.data.keys().hasOnly(fields);
+    }
+
+    function isValidDateString(dateStr) {
+      return dateStr is string &&
+        dateStr.size() >= 19 &&
+        dateStr.size() <= 40 &&
+        dateStr.matches('^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d{1,9})?(Z|[+-]\\d{2}:\\d{2})$');
+    }
+
+    function isValidList(listVal, minSize, maxSize) {
+      return listVal is list &&
+        listVal.size() >= minSize &&
+        listVal.size() <= maxSize;
+    }
+
+    function isNonEmptyString(val, maxLen) {
+      return val is string &&
+        val.size() > 0 &&
+        val.size() <= maxLen;
+    }
+
+    function isValidOptionalNullableString(data, field, maxLen) {
+      return !(field in data) ||
+        data[field] == null ||
+        (data[field] is string && data[field].size() <= maxLen);
+    }
+
+    // =========================================================================
+    // Domain Validators
+    // =========================================================================
+
+    function isValidStreak(streak) {
+      return streak is map &&
+        streak.keys().hasAll(['current', 'best', 'lastClaimDate', 'freezeShields']) &&
+        streak.keys().hasOnly(['current', 'best', 'lastClaimDate', 'freezeShields']) &&
+        streak.current is int && streak.current >= 0 && streak.current <= 100000 &&
+        streak.best is int && streak.best >= 0 && streak.best <= 100000 &&
+        (
+          streak.lastClaimDate == null ||
+          (
+            streak.lastClaimDate is string &&
+            streak.lastClaimDate.size() == 10 &&
+            streak.lastClaimDate.matches('^\\d{4}-\\d{2}-\\d{2}$')
+          )
+        ) &&
+        streak.freezeShields is int && streak.freezeShields >= 0 && streak.freezeShields <= 1000;
+    }
+
+    function isValidSupporter(supporter) {
+      return supporter is map &&
+        supporter.keys().hasAll(['active', 'since', 'lastClaimMonth']) &&
+        supporter.keys().hasOnly(['active', 'since', 'lastClaimMonth']) &&
+        supporter.active is bool &&
+        (
+          supporter.since == null ||
+          isValidDateString(supporter.since) ||
+          supporter.since is timestamp
+        ) &&
+        (
+          supporter.lastClaimMonth == null ||
+          (
+            supporter.lastClaimMonth is string &&
+            supporter.lastClaimMonth.size() == 7 &&
+            supporter.lastClaimMonth.matches('^\\d{4}-\\d{2}$')
+          )
+        );
+    }
+
+    function isDefaultSupporter(supporter) {
+      return isValidSupporter(supporter) &&
+        supporter.active == false &&
+        supporter.since == null &&
+        supporter.lastClaimMonth == null;
+    }
+
+    function isValidStats(stats) {
+      return stats is map &&
+        stats.keys().hasAll(['cyclesCompleted', 'totalFocusMinutes']) &&
+        stats.keys().hasOnly(['cyclesCompleted', 'totalFocusMinutes']) &&
+        stats.cyclesCompleted is int && stats.cyclesCompleted >= 0 && stats.cyclesCompleted <= 1000000 &&
+        stats.totalFocusMinutes is int && stats.totalFocusMinutes >= 0 && stats.totalFocusMinutes <= 100000000;
+    }
+
+    function userRequiredFields() {
+      return [
+        'uid',
+        'updatedAt',
+        'coins',
+        'unlockedCats',
+        'activeCat',
+        'unlockedHats',
+        'activeHat',
+        'unlockedPets',
+        'activePets',
+        'unlockedThemes',
+        'roomTheme',
+        'ownedItems',
+        'placedItems',
+        'streak',
+        'supporter',
+        'unlockedSecretIds',
+        'stats'
+      ];
+    }
+
+    function userAllowedFields() {
+      return [
+        'uid',
+        'displayName',
+        'email',
+        'updatedAt',
+        'coins',
+        'unlockedCats',
+        'activeCat',
+        'unlockedHats',
+        'activeHat',
+        'unlockedPets',
+        'activePets',
+        'unlockedThemes',
+        'roomTheme',
+        'ownedItems',
+        'placedItems',
+        'streak',
+        'supporter',
+        'unlockedSecretIds',
+        'stats'
+      ];
+    }
+
+    function isValidUserState(data, userId) {
+      return hasRequiredFields(userRequiredFields()) &&
+        hasOnlyAllowedFields(userAllowedFields()) &&
+        isNonEmptyString(data.uid, 128) &&
+        data.uid == userId &&
+        isValidOptionalNullableString(data, 'displayName', 120) &&
+        isValidOptionalNullableString(data, 'email', 200) &&
+        (isValidDateString(data.updatedAt) || data.updatedAt is timestamp) &&
+        data.coins is int && data.coins >= 0 && data.coins <= 10000000 &&
+        isValidList(data.unlockedCats, 1, 100) &&
+        isNonEmptyString(data.activeCat, 64) &&
+        data.activeCat in data.unlockedCats &&
+        isValidList(data.unlockedHats, 0, 100) &&
+        (
+          data.activeHat == null ||
+          (isNonEmptyString(data.activeHat, 64) && data.activeHat in data.unlockedHats)
+        ) &&
+        isValidList(data.unlockedPets, 0, 50) &&
+        isValidList(data.activePets, 0, 20) &&
+        isValidList(data.unlockedThemes, 1, 30) &&
+        isNonEmptyString(data.roomTheme, 64) &&
+        data.roomTheme in data.unlockedThemes &&
+        data.ownedItems is map && data.ownedItems.size() <= 200 &&
+        isValidList(data.placedItems, 0, 200) &&
+        isValidStreak(data.streak) &&
+        isValidSupporter(data.supporter) &&
+        isValidList(data.unlockedSecretIds, 0, 50) &&
+        isValidStats(data.stats);
+    }
+
+    function isValidUserCreateState(data) {
+      return isDefaultSupporter(data.supporter) &&
+        data.unlockedSecretIds.size() == 0 &&
+        data.coins <= 1000;
+    }
+
+    function isValidUserUpdateTransition(newData, oldData) {
+      return (!('uid' in oldData) || newData.uid == oldData.uid) &&
+        (
+          ('supporter' in oldData)
+            ? newData.supporter == oldData.supporter
+            : isDefaultSupporter(newData.supporter)
+        ) &&
+        (
+          ('unlockedSecretIds' in oldData)
+            ? newData.unlockedSecretIds == oldData.unlockedSecretIds
+            : newData.unlockedSecretIds.size() == 0
+        ) &&
+        (
+          ('coins' in oldData && oldData.coins is number)
+            ? newData.coins <= oldData.coins + 1000
+            : newData.coins <= 1000
+        );
+    }
+
+    // =========================================================================
+    // Collection Rules
+    // =========================================================================
+
+    match /users/{userId} {
+      // Only the signed-in owner can read their own profile; listing all users is blocked.
+      allow get: if isOwner(userId);
+      allow list: if false;
+
+      // Owner can create/update their synced game state with strict schema & anti-tampering validation.
+      allow create: if isOwner(userId) &&
+        uidUnchanged() &&
+        isValidUserState(request.resource.data, userId) &&
+        isValidUserCreateState(request.resource.data);
+
+      allow update: if isOwner(userId) &&
+        uidNotModified() &&
+        isValidUserState(request.resource.data, userId) &&
+        isValidUserUpdateTransition(request.resource.data, resource.data);
+
+      allow delete: if false;
+    }
+
+    match /purchases/{purchaseId} {
+      // Users can get or list only their own purchase records (requires uid == request.auth.uid query filter).
+      allow read: if isDocOwner();
+
+      // Purchases are written exclusively by trusted Cloud Functions webhooks (Admin SDK bypasses rules).
+      allow create, update, delete: if false;
+    }
+
+    match /app_config/{docId} {
+      // Explicitly public read-only configuration (live_events, version_info); contains no PII.
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // =========================================================================
+    // Default Deny
+    // =========================================================================
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "name": "purrmodoro-functions",
+  "description": "Cloud Functions para PurrModoro (Mercado Pago, Stripe e drops mensais Adote um Dev)",
+  "engines": {
+    "node": "22"
+  },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^13.0.0",
+    "firebase-functions": "^6.0.0",
+    "purrmodoro": "file:.."
+  }
+}

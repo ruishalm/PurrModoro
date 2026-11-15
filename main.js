@@ -378,6 +378,76 @@ function registerIpc() {
     isQuitting = true;
     app.quit();
   });
+
+  ipcMain.handle('purr:google-sign-in', () => {
+    return new Promise((resolve) => {
+      let settled = false;
+      const authWin = new BrowserWindow({
+        width: 520,
+        height: 640,
+        center: true,
+        autoHideMenuBar: true,
+        alwaysOnTop: Boolean(alwaysOnTop),
+        title: 'PurrModoro - Entrar com Google',
+        webPreferences: {
+          nodeIntegration: false,
+          contextIsolation: true,
+        },
+      });
+
+      const rawUa = authWin.webContents.getUserAgent();
+      const cleanUa = rawUa
+        .replace(/\s*Electron\/[^\s]+/g, '')
+        .replace(/\s*purrmodoro\/[^\s]+/gi, '');
+      authWin.webContents.setUserAgent(cleanUa);
+
+      const finish = (payload) => {
+        if (settled) return;
+        settled = true;
+        if (!authWin.isDestroyed()) authWin.close();
+        resolve(payload);
+      };
+
+      authWin.webContents.setWindowOpenHandler(() => ({
+        action: 'allow',
+        overrideBrowserWindowOptions: {
+          width: 500,
+          height: 620,
+          autoHideMenuBar: true,
+          alwaysOnTop: Boolean(alwaysOnTop),
+          parent: authWin,
+        },
+      }));
+
+      authWin.webContents.on('did-create-window', (childWin) => {
+        childWin.webContents.setUserAgent(cleanUa);
+      });
+
+      authWin.on('page-title-updated', (event, title) => {
+        if (typeof title === 'string' && title.startsWith('PURR_AUTH:')) {
+          event.preventDefault();
+          try {
+            const parsed = JSON.parse(title.slice('PURR_AUTH:'.length));
+            finish(parsed);
+          } catch (err) {
+            finish({ error: err?.message || 'Erro ao ler credencial Google.' });
+          }
+        }
+      });
+
+      authWin.webContents.on('did-fail-load', (_e, _code, desc, validatedURL, isMainFrame) => {
+        if (isMainFrame) {
+          finish({ error: `Falha ao abrir login Google: ${desc || validatedURL}` });
+        }
+      });
+
+      authWin.on('closed', () => {
+        finish({ cancelled: true });
+      });
+
+      authWin.loadURL('https://purrrmodoro.web.app/?electron_auth=1', { userAgent: cleanUa });
+    });
+  });
 }
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
