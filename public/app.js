@@ -1523,7 +1523,6 @@ function getItemRoomScale(def) {
   if (['ball_sage', 'ball_indigo'].includes(def.id)) return 0.85;
   if (['yarn_pink', 'yarn_blue'].includes(def.id)) return 1.3;
   if (def.id === 'decor_candle') return 1.5;
-  if (def.id === 'furn_sec_arcade') return 2.0;
   return 1.0;
 }
 

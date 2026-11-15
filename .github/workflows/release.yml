@@ -46,7 +46,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          name: PurrModoro v0.2 Beta (${{ github.ref_name }})
+          name: PurrModoro ${{ github.ref_name }}
           draft: false
           prerelease: false
           generate_release_notes: true
