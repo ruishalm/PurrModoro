@@ -584,7 +584,7 @@ def generate_procedural_foods(items_dir: Path) -> list[dict]:
             "price": 45,
             "particle": "❄️",
             "buff": {"type": "streak_freeze", "freezes": 1, "label": "+1 Escudo ❄️"},
-            "description": "Protege sua ofensiva diária (estilo Duolingo!) se você esquecer de abrir 1 dia!",
+            "description": "Protege sua ofensiva diária se você esquecer de abrir 1 dia!",
             "rows": [
                 "......OOOOOO......",
                 "....OOIIIIIIOO....",
@@ -746,17 +746,49 @@ def generate_procedural_foods(items_dir: Path) -> list[dict]:
                 "....OBBBBBBBBBO...",
             ],
         },
+        {
+            "id": "food_ice_cream_tub",
+            "name": "Pote de Sorvete",
+            "subCategory": "cafe",
+            "price": 110,
+            "particle": "🍨",
+            "buff": {"type": "streak_freeze", "freezes": 3, "label": "+3 Escudos ❄️"},
+            "description": "Pote cremoso de sorvete: segura até 3 strikes (dias perdidos) da sua Ofensiva Diária!",
+            "rows": [
+                "....OOOOOOOOOO....",
+                "...OWWPPPPPPWWO...",
+                "..OPPPPPPPPPPPPO..",
+                "..OOOOOOOOOOOOOO..",
+                "..OIIIIIIIIIIIIO..",
+                "..OIIWWIIIIIIiIO..",
+                "..OIIWWWWIIIIiIO..",
+                "..OIIPPWWPPIIiIO..",
+                "..OIIPPPPPPIIiIO..",
+                "..OIIIIIIIIIIiIO..",
+                "...OIIiiiiiiiIO...",
+                "...OIIIIIIIIiIO...",
+                "....OOOOOOOOOO....",
+            ],
+        },
     ]
 
     out = []
     for spec in designs:
-        img = Image.new("RGBA", (28, 28), (0, 0, 0, 0))
         rows = spec["rows"]
         mw = max(len(r) for r in rows)
         mh = len(rows)
-        ox = (28 - mw) // 2
-        oy = (28 - mh) // 2
-        _plot_mask(img, rows, base_pal, ox=ox, oy=oy)
+        if spec["id"] == "food_taiyaki":
+            img = Image.new("RGBA", (28, 28), (0, 0, 0, 0))
+            ox = (28 - mw) // 2
+            oy = (28 - mh) // 2
+            _plot_mask(img, rows, base_pal, ox=ox, oy=oy)
+        else:
+            raw_food = Image.new("RGBA", (mw, mh), (0, 0, 0, 0))
+            _plot_mask(raw_food, rows, base_pal, ox=0, oy=0)
+            scaled_food = raw_food.resize((mw * 2, mh * 2), Image.Resampling.NEAREST)
+            size = max(42, mw * 2 + 4, mh * 2 + 4)
+            img = Image.new("RGBA", (size, size), (0, 0, 0, 0))
+            img.paste(scaled_food, ((size - scaled_food.width) // 2, (size - scaled_food.height) // 2), scaled_food)
         dest = items_dir / f"{spec['id']}.png"
         img.save(dest)
         out.append({
@@ -766,8 +798,8 @@ def generate_procedural_foods(items_dir: Path) -> list[dict]:
             "subCategory": spec["subCategory"],
             "price": spec["price"],
             "image": f"assets/items/{spec['id']}.png",
-            "width": 28,
-            "height": 28,
+            "width": img.width,
+            "height": img.height,
             "wallItem": False,
             "particle": spec["particle"],
             "buff": spec["buff"],
@@ -1368,25 +1400,33 @@ def generate_secret_furniture(items_dir: Path) -> list[dict]:
             "subCategory": "movel",
             "price": 135,
             "wallItem": False,
-            "description": "Mini máquina arcade brilhante para relaxar nas pausas!",
-            "size": (40, 56),
+            "description": "Máquina arcade isométrica brilhante para relaxar nas pausas!",
+            "scale": 4,
+            "size": (92, 108),
             "rows": [
-                ".....OOOOOOOOOOOOO......",
-                "....OVVVVVVVVVVVVVO.....",
-                "....OVVYYYYYYYYVVVO.....",
-                "....OOKKKKKKKKKKKOO.....",
-                "....OKKAAAAAAAAAKKO.....",
-                "....OKKAANAAANAAKKO.....",
-                "....OKKAAAAAAAAAKKO.....",
-                "....OOKKKKKKKKKKKOO.....",
-                "...OVVVVVRRRRVVVVVVO....",
-                "...OVVVVVVVVVVVVVVVO....",
-                "....OVVVVVVVVVVVVVO.....",
-                "....OVVVvVVVVVvVVVO.....",
-                "....OVVVvVVVVVvVVVO.....",
-                "....OVVVVVVVVVVVVVO.....",
-                "....OVVVvvvvvvvVVVO.....",
-                "....OOOOOOOOOOOOOOO.....",
+                "..........OOOOOO..........",
+                "........OOVVVVVVOO........",
+                "......OOVVYYYYYYVVOO......",
+                ".....OVVYYYYYYYYYYvvO.....",
+                ".....OVVOOYYYYYYOOVvO.....",
+                ".....OVVOKKKKKKKKOVvO.....",
+                ".....OVVOKAAAAAOKOVvO.....",
+                ".....OVVOKAANAOKKOVvO.....",
+                ".....OVVOKAAAAAOKOVvO.....",
+                ".....OVVOKKKKKKKKOVvO.....",
+                "....OVVVOOVVVVVVOOvvO.....",
+                "...OVVRRVVVVVVVVvvvVO.....",
+                "..OVVRRRRVVVVVVVvvvvO.....",
+                "..OOVVVVVVVVVVVVvvvvO.....",
+                "....OOVVVVVVVVVVvvvvO.....",
+                "....OVVVVVVVVVVVvvvvO.....",
+                "....OVVVVAAVVVVVvvvvO.....",
+                "....OVVVVAAVVVVVvvvvO.....",
+                "....OVVVVVVVVVVVvvvvO.....",
+                "....OVVVVVVVVVVVvvvvO.....",
+                ".....OOVVVVVVVVVvvOO......",
+                ".......OOVVVVVVVOO........",
+                ".........OOOOOOO..........",
             ],
         },
         {
@@ -1442,22 +1482,26 @@ def generate_secret_furniture(items_dir: Path) -> list[dict]:
             "subCategory": "movel",
             "price": 115,
             "wallItem": False,
-            "description": "Toca-discos cozy de vinil com trompete dourado!",
-            "size": (38, 42),
+            "description": "Toca-discos isométrico de vinil com trompete dourado!",
+            "size": (48, 52),
             "rows": [
-                ".........OOOOOO...",
-                ".......OOYYYYYYO..",
-                "......OYYWWYYYYO..",
-                ".....OYYYYYYYYO...",
-                ".....OYYYYYOOO....",
-                "......OOOOYYO.....",
-                "..........OYO.....",
-                "..OOOOOOOOOOOO....",
-                ".OKKKKKKKKKKKKO...",
-                ".OMMMMMMMMMMMMO...",
-                ".OMMMYYMMMMMMMO...",
-                ".OMmmmmmmmmmmmO...",
-                "..OOOOOOOOOOOO....",
+                "............OOOOOO....",
+                "..........OOYYYYYYO...",
+                ".........OYYWWWWYYYO..",
+                "........OYYYYYYYYYYO..",
+                "........OYYYYYYOOOO...",
+                ".........OOOOYYYO.....",
+                ".............OYYO.....",
+                "......OOOOOOOOYYOO....",
+                "....OOMMMMMMMMOYMMOO..",
+                "..OOMMMMKKKKMMMMMMMmO.",
+                ".OMMMMMKKKKKKMMMMMmmO.",
+                ".OMMMOOOKYYKOOOMMmmmO.",
+                ".OMmO..OMMMMOOOMmmmmO.",
+                "..OOOMMMMMMMMOOmmmmO..",
+                "....OOMMMMMMMOmmmOO...",
+                "......OOMMMMMOmOO.....",
+                "........OOOOOOO.......",
             ],
         },
         {
@@ -1509,21 +1553,25 @@ def generate_secret_furniture(items_dir: Path) -> list[dict]:
             "subCategory": "quadro",
             "price": 80,
             "wallItem": True,
-            "description": "Letreiro neon brilhante rosa para a parede do quarto!",
-            "size": (36, 32),
+            "description": "Letreiro neon brilhante rosa em perspectiva para a parede do quarto!",
+            "size": (44, 42),
             "rows": [
-                "..OOOOOO....OOOOOO..",
-                ".OPPPPPPO..OPPPPPPO.",
-                "OPWWPPPPPOOPPPPPPpPO",
-                "OPWPPPPPPPPPPPPPPpPO",
-                "OPPPPPPPPPPPPPPPPpPO",
-                ".OPPPPPPPPPPPPPPpPO.",
-                "..OPPPPPPPPPPPPpPO..",
-                "...OPPPPPPPPPPpPO...",
-                "....OPPPPPPPPpPO....",
-                ".....OPPPPPPpPO.....",
-                "......OPPPpPO.......",
-                "........OOOO........",
+                "...............OOOOO..",
+                "............OOOKKKKKO.",
+                ".........OOOKKKKKKKKO.",
+                "......OOOKKPPPKKPPPKO.",
+                "...OOOKKKPPWWPPPPPPKO.",
+                ".OOKKKKKKPWPPPPPPPPKO.",
+                ".OKKKKKKKPPPPPPPPpPKO.",
+                ".OKKPPPKKKPPPPPPpPPKO.",
+                ".OKPPWPPKKKPPPPpPKKKO.",
+                ".OKPPPPPPKKKPPpPKKKO..",
+                ".OKPPPPPPPPKKpPKKKO...",
+                ".OKKPPPPPPPPpPKKKO....",
+                "..OKKKPPPPpPPKKKO.....",
+                "...OKKKKPPKKKKOO......",
+                "....OKKKKKKKOO........",
+                ".....OOOOOOO..........",
             ],
         },
     ]
@@ -1531,15 +1579,14 @@ def generate_secret_furniture(items_dir: Path) -> list[dict]:
     out = []
     for spec in furns:
         tw, th = spec["size"]
-        img = Image.new("RGBA", (tw, th), (0, 0, 0, 0))
+        scale_factor = int(spec.get("scale", 2))
         rows = spec["rows"]
         mw = max(len(r) for r in rows)
         mh = len(rows)
-        # Escala 2x crisp pixel art
         raw_img = Image.new("RGBA", (mw, mh), (0, 0, 0, 0))
         _plot_mask(raw_img, rows, pal, 0, 0)
-        scaled = raw_img.resize((mw * 2, mh * 2), Image.Resampling.NEAREST)
-        canvas = Image.new("RGBA", (max(tw, mw * 2 + 4), max(th, mh * 2 + 4)), (0, 0, 0, 0))
+        scaled = raw_img.resize((mw * scale_factor, mh * scale_factor), Image.Resampling.NEAREST)
+        canvas = Image.new("RGBA", (max(tw, mw * scale_factor + 4), max(th, mh * scale_factor + 4)), (0, 0, 0, 0))
         cx = (canvas.width - scaled.width) // 2
         cy = (canvas.height - scaled.height) // 2
         canvas.paste(scaled, (cx, cy), scaled)
@@ -1675,6 +1722,16 @@ def prepare_items_and_catalog():
         dest = ITEMS_DIR / f"{item_id}.png"
         clear_rects = [(0, 100, 6, 108)] if item_id == "tower_deluxe" else None
         w, h = crop_save(src_rel, rect, dest, clear_corner_rects=clear_rects)
+        if item_id in ("food_can_salmon", "food_drumstick"):
+            with Image.open(dest) as fimg:
+                resized = fimg.resize((fimg.width * 2, fimg.height * 2), Image.Resampling.NEAREST)
+                resized.save(dest)
+                w, h = resized.size
+        elif item_id == "food_fish_plate":
+            with Image.open(dest) as fimg:
+                resized = fimg.resize((round(fimg.width * 1.4), round(fimg.height * 1.4)), Image.Resampling.NEAREST)
+                resized.save(dest)
+                w, h = resized.size
         entry = {
             "id": item_id,
             "name": name,
@@ -2139,6 +2196,24 @@ def prepare_items_and_catalog():
             "scale": 2.0,
         },
     ]
+
+    premium_only_ids = {
+        "cat_mochi_box",
+        "cat_evil_box",
+        "cat_zombie",
+        "cat_witch",
+        "pet_bunny",
+        "pet_golden",
+        "pet_zombie_hand",
+        "coffee_moka",
+        "food_ramen",
+        "food_onigiri",
+        "food_ice_cream_tub",
+    }
+    for col in (items_catalog, cats_catalog, pets_catalog):
+        for entry in col:
+            if entry.get("id") in premium_only_ids:
+                entry["premiumOnly"] = True
 
     catalog = {
         "items": items_catalog,

@@ -131,7 +131,7 @@
         <div id="headerBuffPill" class="buff-pill hidden" title="Multiplicador de moedas no próximo ciclo de foco">
           ☕ <span id="headerBuffText">+25%</span>
         </div>
-        <button id="streakHeaderBtn" class="hdr-btn hdr-streak" title="Ofensiva Diária (estilo Duolingo) — ganhe moedas todo dia!">
+        <button id="streakHeaderBtn" class="hdr-btn hdr-streak" title="Ofensiva Diária — ganhe moedas todo dia!">
           🔥 <span id="headerStreakCount">0</span>
         </button>
         <button id="accountHeaderBtn" class="hdr-btn hdr-cloud" title="Entrar com Google para salvar na nuvem e ganhar o Chapéu Nuvem Mágica!">
@@ -448,7 +448,7 @@
     </div>
   </footer>
 
-  <!-- MODAL DE OFENSIVA DIÁRIA (ESTILO DUOLINGO) -->
+  <!-- MODAL DE OFENSIVA DIÁRIA -->
   <div id="streakModal" class="purr-modal hidden">
     <div class="purr-modal-card">
       <div class="purr-modal-head">
@@ -466,7 +466,10 @@
       </div>
       <div id="streakDaysTrack" class="streak-days-track"></div>
       <button id="claimDailyStreakBtn" class="px-btn px-btn-primary">🎁 Resgatar Moedinhas de Hoje</button>
-      <div id="streakFreezeHint" class="label-sm"></div>
+      <div id="streakFreezeHint" class="label-sm">
+        Dica: o <strong>Picolé de Catnip (+1 ❄️)</strong> e o <strong>Pote de Sorvete (+3 ❄️, Loja Premium)</strong> protegem sua ofensiva se você perder um dia!
+      </div>
+      <button id="openFreezeShopBtn" type="button" class="px-btn px-btn-ghost">🍦 Pegar Escudos na Lojinha (Café)</button>
     </div>
   </div>
 
@@ -513,9 +516,9 @@
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-functions-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics-compat.js"></script>
-  <script src="sound.js?v=20261115"></script>
-  <script src="cloud.js?v=20261115"></script>
-  <script src="app.js?v=20261115"></script>
+  <script src="sound.js?v=20261115b"></script>
+  <script src="cloud.js?v=20261115b"></script>
+  <script src="app.js?v=20261115b"></script>
 </body>
 </html>
 

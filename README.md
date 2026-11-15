@@ -1,6 +1,6 @@
 # PurrModoro 🐾🍅
 
-Um **Idle Game + Timer Pomodoro** em pixel art para Windows e Web onde seu gatinho (ou até o **Dino Sem Wi-Fi**!) passeia em uma barrinha discreta perto do relógio enquanto você trabalha. A cada ciclo concluído você ganha moedinhas proporcionais ao tempo da task para desbloquear **móveis isométricos, mesas e prateleiras, temas de quarto, outros gatinhos, chapéuzinhos, amigos pets e comidinhas interativas**, organizando todo o quartinho em **diorama 2:1 com Drag & Drop livre** — com **Login Google, sincronização na nuvem (Firebase) e Ofensiva Diária estilo Duolingo**!
+Um **Idle Game + Timer Pomodoro** em pixel art para Windows e Web onde seu gatinho (ou até o **Dino Sem Wi-Fi**!) passeia em uma barrinha discreta perto do relógio enquanto você trabalha. A cada ciclo concluído você ganha moedinhas proporcionais ao tempo da task para desbloquear **móveis isométricos, mesas e prateleiras, temas de quarto, outros gatinhos, chapéuzinhos, amigos pets e comidinhas interativas**, organizando todo o quartinho em **diorama 2:1 com Drag & Drop livre** — com **Login Google, sincronização na nuvem (Firebase) e Ofensiva Diária**!
 
 🌐 **Jogue ou teste direto no navegador**: https://purrrmodoro.web.app
 
@@ -105,7 +105,7 @@ cd PurrModoro
     - Bebidas com bônus de moedas (*Café Latte `+25%`*, *Bubble Tea de Taro `+35%`*, *Matcha Latte `+40%`* e *Cafeteira Moka `+50%`*) multiplicam a recompensa do próximo foco concluído.
 - **☁️ Conta Google, Sync na Nuvem, Ofensiva Diária & Apoiador**:
   - **Login Google Real + Firestore**: salve seu quartinho na nuvem para jogar no PC e na Web com o mesmo progresso (e ganhe o **Chapéu Nuvem Mágica + 150 moedas** na primeira conexão!).
-  - **Ofensiva Diária (estilo Duolingo)**: resgate recompensas diárias crescentes por 7 dias com **Escudo de Ofensiva** (`freezeShields`).
+  - **Ofensiva Diária**: resgate recompensas diárias crescentes por 7 dias com **Escudo de Ofensiva** (`freezeShields`).
   - **Bilíngue (`🇧🇷 PT` / `🇺🇸 EN`)** e aba **💖 Apoiar** integrada ao Mercado Pago / Stripe para pacotes de moedas e assinatura mensal com os **24 drops secretos**.
 
 ### 🪙 Ganho de Moedas por Tempo de Task

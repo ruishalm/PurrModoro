@@ -489,7 +489,8 @@
         "type": "coin_multiplier",
         "multiplier": 1.5,
         "label": "+50% moedas"
-      }
+      },
+      "premiumOnly": true
     },
     {
       "id": "food_fish_plate",
@@ -498,8 +499,8 @@
       "subCategory": "comida",
       "price": 15,
       "image": "assets/items/food_fish_plate.png",
-      "width": 56,
-      "height": 28,
+      "width": 78,
+      "height": 39,
       "wallItem": false,
       "description": "Alimenta o gatinho na hora e deixa ele super feliz!",
       "buff": {
@@ -532,8 +533,8 @@
       "subCategory": "comida",
       "price": 12,
       "image": "assets/items/food_can_salmon.png",
-      "width": 18,
-      "height": 18,
+      "width": 36,
+      "height": 36,
       "wallItem": false,
       "description": "Petisco cremoso para comemorar uma pausa.",
       "buff": {
@@ -549,8 +550,8 @@
       "subCategory": "comida",
       "price": 15,
       "image": "assets/items/food_drumstick.png",
-      "width": 24,
-      "height": 23,
+      "width": 48,
+      "height": 46,
       "wallItem": false,
       "description": "Lanche especial compartilhado com os pets.",
       "buff": {
@@ -605,8 +606,8 @@
       "subCategory": "cafe",
       "price": 45,
       "image": "assets/items/food_catnip_freeze.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "❄️",
       "buff": {
@@ -614,7 +615,7 @@
         "freezes": 1,
         "label": "+1 Escudo ❄️"
       },
-      "description": "Protege sua ofensiva diária (estilo Duolingo!) se você esquecer de abrir 1 dia!"
+      "description": "Protege sua ofensiva diária se você esquecer de abrir 1 dia!"
     },
     {
       "id": "coffee_boba",
@@ -623,8 +624,8 @@
       "subCategory": "cafe",
       "price": 25,
       "image": "assets/items/coffee_boba.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🧋",
       "buff": {
@@ -641,8 +642,8 @@
       "subCategory": "cafe",
       "price": 30,
       "image": "assets/items/coffee_matcha.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🍵",
       "buff": {
@@ -677,8 +678,8 @@
       "subCategory": "comida",
       "price": 22,
       "image": "assets/items/food_strawberry_cake.png",
-      "width": 28,
-      "height": 28,
+      "width": 44,
+      "height": 44,
       "wallItem": false,
       "particle": "🍰",
       "buff": {
@@ -695,8 +696,8 @@
       "subCategory": "comida",
       "price": 14,
       "image": "assets/items/food_onigiri.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🍙",
       "buff": {
@@ -704,7 +705,8 @@
         "happiness": 25,
         "label": "Lanchinho Zen"
       },
-      "description": "Bolinho de arroz com carinha fofa e algas crocantes!"
+      "description": "Bolinho de arroz com carinha fofa e algas crocantes!",
+      "premiumOnly": true
     },
     {
       "id": "food_ramen",
@@ -713,8 +715,8 @@
       "subCategory": "comida",
       "price": 24,
       "image": "assets/items/food_ramen.png",
-      "width": 28,
-      "height": 28,
+      "width": 42,
+      "height": 42,
       "wallItem": false,
       "particle": "🍜",
       "buff": {
@@ -722,7 +724,27 @@
         "happiness": 40,
         "label": "Barriga Quentinha"
       },
-      "description": "Tigela fumegante de lámen com ovo e naruto para recarregar energias!"
+      "description": "Tigela fumegante de lámen com ovo e naruto para recarregar energias!",
+      "premiumOnly": true
+    },
+    {
+      "id": "food_ice_cream_tub",
+      "name": "Pote de Sorvete",
+      "category": "food",
+      "subCategory": "cafe",
+      "price": 110,
+      "image": "assets/items/food_ice_cream_tub.png",
+      "width": 42,
+      "height": 42,
+      "wallItem": false,
+      "particle": "🍨",
+      "buff": {
+        "type": "streak_freeze",
+        "freezes": 3,
+        "label": "+3 Escudos ❄️"
+      },
+      "description": "Pote cremoso de sorvete: segura até 3 strikes (dias perdidos) da sua Ofensiva Diária!",
+      "premiumOnly": true
     },
     {
       "id": "furn_sec_gold_trophy",
@@ -743,10 +765,10 @@
       "subCategory": "movel",
       "price": 135,
       "image": "assets/items/furn_sec_arcade.png",
-      "width": 52,
-      "height": 56,
+      "width": 108,
+      "height": 108,
       "wallItem": false,
-      "description": "Mini máquina arcade brilhante para relaxar nas pausas!"
+      "description": "Máquina arcade isométrica brilhante para relaxar nas pausas!"
     },
     {
       "id": "furn_sec_sakura_bonsai",
@@ -779,10 +801,10 @@
       "subCategory": "movel",
       "price": 115,
       "image": "assets/items/furn_sec_gramophone.png",
-      "width": 40,
-      "height": 42,
+      "width": 48,
+      "height": 52,
       "wallItem": false,
-      "description": "Toca-discos cozy de vinil com trompete dourado!"
+      "description": "Toca-discos isométrico de vinil com trompete dourado!"
     },
     {
       "id": "furn_sec_crystal_ball",
@@ -815,10 +837,10 @@
       "subCategory": "quadro",
       "price": 80,
       "image": "assets/items/furn_sec_neon_heart.png",
-      "width": 44,
-      "height": 32,
+      "width": 48,
+      "height": 42,
       "wallItem": true,
-      "description": "Letreiro neon brilhante rosa para a parede do quarto!"
+      "description": "Letreiro neon brilhante rosa em perspectiva para a parede do quarto!"
     },
     {
       "id": "decor_eye_jar",
@@ -923,7 +945,8 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 2.0,
+      "premiumOnly": true
     },
     {
       "id": "cat_pochi_cream",
@@ -1118,7 +1141,8 @@
           "fps": 5
         }
       },
-      "previewScale": 1.45
+      "previewScale": 1.45,
+      "premiumOnly": true
     },
     {
       "id": "cat_evil_box",
@@ -1157,7 +1181,8 @@
           "fps": 5
         }
       },
-      "previewScale": 2.0
+      "previewScale": 2.0,
+      "premiumOnly": true
     },
     {
       "id": "cat_zombie",
@@ -1196,7 +1221,8 @@
           "fps": 5
         }
       },
-      "previewScale": 2.0
+      "previewScale": 2.0,
+      "premiumOnly": true
     },
     {
       "id": "cat_dino",
@@ -1773,7 +1799,8 @@
       "fw": 32,
       "fh": 32,
       "fps": 7,
-      "scale": 1.25
+      "scale": 1.25,
+      "premiumOnly": true
     },
     {
       "id": "pet_golden",
@@ -1787,7 +1814,8 @@
       "fw": 64,
       "fh": 64,
       "fps": 7,
-      "scale": 1.25
+      "scale": 1.25,
+      "premiumOnly": true
     },
     {
       "id": "pet_zombie_hand",
@@ -1801,7 +1829,8 @@
       "fw": 32,
       "fh": 32,
       "fps": 9,
-      "scale": 2.0
+      "scale": 2.0,
+      "premiumOnly": true
     }
   ],
   "hats": [

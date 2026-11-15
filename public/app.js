@@ -74,6 +74,7 @@ const ROOM_THEME_CATALOG = [
     chipLabel: '🎃 Noite',
     price: 180,
     starter: false,
+    premiumOnly: true,
     description: 'Quarto noturno estrelado com lua crescente e clima de bruxinha!',
   },
   {
@@ -152,7 +153,40 @@ const WALL_NATIVE_SIDE = {
   art_abstract: 'left',
   art_dog_golden: 'flat',
   shelf_wall_wood: 'right',
+  furn_sec_neon_heart: 'right',
 };
+
+const PREMIUM_ONLY_IDS = new Set([
+  'cat_mochi_box',
+  'cat_evil_box',
+  'cat_zombie',
+  'cat_witch',
+  'pet_bunny',
+  'pet_golden',
+  'pet_zombie_hand',
+  'coffee_moka',
+  'food_ramen',
+  'food_onigiri',
+  'food_ice_cream_tub',
+  'halloween',
+]);
+
+function isPremiumLocked(entry) {
+  if (!entry) return false;
+  const requiresPremium = Boolean(entry.premiumOnly || PREMIUM_ONLY_IDS.has(entry.id));
+  return requiresPremium && !state.supporter?.active;
+}
+
+function openPremiumShopPrompt(entry) {
+  window.purrSound.playClick();
+  const isEn = getCurrentLang() === 'en';
+  const msg = isEn
+    ? `👑 "${entry?.name || 'Item'}" is in the Premium Shop! Support PurrModoro to unlock.`
+    : `👑 "${entry?.name || 'Item'}" é da Loja Premium! Seja Apoiador para liberar a compra.`;
+  if (roomActors[0]) showRoomPetSpeech(roomActors[0], msg, 4200);
+  showCompactSpeech(msg, 4200);
+  switchSideTab('support');
+}
 
 // Superfícies (estantes, mesas, aparador, prateleira de parede) onde itens menores podem apoiar
 const SURFACE_SPECS = {
@@ -1430,6 +1464,10 @@ function buyOrApplyTheme(themeId) {
     if (roomActors[0]) showRoomPetSpeech(roomActors[0], '🔒 Tema secreto do clube Adote um Dev!');
     return;
   }
+  if (isPremiumLocked(tDef)) {
+    openPremiumShopPrompt(tDef);
+    return;
+  }
   if (state.coins < tDef.price) {
     window.purrSound.playSad();
     if (roomActors[0]) showRoomPetSpeech(roomActors[0], `Precisa de 🪙 ${tDef.price} moedas!`);
@@ -1485,6 +1523,7 @@ function getItemRoomScale(def) {
   if (['ball_sage', 'ball_indigo'].includes(def.id)) return 0.85;
   if (['yarn_pink', 'yarn_blue'].includes(def.id)) return 1.3;
   if (def.id === 'decor_candle') return 1.5;
+  if (def.id === 'furn_sec_arcade') return 2.0;
   return 1.0;
 }
 
@@ -1545,7 +1584,13 @@ function renderRoom() {
     wrap.style.top = `${food.y}%`;
     wrap.style.zIndex = String(food.z || Math.round(food.y) + 1);
 
-    const size = food.inBowl ? 20 : 25;
+    const keepBaseFoodSize =
+      def.id === 'food_kibble_bag' ||
+      def.id === 'coffee_latte' ||
+      def.id === 'coffee_moka' ||
+      def.id === 'food_taiyaki';
+    const baseSize = food.inBowl ? 20 : 25;
+    const size = keepBaseFoodSize ? baseSize : Math.round(baseSize * 1.48);
     const img = document.createElement('img');
     img.src = def.image;
     img.width = size;
@@ -1863,6 +1908,15 @@ function renderThemeShopCards(grid) {
     btn.className = 'shop-action-btn';
 
     const active = state.roomTheme === tDef.id;
+    const premiumLocked = !unlocked && isPremiumLocked(tDef);
+    if (premiumLocked) {
+      card.classList.add('is-premium-locked');
+      const badge = document.createElement('span');
+      badge.className = 'premium-badge';
+      badge.textContent = '👑 Loja Premium';
+      card.appendChild(badge);
+    }
+
     if (active) {
       btn.classList.add('equipped');
       btn.textContent = '✓ Tema em Uso';
@@ -1871,6 +1925,10 @@ function renderThemeShopCards(grid) {
       btn.classList.add('owned');
       btn.textContent = '🎨 Aplicar Tema';
       btn.onclick = () => buyOrApplyTheme(tDef.id);
+    } else if (premiumLocked) {
+      btn.classList.add('premium-locked');
+      btn.textContent = `🔒 👑 Loja Premium (🪙 ${tDef.price})`;
+      btn.onclick = () => openPremiumShopPrompt(tDef);
     } else {
       btn.innerHTML = `🪙 ${tDef.price} • Desbloquear`;
       btn.disabled = state.coins < tDef.price;
@@ -1974,6 +2032,18 @@ function renderShop() {
 
     const btn = document.createElement('button');
     btn.className = 'shop-action-btn';
+    const isItemOwned =
+      (shopCategory === 'cats' && state.unlockedCats.includes(entry.id)) ||
+      (shopCategory === 'hats' && state.unlockedHats.includes(entry.id)) ||
+      (shopCategory === 'pets' && state.unlockedPets.includes(entry.id));
+    const premiumLocked = !isItemOwned && isPremiumLocked(entry);
+    if (premiumLocked) {
+      card.classList.add('is-premium-locked');
+      const badge = document.createElement('span');
+      badge.className = 'premium-badge';
+      badge.textContent = '👑 Loja Premium';
+      card.appendChild(badge);
+    }
 
     if (shopCategory === 'cats') {
       const owned = state.unlockedCats.includes(entry.id);
@@ -1994,6 +2064,10 @@ function renderShop() {
           renderShop();
           renderInventory();
         };
+      } else if (premiumLocked) {
+        btn.classList.add('premium-locked');
+        btn.textContent = `🔒 👑 Loja Premium (🪙 ${entry.price})`;
+        btn.onclick = () => openPremiumShopPrompt(entry);
       } else {
         btn.innerHTML = `🪙 ${entry.price} • Adotar`;
         btn.disabled = state.coins < entry.price;
@@ -2039,6 +2113,10 @@ function renderShop() {
         btn.classList.add(active ? 'equipped' : 'owned');
         btn.textContent = active ? '✓ Passeando no Quarto' : 'Chamar p/ Quarto';
         btn.onclick = () => togglePetInRoom(entry.id);
+      } else if (premiumLocked) {
+        btn.classList.add('premium-locked');
+        btn.textContent = `🔒 👑 Loja Premium (🪙 ${entry.price})`;
+        btn.onclick = () => openPremiumShopPrompt(entry);
       } else {
         btn.innerHTML = `🪙 ${entry.price} • Adotar`;
         btn.disabled = state.coins < entry.price;
@@ -2046,18 +2124,30 @@ function renderShop() {
       }
     } else if (shopCategory === 'food') {
       const isHoldingThis = heldFood && heldFood.id === entry.id;
-      btn.innerHTML = isHoldingThis ? '✕ Soltar' : `🪙 ${entry.price} • Pegar`;
-      btn.disabled = !isHoldingThis && state.coins < entry.price;
-      if (isHoldingThis) btn.classList.add('active');
-      btn.onclick = (ev) => startHoldingFood(entry, ev);
+      if (premiumLocked) {
+        btn.classList.add('premium-locked');
+        btn.textContent = `🔒 👑 Loja Premium (🪙 ${entry.price})`;
+        btn.onclick = () => openPremiumShopPrompt(entry);
+      } else {
+        btn.innerHTML = isHoldingThis ? '✕ Soltar' : `🪙 ${entry.price} • Pegar`;
+        btn.disabled = !isHoldingThis && state.coins < entry.price;
+        if (isHoldingThis) btn.classList.add('active');
+        btn.onclick = (ev) => startHoldingFood(entry, ev);
+      }
     } else {
       const ownedCount = state.ownedItems[entry.id] || 0;
-      btn.innerHTML =
-        ownedCount > 0
-          ? `🪙 ${entry.price} • Comprar +1 (${ownedCount})`
-          : `🪙 ${entry.price} • Comprar`;
-      btn.disabled = state.coins < entry.price;
-      btn.onclick = () => buyFurniture(entry);
+      if (premiumLocked) {
+        btn.classList.add('premium-locked');
+        btn.textContent = `🔒 👑 Loja Premium (🪙 ${entry.price})`;
+        btn.onclick = () => openPremiumShopPrompt(entry);
+      } else {
+        btn.innerHTML =
+          ownedCount > 0
+            ? `🪙 ${entry.price} • Comprar +1 (${ownedCount})`
+            : `🪙 ${entry.price} • Comprar`;
+        btn.disabled = state.coins < entry.price;
+        btn.onclick = () => buyFurniture(entry);
+      }
     }
 
     card.appendChild(preview);
@@ -2069,6 +2159,10 @@ function renderShop() {
 }
 
 function buyFurniture(item) {
+  if (isPremiumLocked(item)) {
+    openPremiumShopPrompt(item);
+    return;
+  }
   if (state.coins < item.price) return;
   state.coins -= item.price;
   state.ownedItems[item.id] = (state.ownedItems[item.id] || 0) + 1;
@@ -2081,6 +2175,10 @@ function buyFurniture(item) {
 }
 
 function buyCat(catDef) {
+  if (isPremiumLocked(catDef)) {
+    openPremiumShopPrompt(catDef);
+    return;
+  }
   if (state.coins < catDef.price || state.unlockedCats.includes(catDef.id)) return;
   state.coins -= catDef.price;
   state.unlockedCats.push(catDef.id);
@@ -2110,6 +2208,10 @@ function buyHat(hatDef) {
 }
 
 function buyPet(petDef) {
+  if (isPremiumLocked(petDef)) {
+    openPremiumShopPrompt(petDef);
+    return;
+  }
   if (state.coins < petDef.price || state.unlockedPets.includes(petDef.id)) return;
   state.coins -= petDef.price;
   state.unlockedPets.push(petDef.id);
@@ -2139,6 +2241,10 @@ function togglePetInRoom(petId) {
 
 function startHoldingFood(item, ev = null) {
   if (!item) return;
+  if (isPremiumLocked(item)) {
+    openPremiumShopPrompt(item);
+    return;
+  }
   if (heldFood && heldFood.id === item.id) {
     cancelHeldFood();
     return;
@@ -2211,9 +2317,11 @@ function consumeFoodByActor(actor, item, alreadyPaid = false) {
     spawnRoomParticle(actor.x, actor.y - 12, '☕');
   } else if (item.buff?.type === 'streak_freeze') {
     if (!state.streak) state.streak = { current: 0, best: 0, lastClaimDate: null, freezeShields: 0 };
-    state.streak.freezeShields = (state.streak.freezeShields || 0) + (item.buff.freezes || 1);
-    showCompactSpeech(`❄️ +1 Escudo de Ofensiva!`);
-    showRoomPetSpeech(actor, `❄️ Ofensiva protegida (${state.streak.freezeShields} escudos)!`);
+    const addedFreezes = item.buff.freezes || 1;
+    state.streak.freezeShields = (state.streak.freezeShields || 0) + addedFreezes;
+    const plural = addedFreezes > 1 ? 's' : '';
+    showCompactSpeech(`❄️ +${addedFreezes} Escudo${plural} de Ofensiva!`);
+    showRoomPetSpeech(actor, `❄️ +${addedFreezes} Escudo${plural}! Total: ${state.streak.freezeShields}`);
     spawnRoomParticle(actor.x, actor.y - 12, '❄️');
     if (typeof renderStreakUI === 'function') renderStreakUI();
   } else {
@@ -3213,6 +3321,14 @@ function bindEvents() {
     closeStreakModal();
   });
   document.getElementById('claimDailyStreakBtn')?.addEventListener('click', claimDailyStreak);
+  document.getElementById('openFreezeShopBtn')?.addEventListener('click', () => {
+    window.purrSound.playClick();
+    document.getElementById('streakModal')?.classList.add('hidden');
+    shopCategory = 'food';
+    document.querySelectorAll('.shop-cat-btn').forEach((b) => b.classList.toggle('active', b.dataset.cat === 'food'));
+    switchSideTab('shop');
+    renderShop();
+  });
 
   document.getElementById('accountHeaderBtn')?.addEventListener('click', () => {
     window.purrSound.playClick();
