@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://*.gstatic.com https://apis.google.com https://accounts.google.com https://*.firebaseapp.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://apis.google.com https://api.github.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com;" />
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self'; script-src 'self' https://*.gstatic.com https://apis.google.com https://accounts.google.com https://*.firebaseapp.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://apis.google.com https://api.github.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com;" />
   <title>PurrModoro — Gatinho de Foco</title>
   <link rel="icon" type="image/png" href="assets/ui/tray_icon.png" />
-  <link rel="stylesheet" href="styles.css?v=20261115d" />
+  <link rel="stylesheet" href="styles.css?v=20261118b" />
 </head>
+
 <body class="mode-compact theme-cozy">
 
   <!-- HERO DO MINI SITE WEB (visível apenas no navegador) -->
@@ -17,15 +20,19 @@
       <div class="web-hero-text">
         <h2 id="webHeroTitle">PurrModoro — Seu Gatinho de Foco em Pixel Art 🐾</h2>
         <p id="webHeroSubtitle">
-          Teste o quartinho isométrico e o timer Pomodoro aqui mesmo no navegador! No app de Windows (.exe), seu gatinho caminha livre perto do relógio da bandeja, inicia junto com o PC e sincroniza tudo na nuvem.
+          Teste o quartinho isométrico e o timer Pomodoro aqui mesmo no navegador! No app de Windows (.exe), seu gatinho
+          caminha livre perto do relógio da bandeja, inicia junto com o PC e sincroniza tudo na nuvem.
         </p>
       </div>
     </div>
     <div class="web-hero-actions">
-      <a id="webHeroDownloadBtn" class="px-btn px-btn-primary web-dl-link" href="https://github.com/ruishalm/Purrmodoro/releases/latest/download/PurrModoro-Setup.exe" target="_blank" rel="noopener">
+      <a id="webHeroDownloadBtn" class="px-btn px-btn-primary web-dl-link"
+        href="https://github.com/ruishalm/Purrmodoro/releases/latest/download/PurrModoro-Setup.exe" target="_blank"
+        rel="noopener">
         ⬇️ Baixar para Windows (.exe) — Grátis
       </a>
-      <a id="webHeroReleasesBtn" class="px-btn px-btn-ghost web-dl-link" href="https://github.com/ruishalm/Purrmodoro/releases" target="_blank" rel="noopener">
+      <a id="webHeroReleasesBtn" class="px-btn px-btn-ghost web-dl-link"
+        href="https://github.com/ruishalm/Purrmodoro/releases" target="_blank" rel="noopener">
         📦 Ver Versão &amp; Notas no GitHub
       </a>
     </div>
@@ -55,14 +62,16 @@
       <div class="compact-drag-bar">
         <span class="drag-grip" title="Arraste para mover">⠿ PurrModoro</span>
         <div class="compact-top-badges">
-          <span class="coin-pill compact-coin" title="Para ganhar moedas, use o timer em suas tarefas!" data-tip="Para ganhar moedas, use o timer em suas tarefas!">
+          <span class="coin-pill compact-coin" title="Para ganhar moedas, use o timer em suas tarefas!"
+            data-tip="Para ganhar moedas, use o timer em suas tarefas!">
             <span class="coin-dot"></span>
             <span id="compactCoins">100</span>
           </span>
           <button id="compactExpandBtn" class="px-icon-btn" title="Abrir Quartinho & Loja">
             <img src="assets/ui/btn_shop.png" alt="Loja" />
           </button>
-          <button id="compactCollapseBtn" class="px-icon-btn px-mini-toggle" title="Recolher painel (deixar só o gatinho)">
+          <button id="compactCollapseBtn" class="px-icon-btn px-mini-toggle"
+            title="Recolher painel (deixar só o gatinho)">
             ▸
           </button>
         </div>
@@ -125,7 +134,8 @@
       </div>
 
       <div class="header-right no-drag">
-        <button id="updateAvailableBtn" class="hdr-btn hdr-update hidden" title="Há uma nova versão do PurrModoro no GitHub!">
+        <button id="updateAvailableBtn" class="hdr-btn hdr-update hidden"
+          title="Há uma nova versão do PurrModoro no GitHub!">
           ✨ Nova versão!
         </button>
         <div id="headerBuffPill" class="buff-pill hidden" title="Multiplicador de moedas no próximo ciclo de foco">
@@ -134,14 +144,17 @@
         <button id="streakHeaderBtn" class="hdr-btn hdr-streak" title="Ofensiva Diária — ganhe moedas todo dia!">
           🔥 <span id="headerStreakCount">0</span>
         </button>
-        <button id="accountHeaderBtn" class="hdr-btn hdr-cloud" title="Entrar com Google para salvar na nuvem e ganhar o Chapéu Nuvem Mágica!">
+        <button id="accountHeaderBtn" class="hdr-btn hdr-cloud"
+          title="Entrar com Google para salvar na nuvem e ganhar o Chapéu Nuvem Mágica!">
           ☁️ Entrar
         </button>
-        <div class="coin-pill header-coins" title="Para ganhar moedas, use o timer em suas tarefas!" data-tip="Para ganhar moedas, use o timer em suas tarefas!">
+        <div class="coin-pill header-coins" title="Para ganhar moedas, use o timer em suas tarefas!"
+          data-tip="Para ganhar moedas, use o timer em suas tarefas!">
           <span class="coin-dot"></span>
           <span id="headerCoins">100</span>
         </div>
-        <button id="langToggleBtn" class="hdr-btn" title="Alternar idioma / Switch language (PT-BR / EN-US)">🇧🇷 PT</button>
+        <button id="langToggleBtn" class="hdr-btn" title="Alternar idioma / Switch language (PT-BR / EN-US)">🇧🇷
+          PT</button>
         <button id="muteBtn" class="hdr-btn" title="Ativar/Silenciar Sons">🔊</button>
         <button id="minimizeCompactBtn" class="hdr-btn hdr-accent" title="Minimizar para o Modo Relógio perto da hora">
           🐾 Modo Relógio
@@ -154,10 +167,13 @@
     <div id="webPromoBanner" class="web-promo-banner hidden">
       <div class="web-promo-copy">
         <strong>🌐 PurrModoro Web Preview:</strong>
-        <span id="webBannerText">Versão Web de Apresentação! Quer o gatinho livre em cima do relógio do Windows e iniciando com o PC?</span>
+        <span id="webBannerText">Versão Web de Apresentação! Quer o gatinho livre em cima do relógio do Windows e
+          iniciando com o PC?</span>
       </div>
       <div class="web-promo-actions">
-        <a id="webDownloadExeBtn" class="px-btn px-btn-primary web-dl-link" href="https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Setup.exe" target="_blank" rel="noopener">
+        <a id="webDownloadExeBtn" class="px-btn px-btn-primary web-dl-link"
+          href="https://github.com/ruishalm/PurrModoro/releases/latest/download/PurrModoro-Setup.exe" target="_blank"
+          rel="noopener">
           ⬇️ Baixar PurrModoro (.exe)
         </a>
         <button id="webBannerCloseBtn" class="tiny-btn" title="Ocultar aviso">✕</button>
@@ -171,10 +187,14 @@
           <div class="theme-switcher" title="Escolha o estilo do quartinho">
             <span class="label-sm">Tema:</span>
             <button class="theme-chip active" data-theme="cozy" title="Aplicar tema Cozy acolhedor">☕ Cozy</button>
-            <button class="theme-chip" data-theme="pastel" title="Aplicar tema Pastel doce (desbloqueável na loja)">🌸 Pastel</button>
-            <button class="theme-chip" data-theme="bamboo" title="Aplicar tema Jardim Bamboo (desbloqueável na loja)">🎋 Bamboo</button>
-            <button class="theme-chip" data-theme="halloween" title="Aplicar tema Noite Mística / Halloween (desbloqueável na loja)">🎃 Noite</button>
-            <button class="theme-chip hidden" data-theme="starlight" title="Aplicar tema secreto Galáxia Lo-Fi">🌌 Galáxia</button>
+            <button class="theme-chip" data-theme="pastel" title="Aplicar tema Pastel doce (desbloqueável na loja)">🌸
+              Pastel</button>
+            <button class="theme-chip" data-theme="bamboo" title="Aplicar tema Jardim Bamboo (desbloqueável na loja)">🎋
+              Bamboo</button>
+            <button class="theme-chip" data-theme="halloween"
+              title="Aplicar tema Noite Mística / Halloween (desbloqueável na loja)">🎃 Noite</button>
+            <button class="theme-chip hidden" data-theme="starlight" title="Aplicar tema secreto Galáxia Lo-Fi">🌌
+              Galáxia</button>
           </div>
           <div class="room-hint">Arraste os móveis livremente! 🐾</div>
         </div>
@@ -211,33 +231,37 @@
 
         <!-- Rodapé rápido do quarto -->
         <div class="room-footer">
-          <span id="roomActiveCatText" title="Gatinho ou companheiro ativo no quarto e perto do relógio">🐱 Companheiro: <strong>Mochi Laranja</strong></span>
-          <span id="roomStatsText" title="Quantidade de móveis decorando o quarto e ciclos concluídos hoje">🪑 2 móveis no quarto • 🔥 0 ciclos hoje</span>
+          <span id="roomActiveCatText" title="Gatinho ou companheiro ativo no quarto e perto do relógio">🐱 Companheiro:
+            <strong>Mochi Laranja</strong></span>
+          <span id="roomStatsText" title="Quantidade de móveis decorando o quarto e ciclos concluídos hoje">🪑 2 móveis
+            no quarto • 🔥 0 ciclos hoje</span>
         </div>
       </section>
 
       <!-- LADO DIREITO: ABAS (TIMER / LOJINHA / MEU QUARTO) -->
       <aside class="side-panel">
         <nav class="side-tabs">
-          <button class="side-tab active" data-tab="timer" title="Configurar e acompanhar seu Timer Pomodoro">🍅 Timer</button>
-          <button class="side-tab" data-tab="shop" title="Comprar móveis, gatinhos, chapéus, pets e comidinhas">🛒 Lojinha</button>
-          <button class="side-tab" data-tab="inventory" title="Equipar seus gatinhos, chapéus, pets e móveis comprados">🎒 Quarto</button>
-          <button class="side-tab" data-tab="support" title="Assinatura Adote um Dev (24 brindes secretos!) e pacotes de moedas">💖 Apoiar</button>
+          <button class="side-tab active" data-tab="timer" title="Configurar e acompanhar seu Timer Pomodoro">🍅
+            Timer</button>
+          <button class="side-tab" data-tab="shop" title="Comprar móveis, gatinhos, chapéus, pets e comidinhas">🛒
+            Lojinha</button>
+          <button class="side-tab" data-tab="inventory"
+            title="Equipar seus gatinhos, chapéus, pets e móveis comprados">🎒 Quarto</button>
+          <button class="side-tab" data-tab="support"
+            title="Assinatura Adote um Dev (24 brindes secretos!) e pacotes de moedas">💖 Apoiar</button>
         </nav>
 
         <!-- ABA 1: TIMER POMODORO REGULÁVEL -->
         <div id="tab-timer" class="tab-content active">
           <div class="phase-selector">
-            <button class="phase-btn active" data-phase="focus" title="Ciclo de foco (2 moedas/min + bônus em tarefas longas)">🍅 Foco</button>
-            <button class="phase-btn" data-phase="shortBreak" title="Pausa curta para descansar (1 moeda/min)">☕ Pausa</button>
-            <button class="phase-btn" data-phase="longBreak" title="Pausa longa após completar a rodada de ciclos (~1.2 moedas/min)">🌙 Longa</button>
-            <button
-              type="button"
-              id="pomodoroHelpBtn"
-              class="help-tip-btn"
-              aria-label="Como funciona o Pomodoro"
-              data-tip="Método Pomodoro: foque sem distrações durante o Foco (ex: 25m), descanse na Pausa Curta (5m) e, a cada 4 ciclos, faça uma Pausa Longa (15m) para recarregar!"
-            >?</button>
+            <button class="phase-btn active" data-phase="focus"
+              title="Ciclo de foco (2 moedas/min + bônus em tarefas longas)">🍅 Foco</button>
+            <button class="phase-btn" data-phase="shortBreak" title="Pausa curta para descansar (1 moeda/min)">☕
+              Pausa</button>
+            <button class="phase-btn" data-phase="longBreak"
+              title="Pausa longa após completar a rodada de ciclos (~1.2 moedas/min)">🌙 Longa</button>
+            <button type="button" id="pomodoroHelpBtn" class="help-tip-btn" aria-label="Como funciona o Pomodoro"
+              data-tip="Método Pomodoro: foque sem distrações durante o Foco (ex: 25m), descanse na Pausa Curta (5m) e, a cada 4 ciclos, faça uma Pausa Longa (15m) para recarregar!">?</button>
           </div>
 
           <div class="timer-card">
@@ -255,14 +279,17 @@
               <button class="adj-btn" data-delta="5" title="Aumentar 5 minutos no timer">+5m</button>
             </div>
 
-            <div id="rewardPreviewText" class="reward-preview" title="Complete o timer até o fim sem desistir para ganhar essas moedinhas!">
+            <div id="rewardPreviewText" class="reward-preview"
+              title="Complete o timer até o fim sem desistir para ganhar essas moedinhas!">
               Recompensa ao concluir: 🪙 <strong>+30 moedas</strong>
             </div>
 
             <div class="timer-main-actions">
-              <button id="mainPlayPauseBtn" class="px-btn px-btn-primary" title="Iniciar ou pausar a contagem atual">▶ Iniciar Foco</button>
+              <button id="mainPlayPauseBtn" class="px-btn px-btn-primary" title="Iniciar ou pausar a contagem atual">▶
+                Iniciar Foco</button>
               <button id="resetTimerBtn" class="px-btn px-btn-ghost" title="Reiniciar tempo atual">↺</button>
-              <button id="giveUpBtn" class="px-btn px-btn-danger hidden" title="Cancelar foco (o gatinho vai chorar!)">🏳️ Desistir</button>
+              <button id="giveUpBtn" class="px-btn px-btn-danger hidden"
+                title="Cancelar foco (o gatinho vai chorar!)">🏳️ Desistir</button>
             </div>
           </div>
 
@@ -273,46 +300,58 @@
             </div>
 
             <div class="presets-row">
-              <button class="preset-chip" data-f="25" data-s="5" data-l="15" title="Aplicar preset: 25m Foco / 5m Pausa / 15m Longa">Clássico 25/5</button>
-              <button class="preset-chip" data-f="15" data-s="3" data-l="10" title="Aplicar preset: 15m Foco / 3m Pausa / 10m Longa">Sprint 15/3</button>
-              <button class="preset-chip" data-f="50" data-s="10" data-l="20" title="Aplicar preset: 50m Foco / 10m Pausa / 20m Longa">Deep 50/10</button>
-              <button class="preset-chip" data-f="20" data-s="5" data-l="15" title="Aplicar preset: 20m Foco / 5m Pausa / 15m Longa">Leve 20/5</button>
+              <button class="preset-chip" data-f="25" data-s="5" data-l="15"
+                title="Aplicar preset: 25m Foco / 5m Pausa / 15m Longa">Clássico 25/5</button>
+              <button class="preset-chip" data-f="15" data-s="3" data-l="10"
+                title="Aplicar preset: 15m Foco / 3m Pausa / 10m Longa">Sprint 15/3</button>
+              <button class="preset-chip" data-f="50" data-s="10" data-l="20"
+                title="Aplicar preset: 50m Foco / 10m Pausa / 20m Longa">Deep 50/10</button>
+              <button class="preset-chip" data-f="20" data-s="5" data-l="15"
+                title="Aplicar preset: 20m Foco / 5m Pausa / 15m Longa">Leve 20/5</button>
             </div>
 
             <div class="settings-grid">
               <div class="setting-field">
                 <label for="cfgFocus">🍅 Foco</label>
                 <div class="stepper">
-                  <button type="button" class="step-btn" aria-label="Diminuir foco" data-target="cfgFocus" data-step="-1">-</button>
+                  <button type="button" class="step-btn" aria-label="Diminuir foco" data-target="cfgFocus"
+                    data-step="-1">-</button>
                   <input id="cfgFocus" type="number" min="1" max="180" value="25" />
-                  <button type="button" class="step-btn" aria-label="Aumentar foco" data-target="cfgFocus" data-step="1">+</button>
+                  <button type="button" class="step-btn" aria-label="Aumentar foco" data-target="cfgFocus"
+                    data-step="1">+</button>
                 </div>
               </div>
 
               <div class="setting-field">
                 <label for="cfgShort">☕ Pausa Curta</label>
                 <div class="stepper">
-                  <button type="button" class="step-btn" aria-label="Diminuir pausa curta" data-target="cfgShort" data-step="-1">-</button>
+                  <button type="button" class="step-btn" aria-label="Diminuir pausa curta" data-target="cfgShort"
+                    data-step="-1">-</button>
                   <input id="cfgShort" type="number" min="1" max="60" value="5" />
-                  <button type="button" class="step-btn" aria-label="Aumentar pausa curta" data-target="cfgShort" data-step="1">+</button>
+                  <button type="button" class="step-btn" aria-label="Aumentar pausa curta" data-target="cfgShort"
+                    data-step="1">+</button>
                 </div>
               </div>
 
               <div class="setting-field">
                 <label for="cfgLong">🌙 Pausa Longa</label>
                 <div class="stepper">
-                  <button type="button" class="step-btn" aria-label="Diminuir pausa longa" data-target="cfgLong" data-step="-1">-</button>
+                  <button type="button" class="step-btn" aria-label="Diminuir pausa longa" data-target="cfgLong"
+                    data-step="-1">-</button>
                   <input id="cfgLong" type="number" min="1" max="90" value="15" />
-                  <button type="button" class="step-btn" aria-label="Aumentar pausa longa" data-target="cfgLong" data-step="1">+</button>
+                  <button type="button" class="step-btn" aria-label="Aumentar pausa longa" data-target="cfgLong"
+                    data-step="1">+</button>
                 </div>
               </div>
 
               <div class="setting-field">
                 <label for="cfgCycles">🔁 Ciclos/Longa</label>
                 <div class="stepper">
-                  <button type="button" class="step-btn" aria-label="Diminuir ciclos" data-target="cfgCycles" data-step="-1">-</button>
+                  <button type="button" class="step-btn" aria-label="Diminuir ciclos" data-target="cfgCycles"
+                    data-step="-1">-</button>
                   <input id="cfgCycles" type="number" min="2" max="8" value="4" />
-                  <button type="button" class="step-btn" aria-label="Aumentar ciclos" data-target="cfgCycles" data-step="1">+</button>
+                  <button type="button" class="step-btn" aria-label="Aumentar ciclos" data-target="cfgCycles"
+                    data-step="1">+</button>
                 </div>
               </div>
             </div>
@@ -327,11 +366,16 @@
         <!-- ABA 2: LOJINHA -->
         <div id="tab-shop" class="tab-content">
           <div class="shop-categories">
-            <button class="shop-cat-btn active" data-cat="furniture" title="Comprar móveis, decoração e temas para o quarto">🪑 Móveis</button>
-            <button class="shop-cat-btn" data-cat="cats" title="Desbloquear gatinhos e o Dino Sem Wi-Fi">🐱 Gatos</button>
-            <button class="shop-cat-btn" data-cat="hats" title="Desbloquear chapéuzinhos e acessórios para seu gatinho">🎩 Chapéus</button>
-            <button class="shop-cat-btn" data-cat="pets" title="Adotar amigos pets para passear pelo quarto">🐶 Pets</button>
-            <button class="shop-cat-btn" data-cat="food" title="Comidinhas interativas e bebidas com bônus de moedas">☕ Café</button>
+            <button class="shop-cat-btn active" data-cat="furniture"
+              title="Comprar móveis, decoração e temas para o quarto">🪑 Móveis</button>
+            <button class="shop-cat-btn" data-cat="cats" title="Desbloquear gatinhos e o Dino Sem Wi-Fi">🐱
+              Gatos</button>
+            <button class="shop-cat-btn" data-cat="hats"
+              title="Desbloquear chapéuzinhos e acessórios para seu gatinho">🎩 Chapéus</button>
+            <button class="shop-cat-btn" data-cat="pets" title="Adotar amigos pets para passear pelo quarto">🐶
+              Pets</button>
+            <button class="shop-cat-btn" data-cat="food" title="Comidinhas interativas e bebidas com bônus de moedas">☕
+              Café</button>
           </div>
 
           <div id="shopSubfilters" class="shop-subfilters">
@@ -345,7 +389,8 @@
             <button class="sub-chip" data-sub="quadro" title="Filtrar quadros e pôsteres">Quadros</button>
             <button class="sub-chip" data-sub="potinho" title="Filtrar potinhos de ração e água">Potinhos</button>
             <button class="sub-chip" data-sub="brinquedo" title="Filtrar brinquedos para o gatinho">Brinquedos</button>
-            <button class="sub-chip" data-sub="halloween" title="Filtrar itens especiais de Halloween">Halloween</button>
+            <button class="sub-chip" data-sub="halloween"
+              title="Filtrar itens especiais de Halloween">Halloween</button>
           </div>
 
           <div id="shopGrid" class="shop-grid"></div>
@@ -371,7 +416,8 @@
           <div class="inv-section">
             <div class="inv-section-head">
               <h3>🪑 Móveis Comprados</h3>
-              <button id="clearRoomBtn" class="tiny-btn" title="Guardar todos os móveis no inventário">Guardar tudo</button>
+              <button id="clearRoomBtn" class="tiny-btn" title="Guardar todos os móveis no inventário">Guardar
+                tudo</button>
             </div>
             <div id="invFurnitureGrid" class="inv-furniture-grid"></div>
           </div>
@@ -385,7 +431,8 @@
               <span id="supportPriceBadge" class="support-price-pill">R$ 14,90/mês</span>
             </div>
             <p id="supportHeroDesc" class="support-hero-desc">
-              +500 🪙 todo mês + 1 Brinde Secreto Exclusivo aleatório de uma coleção oculta com 24 itens (2 anos sem repetir!)
+              +500 🪙 todo mês + 1 Brinde Secreto Exclusivo aleatório de uma coleção oculta com 24 itens (2 anos sem
+              repetir!)
             </p>
             <div class="support-progress-wrap">
               <div class="support-progress-labels">
@@ -398,7 +445,8 @@
             </div>
             <div class="support-actions-col">
               <button id="subscribeDevBtn" class="px-btn px-btn-primary">💖 Assinar Adote um Dev</button>
-              <button id="claimMonthlyDropBtn" class="px-btn px-btn-ghost hidden">🎁 Abrir Brinde Mensal (+500 🪙)</button>
+              <button id="claimMonthlyDropBtn" class="px-btn px-btn-ghost hidden">🎁 Abrir Brinde Mensal (+500
+                🪙)</button>
             </div>
             <div id="supporterStatusText" class="label-sm"></div>
             <div id="supportGatewayHint" class="support-gateway-note">
@@ -428,23 +476,28 @@
     <div class="web-feature-grid">
       <div class="web-feature-card">
         <strong id="webFeature1Title">🐾 Modo Relógio no Windows</strong>
-        <span id="webFeature1Desc">O gatinho caminha acima da hora do sistema sem atrapalhar e inicia com o Windows.</span>
+        <span id="webFeature1Desc">O gatinho caminha acima da hora do sistema sem atrapalhar e inicia com o
+          Windows.</span>
       </div>
       <div class="web-feature-card">
         <strong id="webFeature2Title">🏠 Quartinho Isométrico Cozy</strong>
-        <span id="webFeature2Desc">Ganhe moedas focando nas tarefas e compre móveis, quadros, comidas e temas do quarto.</span>
+        <span id="webFeature2Desc">Ganhe moedas focando nas tarefas e compre móveis, quadros, comidas e temas do
+          quarto.</span>
       </div>
       <div class="web-feature-card">
         <strong id="webFeature3Title">🔥 Ofensiva Diária &amp; Nuvem</strong>
-        <span id="webFeature3Desc">Entre com Google, ganhe o Chapéu Nuvem Mágica + 150 🪙 e mantenha sua sequência ativa.</span>
+        <span id="webFeature3Desc">Entre com Google, ganhe o Chapéu Nuvem Mágica + 150 🪙 e mantenha sua sequência
+          ativa.</span>
       </div>
       <div class="web-feature-card">
         <strong id="webFeature4Title">💖 23 Bichinhos &amp; 27 Chapéus</strong>
-        <span id="webFeature4Desc">Inclui Dino Verde, novas cores gratuitas e clube Adote um Dev com 24 brindes secretos.</span>
+        <span id="webFeature4Desc">Inclui Dino Verde, novas cores gratuitas e clube Adote um Dev com 24 brindes
+          secretos.</span>
       </div>
     </div>
     <div class="web-footer-meta">
-      PurrModoro v0.2.1 • Feito com ❤️ e café ☕ • <a href="https://github.com/ruishalm/Purrmodoro" target="_blank" rel="noopener">GitHub</a>
+      PurrModoro v0.1.2 • Feito com ❤️ e café ☕ • <a href="https://github.com/ruishalm/Purrmodoro" target="_blank"
+        rel="noopener">GitHub</a>
     </div>
   </footer>
 
@@ -459,7 +512,8 @@
         Volte todo dia para manter o foguinho aceso e ganhar mais moedinhas!
       </p>
       <div class="streak-summary-bar">
-        <div class="streak-big-num">🔥 <span id="streakCurrentBig">0</span> <small id="streakDaysLabel">dias</small></div>
+        <div class="streak-big-num">🔥 <span id="streakCurrentBig">0</span> <small id="streakDaysLabel">dias</small>
+        </div>
         <div class="streak-shield-pill" title="Protege automaticamente sua ofensiva se você esquecer de abrir 1 dia!">
           ❄️ <span id="streakShieldsLabelText">Escudos:</span> <strong id="streakShieldsCount">0</strong>
         </div>
@@ -467,9 +521,11 @@
       <div id="streakDaysTrack" class="streak-days-track"></div>
       <button id="claimDailyStreakBtn" class="px-btn px-btn-primary">🎁 Resgatar Moedinhas de Hoje</button>
       <div id="streakFreezeHint" class="label-sm">
-        Dica: o <strong>Picolé de Catnip (+1 ❄️)</strong> e o <strong>Pote de Sorvete (+3 ❄️, Loja Premium)</strong> protegem sua ofensiva se você perder um dia!
+        Dica: o <strong>Picolé de Catnip (+1 ❄️)</strong> e o <strong>Pote de Sorvete (+3 ❄️, Loja Premium)</strong>
+        protegem sua ofensiva se você perder um dia!
       </div>
-      <button id="openFreezeShopBtn" type="button" class="px-btn px-btn-ghost">🍦 Pegar Escudos na Lojinha (Café)</button>
+      <button id="openFreezeShopBtn" type="button" class="px-btn px-btn-ghost">🍦 Pegar Escudos na Lojinha
+        (Café)</button>
     </div>
   </div>
 
@@ -491,7 +547,8 @@
         </div>
       </div>
       <p id="loginModalDesc" class="purr-modal-desc">
-        Conecte sua conta Google grátis para salvar seu quartinho na nuvem, abrir em qualquer PC e ganhar na hora o Chapéu Nuvem Mágica ☁️⭐ + 150 🪙!
+        Conecte sua conta Google grátis para salvar seu quartinho na nuvem, abrir em qualquer PC e ganhar na hora o
+        Chapéu Nuvem Mágica ☁️⭐ + 150 🪙!
       </p>
       <div id="loginFormArea" class="login-form-area">
         <button id="googleSignInBtn" class="px-btn px-btn-primary">☁️ Entrar com Google & Ganhar Chapéu</button>
@@ -516,9 +573,9 @@
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-functions-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics-compat.js"></script>
-  <script src="sound.js?v=20261118"></script>
-  <script src="cloud.js?v=20261118"></script>
-  <script src="app.js?v=20261118"></script>
+  <script src="sound.js?v=20261118b"></script>
+  <script src="cloud.js?v=20261118b"></script>
+  <script src="app.js?v=20261118b"></script>
 </body>
-</html>
 
+</html>

@@ -3360,9 +3360,30 @@ function bindEvents() {
     document.getElementById('webPromoBanner')?.classList.add('hidden');
   });
   document.getElementById('updateAvailableBtn')?.addEventListener('click', () => {
+    if (latestUpdateInfo?.autoReady && window.purrAPI?.installUpdate) {
+      window.purrAPI.installUpdate();
+      return;
+    }
     const url = latestUpdateInfo?.url || window.purrCloud?.GITHUB_RELEASES_URL;
     if (url) window.open(url, '_blank', 'noopener');
   });
+
+  if (window.purrAPI?.onUpdateStatus) {
+    window.purrAPI.onUpdateStatus((payload) => {
+      const btn = document.getElementById('updateAvailableBtn');
+      if (!btn || !payload) return;
+      if (payload.status === 'downloading') {
+        btn.classList.remove('hidden');
+        btn.textContent = `⬇️ v${payload.version || ''}`;
+        btn.title = `Baixando atualização v${payload.version || ''} em segundo plano...`;
+      } else if (payload.status === 'ready') {
+        latestUpdateInfo = { ...(latestUpdateInfo || {}), version: payload.version, autoReady: true };
+        btn.classList.remove('hidden');
+        btn.textContent = `🔄 Atualizar v${payload.version || ''}`;
+        btn.title = `Atualização v${payload.version || ''} pronta! Clique para reiniciar e aplicar (ou instala sozinho ao sair).`;
+      }
+    });
+  }
 
   // Fechar modais ao clicar fora do card
   ['streakModal', 'loginPromptModal'].forEach((mid) => {

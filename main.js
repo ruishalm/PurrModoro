@@ -1,6 +1,10 @@
 const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
+let autoUpdater = null;
+try {
+  ({ autoUpdater } = require('electron-updater'));
+} catch {}
 
 const COMPACT_SIZE = { width: 396, height: 172 };
 const COMPACT_COLLAPSED_SIZE = { width: 242, height: 158 };
@@ -448,6 +452,47 @@ function registerIpc() {
       authWin.loadURL('https://purrrmodoro.web.app/?electron_auth=1', { userAgent: cleanUa });
     });
   });
+
+  ipcMain.handle('purr:install-update', () => {
+    if (autoUpdater && app.isPackaged) {
+      isQuitting = true;
+      autoUpdater.quitAndInstall(false, true);
+      return true;
+    }
+    return false;
+  });
+}
+
+function initAutoUpdater() {
+  if (!autoUpdater || !app.isPackaged) return;
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  const notifyRenderer = (payload) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('update-status', payload);
+    }
+  };
+
+  autoUpdater.on('update-available', (info) => {
+    notifyRenderer({ status: 'downloading', version: info?.version || '' });
+  });
+
+  autoUpdater.on('update-downloaded', (info) => {
+    notifyRenderer({ status: 'ready', version: info?.version || '' });
+  });
+
+  autoUpdater.on('error', (err) => {
+    console.warn('AutoUpdater:', err?.message || err);
+  });
+
+  setTimeout(() => {
+    autoUpdater.checkForUpdates().catch(() => {});
+  }, 4000);
+
+  setInterval(() => {
+    autoUpdater.checkForUpdates().catch(() => {});
+  }, 4 * 60 * 60 * 1000);
 }
 
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
@@ -466,6 +511,7 @@ if (!gotSingleInstanceLock) {
     registerIpc();
     createWindow();
     createTray();
+    initAutoUpdater();
   });
 
   app.on('before-quit', () => {
