@@ -52,4 +52,6 @@ jobs:
           generate_release_notes: true
           files: |
             dist/PurrModoro-Setup.exe
+            dist/PurrModoro-Setup.exe.blockmap
             dist/PurrModoro-Portable.exe
+            dist/latest.yml

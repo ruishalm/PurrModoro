@@ -12,6 +12,12 @@ contextBridge.exposeInMainWorld('purrAPI', {
   hideToTray: () => ipcRenderer.invoke('hide-to-tray'),
   quitApp: () => ipcRenderer.invoke('quit-app'),
   googleSignIn: () => ipcRenderer.invoke('purr:google-sign-in'),
+  installUpdate: () => ipcRenderer.invoke('purr:install-update'),
+  onUpdateStatus: (callback) => {
+    const listener = (_event, payload) => callback(payload);
+    ipcRenderer.on('update-status', listener);
+    return () => ipcRenderer.removeListener('update-status', listener);
+  },
   onTrayAction: (callback) => {
     const listener = (_event, action) => callback(action);
     ipcRenderer.on('tray-action', listener);
