@@ -3719,28 +3719,67 @@ function getCurrentYearMonth() {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
 }
 
+function getSupporterMonthsCount(sup) {
+  if (!sup?.active) return 0;
+  if (!sup.since) return Math.max(1, (state.unlockedSecretIds || []).length);
+  const start = new Date(sup.since);
+  const now = new Date();
+  if (Number.isNaN(start.getTime())) return 1;
+  const diff = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()) + 1;
+  return Math.max(1, diff, (state.unlockedSecretIds || []).length);
+}
+
+function formatMonthLabelOffset(sinceIso, monthIndexZeroBased) {
+  const base = sinceIso ? new Date(sinceIso) : new Date();
+  const d = Number.isNaN(base.getTime()) ? new Date() : new Date(base.getFullYear(), base.getMonth() + monthIndexZeroBased, 1);
+  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+  return `${meses[d.getMonth()]}/${d.getFullYear()}`;
+}
+
+function getSecretRewardName(sid) {
+  if (sid === 'theme_sec_starlight') return '🌌 Tema Galáxia Lo-Fi';
+  const item = getCatalogItem(sid);
+  if (item) return `✨ ${item.name}`;
+  const cat = getCatDef(sid);
+  if (cat) return `🐱 ${cat.name}`;
+  return `🎁 ${sid}`;
+}
+
 function renderSupportTab() {
   if (!window.purrCloud) return;
   const lang = getCurrentLang();
   const plan = window.purrCloud.SUPPORTER_PLAN;
-  const unlockedCount = (state.unlockedSecretIds || []).length;
+  const unlockedIds = state.unlockedSecretIds || [];
+  const unlockedCount = unlockedIds.length;
   const totalPool = window.purrCloud.SUPPORTER_SECRET_POOL.length;
 
   const badge = document.getElementById('supportPriceBadge');
   if (badge) badge.textContent = window.purrCloud.formatPrice(plan, lang);
+
+  const curMonth = getCurrentYearMonth();
+  const sup = state.supporter || { active: false, since: null, lastClaimMonth: null };
+  const canClaimThisMonth = Boolean(sup.active && sup.lastClaimMonth !== curMonth);
+  const monthsActive = getSupporterMonthsCount(sup);
+
   const counter = document.getElementById('supporterDropsCounter');
-  if (counter) counter.textContent = `${unlockedCount}/${totalPool}`;
+  if (counter) {
+    counter.textContent = sup.active
+      ? `Mês ${monthsActive} (${unlockedCount} brindes)`
+      : 'Mês 0 (Não ativo)';
+  }
   const bar = document.getElementById('supporterProgressBar');
-  if (bar) bar.style.width = `${Math.round((unlockedCount / totalPool) * 100)}%`;
+  if (bar) {
+    const pct = sup.active
+      ? Math.min(100, Math.max(8, Math.round((Math.min(unlockedCount, totalPool) / totalPool) * 100)))
+      : 0;
+    bar.style.width = `${pct}%`;
+  }
   const gw = document.getElementById('supportGatewayHint');
   if (gw) gw.textContent = lang === 'en' ? tc('supportGatewayEn') : tc('supportGatewayPt');
 
   const subBtn = document.getElementById('subscribeDevBtn');
   const claimBtn = document.getElementById('claimMonthlyDropBtn');
   const statusEl = document.getElementById('supporterStatusText');
-  const curMonth = getCurrentYearMonth();
-  const sup = state.supporter || { active: false, lastClaimMonth: null };
-  const canClaimThisMonth = Boolean(sup.active && sup.lastClaimMonth !== curMonth);
 
   if (subBtn && claimBtn && statusEl) {
     if (sup.active) {
@@ -3749,13 +3788,13 @@ function renderSupportTab() {
       claimBtn.classList.toggle('hidden', !canClaimThisMonth);
       claimBtn.textContent = tc('supportClaimMonthlyBtn');
       statusEl.textContent = canClaimThisMonth
-        ? '🎁 Seu brinde secreto deste mês está pronto para abrir!'
-        : `✓ Brinde do mês (${curMonth}) já resgatado! Próximo drop secreto no próximo mês.`;
+        ? `🎁 Seu presente do Mês ${monthsActive} está pronto para abrir!`
+        : `✓ Presente do mês (${curMonth}) já resgatado! Próximo presente no mês que vem.`;
     } else {
       subBtn.disabled = false;
       subBtn.textContent = `${tc('supportSubscribeBtn')} (${window.purrCloud.formatPrice(plan, lang)})`;
       claimBtn.classList.add('hidden');
-      statusEl.textContent = 'Ao assinar, você libera na hora +500 🪙 e 1 dos 24 brindes ocultos!';
+      statusEl.textContent = 'Ao assinar, você libera na hora a Loja Premium, +500 🪙 e 1 presente por mês!';
     }
   }
 
@@ -3783,24 +3822,43 @@ function renderSupportTab() {
     });
   }
 
-  // Brindes Secretos Desbloqueados (ocultos até o jogador ganhar!)
+  // Histórico Mensal Contínuo (sem limite de 2 anos!)
   const secTag = document.getElementById('secretUnlockedCountTag');
-  if (secTag) secTag.textContent = `${unlockedCount}/${totalPool}`;
+  if (secTag) {
+    secTag.textContent = sup.active ? `${monthsActive} ${monthsActive === 1 ? 'mês' : 'meses'}` : '0 meses';
+  }
   const secGrid = document.getElementById('secretCollectionGrid');
   if (secGrid) {
     secGrid.innerHTML = '';
-    if (unlockedCount === 0) {
-      secGrid.innerHTML = '<span class="label-sm">🔒 Coleção secreta oculta — assine Adote um Dev para revelar 1 item inédito por mês!</span>';
+    if (!sup.active && unlockedCount === 0) {
+      secGrid.innerHTML =
+        '<span class="label-sm">🔒 Assine Adote um Dev para desbloquear a Loja Premium e registrar seus presentes mês a mês!</span>';
     } else {
-      (state.unlockedSecretIds || []).forEach((sid) => {
-        const entry = getCatalogItem(sid);
-        if (!entry) return;
-        const pill = document.createElement('span');
-        pill.className = 'inv-pill-btn active';
-        pill.title = entry.description || entry.name;
-        pill.textContent = `✨ ${entry.name}`;
-        secGrid.appendChild(pill);
-      });
+      const totalRows = Math.max(monthsActive, unlockedCount + (canClaimThisMonth ? 1 : 0), 1);
+      for (let i = 0; i < totalRows; i++) {
+        const row = document.createElement('div');
+        const sid = unlockedIds[i] || null;
+        const isCurrentReady = !sid && canClaimThisMonth && i === totalRows - 1;
+        row.className = 'monthly-gift-row' + (isCurrentReady ? ' is-ready' : '');
+
+        const left = document.createElement('span');
+        left.className = 'monthly-gift-month';
+        left.textContent = `Mês ${i + 1} • ${formatMonthLabelOffset(sup.since, i)}`;
+
+        const right = document.createElement('span');
+        right.className = 'monthly-gift-reward';
+        if (sid) {
+          right.textContent = `${getSecretRewardName(sid)} + 500 🪙`;
+        } else if (isCurrentReady) {
+          right.textContent = '🎁 Pronto para abrir (+500 🪙)!';
+        } else {
+          right.textContent = '🪙 Bônus Mensal VIP (+500 moedas)';
+        }
+
+        row.appendChild(left);
+        row.appendChild(right);
+        secGrid.appendChild(row);
+      }
     }
   }
 }

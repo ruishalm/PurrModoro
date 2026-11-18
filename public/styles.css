@@ -2280,4 +2280,42 @@ body.is-web-browser .compact-view {
   }
 }
 
+/* =========================================================
+   CONTADOR & HISTÓRICO MENSAL DE PRESENTES (ABA APOIAR)
+   ========================================================= */
+.monthly-gifts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.monthly-gift-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 2px solid var(--border-mid);
+  font-size: 11.5px;
+  font-weight: 700;
+}
+
+.monthly-gift-row.is-ready {
+  border-color: #d9821e;
+  background: #fff4dc;
+}
+
+.monthly-gift-month {
+  color: var(--text-muted);
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.monthly-gift-reward {
+  color: var(--text-main);
+  text-align: right;
+}
+
 

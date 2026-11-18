@@ -491,6 +491,31 @@
     };
   }
 
+  function waitForFirebaseAuthReady(timeoutMs = 2500) {
+    return new Promise((resolve) => {
+      if (!ensureFirebaseInitialized() || !window.firebase?.auth) {
+        resolve(null);
+        return;
+      }
+      const auth = window.firebase.auth();
+      if (auth.currentUser) {
+        resolve(auth.currentUser);
+        return;
+      }
+      let settled = false;
+      let unsub = null;
+      const done = (user) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (typeof unsub === 'function') unsub();
+        resolve(user || null);
+      };
+      const timer = setTimeout(() => done(auth.currentUser), timeoutMs);
+      unsub = auth.onAuthStateChanged((user) => done(user));
+    });
+  }
+
   async function syncStateToCloud(state) {
     if (!state?.cloudUser?.uid) return { ok: false, reason: 'not-logged-in' };
 
@@ -502,22 +527,29 @@
 
     if (ensureFirebaseInitialized() && window.firebase?.firestore && state.cloudUser.provider === 'firebase-google') {
       try {
-        await window.firebase.firestore().collection('users').doc(state.cloudUser.uid).set(snapshot, { merge: true });
+        const authUser = await waitForFirebaseAuthReady();
+        if (authUser && authUser.uid === state.cloudUser.uid) {
+          await window.firebase.firestore().collection('users').doc(state.cloudUser.uid).set(snapshot, { merge: true });
+          return { ok: true, mode: 'firestore', syncedAt: snapshot.updatedAt };
+        }
       } catch (err) {
         console.warn('Firestore sync warning:', err?.message);
       }
     }
 
-    return { ok: true, syncedAt: snapshot.updatedAt };
+    return { ok: true, mode: 'local-cloud-fallback', syncedAt: snapshot.updatedAt };
   }
 
   async function loadStateFromCloud(uid, provider = 'firebase-google') {
     if (!uid) return null;
     if (ensureFirebaseInitialized() && window.firebase?.firestore && provider === 'firebase-google') {
       try {
-        const snap = await window.firebase.firestore().collection('users').doc(uid).get();
-        if (snap.exists) {
-          return snap.data();
+        const authUser = await waitForFirebaseAuthReady();
+        if (authUser && authUser.uid === uid) {
+          const snap = await window.firebase.firestore().collection('users').doc(uid).get();
+          if (snap.exists) {
+            return snap.data();
+          }
         }
       } catch (err) {
         console.warn('Firestore load warning:', err?.message);

@@ -8,7 +8,7 @@
     content="default-src 'self'; script-src 'self' https://*.gstatic.com https://apis.google.com https://accounts.google.com https://*.firebaseapp.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.googleapis.com https://*.gstatic.com https://*.firebaseio.com https://*.firebaseapp.com https://*.cloudfunctions.net https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://accounts.google.com https://apis.google.com https://api.github.com https://www.google-analytics.com https://analytics.google.com; frame-src 'self' https://*.firebaseapp.com https://accounts.google.com https://apis.google.com;" />
   <title>PurrModoro — Gatinho de Foco</title>
   <link rel="icon" type="image/png" href="assets/ui/tray_icon.png" />
-  <link rel="stylesheet" href="styles.css?v=20261118d" />
+  <link rel="stylesheet" href="styles.css?v=20261118e" />
 </head>
 
 <body class="mode-compact theme-cozy">
@@ -431,13 +431,12 @@
               <span id="supportPriceBadge" class="support-price-pill">R$ 14,90/mês</span>
             </div>
             <p id="supportHeroDesc" class="support-hero-desc">
-              +500 🪙 todo mês + 1 Brinde Secreto Exclusivo aleatório de uma coleção oculta com 24 itens (2 anos sem
-              repetir!)
+              Mês a mês sem limite: +500 🪙 todo mês + brindes exclusivos da Coleção Secreta e acesso total à Loja Premium!
             </p>
             <div class="support-progress-wrap">
               <div class="support-progress-labels">
-                <span id="supporterCollectionLabel">Coleção Secreta Adote um Dev</span>
-                <strong id="supporterDropsCounter">0/24</strong>
+                <span id="supporterCollectionLabel">Contador Mensal Adote um Dev</span>
+                <strong id="supporterDropsCounter">Mês 0</strong>
               </div>
               <div class="timer-progress-track">
                 <div id="supporterProgressBar" class="timer-progress-fill" style="width: 0%"></div>
@@ -461,10 +460,10 @@
 
           <div class="inv-section">
             <div class="inv-section-head">
-              <h3>🎁 Meus Brindes Secretos Recebidos</h3>
-              <span id="secretUnlockedCountTag" class="label-sm">0/24</span>
+              <h3>📅 Histórico Mensal de Presentes</h3>
+              <span id="secretUnlockedCountTag" class="label-sm">0 meses</span>
             </div>
-            <div id="secretCollectionGrid" class="inv-mini-list"></div>
+            <div id="secretCollectionGrid" class="monthly-gifts-list"></div>
           </div>
         </div>
       </aside>
@@ -573,9 +572,9 @@
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-functions-compat.js"></script>
   <script defer src="https://www.gstatic.com/firebasejs/11.6.1/firebase-analytics-compat.js"></script>
-  <script src="sound.js?v=20261118d"></script>
-  <script src="cloud.js?v=20261118d"></script>
-  <script src="app.js?v=20261118d"></script>
+  <script src="sound.js?v=20261118e"></script>
+  <script src="cloud.js?v=20261118e"></script>
+  <script src="app.js?v=20261118e"></script>
 </body>
 
 </html>
