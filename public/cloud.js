@@ -3,7 +3,7 @@
    ============================================================================ */
 
 (function () {
-  const APP_VERSION = '0.1.2';
+  const APP_VERSION = '0.1.5';
   const GITHUB_LATEST_API = 'https://api.github.com/repos/ruishalm/PurrModoro/releases/latest';
   const GITHUB_RELEASES_URL = 'https://github.com/ruishalm/PurrModoro/releases/latest';
   const WEB_APP_URL = 'https://purrrmodoro.web.app';
@@ -491,6 +491,31 @@
     };
   }
 
+  function waitForFirebaseAuthReady(timeoutMs = 2500) {
+    return new Promise((resolve) => {
+      if (!ensureFirebaseInitialized() || !window.firebase?.auth) {
+        resolve(null);
+        return;
+      }
+      const auth = window.firebase.auth();
+      if (auth.currentUser) {
+        resolve(auth.currentUser);
+        return;
+      }
+      let settled = false;
+      let unsub = null;
+      const done = (user) => {
+        if (settled) return;
+        settled = true;
+        clearTimeout(timer);
+        if (typeof unsub === 'function') unsub();
+        resolve(user || null);
+      };
+      const timer = setTimeout(() => done(auth.currentUser), timeoutMs);
+      unsub = auth.onAuthStateChanged((user) => done(user));
+    });
+  }
+
   async function syncStateToCloud(state) {
     if (!state?.cloudUser?.uid) return { ok: false, reason: 'not-logged-in' };
 
@@ -502,25 +527,47 @@
 
     if (ensureFirebaseInitialized() && window.firebase?.firestore && state.cloudUser.provider === 'firebase-google') {
       try {
+        const authUser = await waitForFirebaseAuthReady();
+        if (!authUser || authUser.uid !== state.cloudUser.uid) {
+          console.warn('Firestore sync skipped: sessão Firebase Auth ausente ou UID diferente.', {
+            hasAuthUser: Boolean(authUser),
+            authUid: authUser?.uid || null,
+            stateUid: state.cloudUser.uid,
+          });
+          return { ok: false, reason: 'auth-expired' };
+        }
         await window.firebase.firestore().collection('users').doc(state.cloudUser.uid).set(snapshot, { merge: true });
+        return { ok: true, mode: 'firestore', syncedAt: snapshot.updatedAt };
       } catch (err) {
         console.warn('Firestore sync warning:', err?.message);
+        return { ok: false, reason: err?.message || 'firestore-error' };
       }
     }
 
-    return { ok: true, syncedAt: snapshot.updatedAt };
+    return { ok: false, reason: 'firebase-unavailable' };
   }
 
   async function loadStateFromCloud(uid, provider = 'firebase-google') {
     if (!uid) return null;
     if (ensureFirebaseInitialized() && window.firebase?.firestore && provider === 'firebase-google') {
       try {
+        const authUser = await waitForFirebaseAuthReady();
+        if (!authUser || authUser.uid !== uid) {
+          console.warn('Firestore load skipped: sessão Firebase Auth ausente ou UID diferente.', {
+            hasAuthUser: Boolean(authUser),
+            authUid: authUser?.uid || null,
+            stateUid: uid,
+          });
+          return null;
+        }
         const snap = await window.firebase.firestore().collection('users').doc(uid).get();
         if (snap.exists) {
           return snap.data();
         }
+        return null;
       } catch (err) {
         console.warn('Firestore load warning:', err?.message);
+        return null;
       }
     }
     const vault = readCloudVault();

@@ -8,7 +8,7 @@ Um **Idle Game + Timer Pomodoro** em pixel art para Windows e Web onde seu gatin
 
 ## 📥 Download & Instalação (Windows)
 
-### Opção 1 — Executável `.exe` Pronto — v0.1.2 (`v0.1.2`)
+### Opção 1 — Executável `.exe` Pronto — v0.1.5 (`v0.1.5`)
 
 Baixe e execute direto no Windows sem precisar de Node.js pela página de [GitHub Releases](https://github.com/ruishalm/PurrModoro/releases):
 
