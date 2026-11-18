@@ -2007,7 +2007,8 @@ body.is-web-browser {
   background: radial-gradient(circle at top, var(--accent-soft), var(--diorama-backdrop) 70%);
 }
 
-body.is-web-browser #closeAppBtn {
+body.is-web-browser #closeAppBtn,
+body.is-web-browser #minimizeCompactBtn {
   display: none;
 }
 
