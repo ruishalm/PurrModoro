@@ -528,16 +528,23 @@
     if (ensureFirebaseInitialized() && window.firebase?.firestore && state.cloudUser.provider === 'firebase-google') {
       try {
         const authUser = await waitForFirebaseAuthReady();
-        if (authUser && authUser.uid === state.cloudUser.uid) {
-          await window.firebase.firestore().collection('users').doc(state.cloudUser.uid).set(snapshot, { merge: true });
-          return { ok: true, mode: 'firestore', syncedAt: snapshot.updatedAt };
+        if (!authUser || authUser.uid !== state.cloudUser.uid) {
+          console.warn('Firestore sync skipped: sessão Firebase Auth ausente ou UID diferente.', {
+            hasAuthUser: Boolean(authUser),
+            authUid: authUser?.uid || null,
+            stateUid: state.cloudUser.uid,
+          });
+          return { ok: false, reason: 'auth-expired' };
         }
+        await window.firebase.firestore().collection('users').doc(state.cloudUser.uid).set(snapshot, { merge: true });
+        return { ok: true, mode: 'firestore', syncedAt: snapshot.updatedAt };
       } catch (err) {
         console.warn('Firestore sync warning:', err?.message);
+        return { ok: false, reason: err?.message || 'firestore-error' };
       }
     }
 
-    return { ok: true, mode: 'local-cloud-fallback', syncedAt: snapshot.updatedAt };
+    return { ok: false, reason: 'firebase-unavailable' };
   }
 
   async function loadStateFromCloud(uid, provider = 'firebase-google') {
@@ -545,14 +552,22 @@
     if (ensureFirebaseInitialized() && window.firebase?.firestore && provider === 'firebase-google') {
       try {
         const authUser = await waitForFirebaseAuthReady();
-        if (authUser && authUser.uid === uid) {
-          const snap = await window.firebase.firestore().collection('users').doc(uid).get();
-          if (snap.exists) {
-            return snap.data();
-          }
+        if (!authUser || authUser.uid !== uid) {
+          console.warn('Firestore load skipped: sessão Firebase Auth ausente ou UID diferente.', {
+            hasAuthUser: Boolean(authUser),
+            authUid: authUser?.uid || null,
+            stateUid: uid,
+          });
+          return null;
         }
+        const snap = await window.firebase.firestore().collection('users').doc(uid).get();
+        if (snap.exists) {
+          return snap.data();
+        }
+        return null;
       } catch (err) {
         console.warn('Firestore load warning:', err?.message);
+        return null;
       }
     }
     const vault = readCloudVault();

@@ -3676,6 +3676,17 @@ async function syncCloudNow() {
     renderSupportTab();
     window.purrSound.playCoin();
     if (roomActors[0]) showRoomPetSpeech(roomActors[0], '☁️ Perfil e gatinhos sincronizados!');
+  } else {
+    window.purrSound.playSad();
+    const errMsg =
+      res.reason === 'auth-expired'
+        ? '⚠️ Sessão Google expirada neste navegador. Faça login novamente para sincronizar!'
+        : `⚠️ Não foi possível sincronizar com o Firestore (${res.reason || 'erro'}).`;
+    if (roomActors[0]) showRoomPetSpeech(roomActors[0], errMsg, 4500);
+    showCompactSpeech(errMsg, 4500);
+    if (res.reason === 'auth-expired') {
+      openLoginPromptModal(false);
+    }
   }
 }
 
