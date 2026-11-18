@@ -3794,14 +3794,17 @@ function renderSupportTab() {
 
   if (subBtn && claimBtn && statusEl) {
     if (sup.active) {
-      subBtn.textContent = lang === 'en' ? '✓ Adopt a Dev Active 💖' : '✓ Assinatura Adote um Dev Ativa 💖';
+      subBtn.classList.add('hidden');
       subBtn.disabled = true;
       claimBtn.classList.toggle('hidden', !canClaimThisMonth);
+      claimBtn.classList.remove('px-btn-ghost');
+      claimBtn.classList.add('px-btn-primary');
       claimBtn.textContent = tc('supportClaimMonthlyBtn');
       statusEl.textContent = canClaimThisMonth
         ? `🎁 Seu presente do Mês ${monthsActive} está pronto para abrir!`
         : `✓ Presente do mês (${curMonth}) já resgatado! Próximo presente no mês que vem.`;
     } else {
+      subBtn.classList.remove('hidden');
       subBtn.disabled = false;
       subBtn.textContent = `${tc('supportSubscribeBtn')} (${window.purrCloud.formatPrice(plan, lang)})`;
       claimBtn.classList.add('hidden');
