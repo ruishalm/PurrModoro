@@ -3764,13 +3764,16 @@ function renderSupportTab() {
   const unlockedCount = unlockedIds.length;
   const totalPool = window.purrCloud.SUPPORTER_SECRET_POOL.length;
 
-  const badge = document.getElementById('supportPriceBadge');
-  if (badge) badge.textContent = window.purrCloud.formatPrice(plan, lang);
-
   const curMonth = getCurrentYearMonth();
   const sup = state.supporter || { active: false, since: null, lastClaimMonth: null };
   const canClaimThisMonth = Boolean(sup.active && sup.lastClaimMonth !== curMonth);
   const monthsActive = getSupporterMonthsCount(sup);
+
+  const badge = document.getElementById('supportPriceBadge');
+  if (badge) {
+    badge.classList.toggle('hidden', Boolean(sup.active));
+    badge.textContent = window.purrCloud.formatPrice(plan, lang);
+  }
 
   const counter = document.getElementById('supporterDropsCounter');
   if (counter) {
@@ -3786,7 +3789,10 @@ function renderSupportTab() {
     bar.style.width = `${pct}%`;
   }
   const gw = document.getElementById('supportGatewayHint');
-  if (gw) gw.textContent = lang === 'en' ? tc('supportGatewayEn') : tc('supportGatewayPt');
+  if (gw) {
+    gw.classList.toggle('hidden', Boolean(sup.active));
+    gw.textContent = lang === 'en' ? tc('supportGatewayEn') : tc('supportGatewayPt');
+  }
 
   const subBtn = document.getElementById('subscribeDevBtn');
   const claimBtn = document.getElementById('claimMonthlyDropBtn');
