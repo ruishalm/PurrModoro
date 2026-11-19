@@ -284,10 +284,13 @@ function getHatDef(id) {
   return (catalog.hats || []).find((h) => h.id === id) || null;
 }
 
+const APP_ASSET_VERSION = '0.1.6';
+
 function loadImage(src) {
   if (imageCache.has(src)) return imageCache.get(src);
   const img = new Image();
-  img.src = src;
+  const sep = src.includes('?') ? '&' : '?';
+  img.src = `${src}${sep}v=${APP_ASSET_VERSION}`;
   imageCache.set(src, img);
   return img;
 }
@@ -439,6 +442,12 @@ const CAT_HEAD_ANCHORS = {
   'cat_dino_sleep.png': { x: 19, y: 16, bob: [0, 0, 1, 0] },
   'cat_dino_cheer.png': { x: 20, y: 7, bob: [0, -3, -4, -2] },
   'cat_dino_cry.png': { x: 20, y: 7, bob: [0, 1, 0, 1] },
+  'cat_dino_walk.png': { x: 20, y: 7, bob: [0, -1, 0, -1] },
+  'cat_mochi_walk.png': { x: 10, y: 7, bob: [0, -1, 0, -1] },
+  'cat_mochi_box_walk.png': { x: 15, y: 5, bob: [0, -1, 0, -1] },
+  'cat_cream_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
+  'cat_tuxedo_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
+  'cat_white_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
 };
 
 function resolveCatHeadAnchor(sheetName, fw = 32) {
@@ -447,8 +456,10 @@ function resolveCatHeadAnchor(sheetName, fw = 32) {
     if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_dino_sleep.png'];
     if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_dino_cheer.png'];
     if (sheetName.endsWith('_cry.png')) return CAT_HEAD_ANCHORS['cat_dino_cry.png'];
+    if (sheetName.endsWith('_walk.png')) return CAT_HEAD_ANCHORS['cat_dino_walk.png'];
     return CAT_HEAD_ANCHORS['cat_dino_idle.png'];
   }
+  if (sheetName.endsWith('_walk.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_mochi_walk.png'] : CAT_HEAD_ANCHORS['cat_cream_walk.png'];
   if (sheetName.endsWith('_idle.png')) return CAT_HEAD_ANCHORS['cat_mochi_idle.png'];
   if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_cream_sleep.png'];
   if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_cream_cheer.png'];
@@ -531,10 +542,11 @@ function getActorCanvasSize(kind, config) {
 }
 
 function getCatAnimationForState(catDef, moodOrBehavior) {
-  const anims = catDef.animations || {};
+  const anims = catDef?.animations || {};
   if (moodOrBehavior === 'cheer' && anims.cheer) return anims.cheer;
   if (moodOrBehavior === 'cry' && anims.cry) return anims.cry;
   if (moodOrBehavior === 'sleep' && anims.sleep) return anims.sleep;
+  if (moodOrBehavior === 'walk' && anims.walk) return anims.walk;
   return anims.idle || Object.values(anims)[0];
 }
 

@@ -877,6 +877,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_mochi_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "box": {
           "src": "assets/sprites/cat_mochi_box.png",
           "frames": 4,
@@ -923,6 +930,13 @@
           "fh": 32,
           "fps": 4
         },
+        "walk": {
+          "src": "assets/sprites/cat_mochi_box_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_curled_sleep.png",
           "frames": 1,
@@ -963,6 +977,13 @@
           "fh": 64,
           "fps": 3
         },
+        "walk": {
+          "src": "assets/sprites/cat_cream_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_cream_sleep.png",
           "frames": 4,
@@ -1001,6 +1022,13 @@
           "fw": 64,
           "fh": 64,
           "fps": 3
+        },
+        "walk": {
+          "src": "assets/sprites/cat_tuxedo_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
         },
         "sleep": {
           "src": "assets/sprites/cat_tuxedo_sleep.png",
@@ -1041,6 +1069,13 @@
           "fh": 64,
           "fps": 3
         },
+        "walk": {
+          "src": "assets/sprites/cat_white_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_curled_sleep.png",
           "frames": 1,
@@ -1080,6 +1115,13 @@
           "fh": 32,
           "fps": 5
         },
+        "walk": {
+          "src": "assets/sprites/cat_dracula.png",
+          "frames": 6,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
         "sleep": {
           "src": "assets/sprites/cat_tuxedo_sleep.png",
           "frames": 4,
@@ -1118,6 +1160,13 @@
           "fw": 48,
           "fh": 64,
           "fps": 6
+        },
+        "walk": {
+          "src": "assets/sprites/cat_witch.png",
+          "frames": 6,
+          "fw": 48,
+          "fh": 64,
+          "fps": 7
         },
         "sleep": {
           "src": "assets/sprites/cat_curled_sleep.png",
@@ -1159,6 +1208,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_evil_box.png",
+          "frames": 12,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
         "sleep": {
           "src": "assets/sprites/cat_tuxedo_sleep.png",
           "frames": 4,
@@ -1198,6 +1254,13 @@
           "fw": 32,
           "fh": 32,
           "fps": 7
+        },
+        "walk": {
+          "src": "assets/sprites/cat_zombie_eating.png",
+          "frames": 15,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
         },
         "sleep": {
           "src": "assets/sprites/cat_tuxedo_sleep.png",
@@ -1240,6 +1303,13 @@
           "fh": 32,
           "fps": 7
         },
+        "walk": {
+          "src": "assets/sprites/cat_dino_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
         "sleep": {
           "src": "assets/sprites/cat_dino_sleep.png",
           "frames": 4,
@@ -1279,6 +1349,13 @@
           "fh": 32,
           "fps": 7
         },
+        "walk": {
+          "src": "assets/sprites/cat_dino_green_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
         "sleep": {
           "src": "assets/sprites/cat_dino_green_sleep.png",
           "frames": 4,
@@ -1314,6 +1391,13 @@
         "idle": {
           "src": "assets/sprites/cat_sakura_idle.png",
           "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "walk": {
+          "src": "assets/sprites/cat_sakura_walk.png",
+          "frames": 4,
           "fw": 32,
           "fh": 32,
           "fps": 6
@@ -1357,6 +1441,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_blueberry_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_blueberry_sleep.png",
           "frames": 4,
@@ -1396,6 +1487,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_matcha_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_matcha_sleep.png",
           "frames": 4,
@@ -1431,6 +1529,13 @@
         "idle": {
           "src": "assets/sprites/cat_lavender_idle.png",
           "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "walk": {
+          "src": "assets/sprites/cat_lavender_walk.png",
+          "frames": 4,
           "fw": 32,
           "fh": 32,
           "fps": 6
@@ -1476,6 +1581,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_sec_galaxy_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_sec_galaxy_sleep.png",
           "frames": 4,
@@ -1513,6 +1625,13 @@
         "idle": {
           "src": "assets/sprites/cat_sec_gold_idle.png",
           "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "walk": {
+          "src": "assets/sprites/cat_sec_gold_walk.png",
+          "frames": 4,
           "fw": 32,
           "fh": 32,
           "fps": 6
@@ -1558,6 +1677,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_sec_cyber_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_sec_cyber_sleep.png",
           "frames": 4,
@@ -1599,6 +1725,13 @@
           "fh": 32,
           "fps": 6
         },
+        "walk": {
+          "src": "assets/sprites/cat_sec_sunset_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
         "sleep": {
           "src": "assets/sprites/cat_sec_sunset_sleep.png",
           "frames": 4,
@@ -1634,6 +1767,13 @@
         "idle": {
           "src": "assets/sprites/cat_sec_cocoa_idle.png",
           "frames": 10,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "walk": {
+          "src": "assets/sprites/cat_sec_cocoa_walk.png",
+          "frames": 4,
           "fw": 32,
           "fh": 32,
           "fps": 6
@@ -1679,6 +1819,13 @@
           "fh": 32,
           "fps": 7
         },
+        "walk": {
+          "src": "assets/sprites/cat_sec_dino_pink_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
         "sleep": {
           "src": "assets/sprites/cat_sec_dino_pink_sleep.png",
           "frames": 4,
@@ -1720,6 +1867,13 @@
           "fh": 32,
           "fps": 7
         },
+        "walk": {
+          "src": "assets/sprites/cat_sec_dino_gold_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
+        },
         "sleep": {
           "src": "assets/sprites/cat_sec_dino_gold_sleep.png",
           "frames": 4,
@@ -1760,6 +1914,13 @@
           "fw": 32,
           "fh": 32,
           "fps": 7
+        },
+        "walk": {
+          "src": "assets/sprites/cat_sec_dino_purple_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 8
         },
         "sleep": {
           "src": "assets/sprites/cat_sec_dino_purple_sleep.png",

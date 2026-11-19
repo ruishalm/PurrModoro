@@ -239,6 +239,176 @@ def generate_dino_sprites(
             _plot_mask(cry_strip, ["R.R", ".R.", "R.R"], pal, ox=i * 32 + 6, oy=3)
     cry_strip.save(sprites_dir / f"{prefix}_cry.png")
 
+    # 5. Walk (4 frames, 32x32 — corrida/passo alternado)
+    walk_strip = Image.new("RGBA", (32 * 4, 32), (0, 0, 0, 0))
+    walk_poses = [
+        (0, legs_walk_a),
+        (-1, legs_stand),
+        (0, legs_walk_b),
+        (-1, legs_stand),
+    ]
+    for i, (bob_y, legs) in enumerate(walk_poses):
+        _plot_mask(walk_strip, dino_upper + legs, pal, ox=i * 32 + 1, oy=7 + bob_y)
+    walk_strip.save(sprites_dir / f"{prefix}_walk.png")
+
+
+
+def generate_mochi_walk_sprite(sprites_dir: Path):
+    """Gera caminhada quadrúpede (de 4 patas!) para o Mochi, com corpo horizontal, patinhas alternadas e rabo em pé."""
+    src_idle = SRC / "CatPackFree/CatPackFree/Idle.png"
+    if not src_idle.exists():
+        src_idle = SPRITES_DIR / "cat_mochi_idle.png"
+    with Image.open(src_idle).convert("RGBA") as idle_img:
+        f0 = idle_img.crop((0, 0, 32, 32))
+
+    head = f0.crop((3, 4, 18, 18))
+    OUTLINE = (33, 33, 33, 255)
+    FUR_WHITE = (254, 245, 230, 255)
+    FUR_ORANGE = (253, 213, 181, 255)
+    FUR_SHADOW = (230, 180, 160, 255)
+
+    def build_frame(phase: int) -> Image.Image:
+        bob = -1 if phase in (1, 3) else 0
+        fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+        px = fr.load()
+
+        # 1. Peito e Tronco horizontal (de 4 patas)
+        for y in range(18, 25):
+            px[3, y + bob] = OUTLINE
+            for x in range(4, 14):
+                px[x, y + bob] = FUR_WHITE
+
+        # Dorso e corpo horizontal até a anca
+        for y in range(14, 25):
+            for x in range(12, 25):
+                if y == 14 and 14 <= x <= 22:
+                    px[x, y + bob] = OUTLINE
+                elif 15 <= y <= 23:
+                    if x == 24 or (y == 15 and x == 23):
+                        px[x, y + bob] = OUTLINE
+                    elif 12 <= x < 24:
+                        px[x, y + bob] = FUR_ORANGE if y < 20 else FUR_WHITE
+                elif y == 24 and 10 <= x <= 16:
+                    px[x, y + bob] = OUTLINE
+
+        # 2. Rabinho erguido no fundo
+        tail_bobs = [0, -1, 1, -1]
+        tb = tail_bobs[phase]
+        tail_pts = [(23, 14), (24, 13), (25, 12), (25, 11), (24, 10), (23, 10)]
+        for tx, ty in tail_pts:
+            px[tx, ty + bob + tb] = FUR_ORANGE
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nx, ny = tx + dx, ty + dy + bob + tb
+                if 0 <= nx < 32 and 0 <= ny < 32 and px[nx, ny][3] == 0:
+                    px[nx, ny] = OUTLINE
+
+        # 3. Cabeça original do gatinho
+        fr.paste(head, (2, 7 + bob), head)
+
+        # 4. As 4 patinhas de gato andando no chão
+        if phase == 0:
+            # Pata dianteira esquerda à frente
+            for y in range(24, 31):
+                px[4, y] = OUTLINE; px[5, y] = FUR_WHITE; px[6, y] = FUR_WHITE; px[7, y] = OUTLINE
+            px[4, 31] = OUTLINE; px[5, 31] = OUTLINE; px[6, 31] = OUTLINE; px[7, 31] = OUTLINE
+
+            # Pata dianteira direita recuada
+            for y in range(24, 30):
+                px[8, y] = OUTLINE; px[9, y] = FUR_SHADOW; px[10, y] = FUR_SHADOW; px[11, y] = OUTLINE
+            px[8, 30] = OUTLINE; px[9, 30] = OUTLINE; px[10, 30] = OUTLINE; px[11, 30] = OUTLINE
+
+            # Pata traseira direita avançando
+            for y in range(24, 30):
+                px[16, y] = OUTLINE; px[17, y] = FUR_SHADOW; px[18, y] = FUR_SHADOW; px[19, y] = OUTLINE
+            px[16, 30] = OUTLINE; px[17, 30] = OUTLINE; px[18, 30] = OUTLINE; px[19, 30] = OUTLINE
+
+            # Pata traseira esquerda de apoio
+            for y in range(24, 31):
+                px[20, y] = OUTLINE; px[21, y] = FUR_ORANGE; px[22, y] = FUR_ORANGE; px[23, y] = OUTLINE
+            px[20, 31] = OUTLINE; px[21, 31] = OUTLINE; px[22, 31] = OUTLINE; px[23, 31] = OUTLINE
+
+        elif phase in (1, 3):
+            # Passagem/saltinho centralizado
+            for y in range(23, 30):
+                px[6, y] = OUTLINE; px[7, y] = FUR_WHITE; px[8, y] = FUR_WHITE; px[9, y] = OUTLINE
+            px[6, 30] = OUTLINE; px[7, 30] = OUTLINE; px[8, 30] = OUTLINE; px[9, 30] = OUTLINE
+
+            for y in range(23, 30):
+                px[18, y] = OUTLINE; px[19, y] = FUR_ORANGE; px[20, y] = FUR_ORANGE; px[21, y] = OUTLINE
+            px[18, 30] = OUTLINE; px[19, 30] = OUTLINE; px[20, 30] = OUTLINE; px[21, 30] = OUTLINE
+
+        elif phase == 2:
+            # Pata dianteira esquerda recuada
+            for y in range(24, 31):
+                px[8, y] = OUTLINE; px[9, y] = FUR_WHITE; px[10, y] = FUR_WHITE; px[11, y] = OUTLINE
+            px[8, 31] = OUTLINE; px[9, 31] = OUTLINE; px[10, 31] = OUTLINE; px[11, 31] = OUTLINE
+
+            # Pata dianteira direita à frente
+            for y in range(24, 30):
+                px[4, y] = OUTLINE; px[5, y] = FUR_SHADOW; px[6, y] = FUR_SHADOW; px[7, y] = OUTLINE
+            px[4, 30] = OUTLINE; px[5, 30] = OUTLINE; px[6, 30] = OUTLINE; px[7, 30] = OUTLINE
+
+            # Pata traseira direita recuada
+            for y in range(24, 30):
+                px[20, y] = OUTLINE; px[21, y] = FUR_SHADOW; px[22, y] = FUR_SHADOW; px[23, y] = OUTLINE
+            px[20, 30] = OUTLINE; px[21, 30] = OUTLINE; px[22, 30] = OUTLINE; px[23, 30] = OUTLINE
+
+            # Pata traseira esquerda avançando
+            for y in range(24, 31):
+                px[16, y] = OUTLINE; px[17, y] = FUR_ORANGE; px[18, y] = FUR_ORANGE; px[19, y] = OUTLINE
+            px[16, 31] = OUTLINE; px[17, 31] = OUTLINE; px[18, 31] = OUTLINE; px[19, 31] = OUTLINE
+
+        return fr
+
+    strip = Image.new("RGBA", (32 * 4, 32), (0, 0, 0, 0))
+    for i in range(4):
+        strip.paste(build_frame(i), (i * 32, 0))
+    strip.save(sprites_dir / "cat_mochi_walk.png")
+
+
+def generate_biped_walk_sprite(src_img_path: Path, dest_path: Path, frame_size: int = 64):
+    """Gera caminhada de 4 frames a partir do frame parado de gatos maiores (Pochi, Frajola, Neve)."""
+    with Image.open(src_img_path).convert("RGBA") as img:
+        f0 = img.crop((0, 0, frame_size, frame_size))
+        split_y = 53 if frame_size == 64 else int(frame_size * 0.8)
+        upper = f0.crop((0, 0, frame_size, split_y))
+        paw_l = f0.crop((18, split_y, 33, frame_size))
+        paw_r = f0.crop((33, split_y, 48, frame_size))
+
+        strip = Image.new("RGBA", (frame_size * 4, frame_size), (0, 0, 0, 0))
+        for phase in range(4):
+            fr = Image.new("RGBA", (frame_size, frame_size), (0, 0, 0, 0))
+            bob = -1 if phase in (1, 3) else 0
+            fr.paste(upper, (0, bob), upper)
+            if phase == 0:
+                fr.paste(paw_l, (18 - 2, split_y), paw_l)
+                fr.paste(paw_r, (33 + 2, split_y), paw_r)
+            elif phase == 1:
+                fr.paste(paw_l, (18, split_y - 1), paw_l)
+                fr.paste(paw_r, (33, split_y - 1), paw_r)
+            elif phase == 2:
+                fr.paste(paw_l, (18 + 2, split_y), paw_l)
+                fr.paste(paw_r, (33 - 2, split_y), paw_r)
+            elif phase == 3:
+                fr.paste(paw_l, (18, split_y - 1), paw_l)
+                fr.paste(paw_r, (33, split_y - 1), paw_r)
+            strip.paste(fr, (phase * frame_size, 0))
+
+        strip.save(dest_path)
+
+
+def generate_box_walk_sprite(src_img_path: Path, dest_path: Path):
+    """Gera caminhada para gatinho dentro da caixa (waddle / gingado lateral e bobbing)."""
+    with Image.open(src_img_path).convert("RGBA") as img:
+        f0 = img.crop((0, 0, 32, 32))
+        strip = Image.new("RGBA", (32 * 4, 32), (0, 0, 0, 0))
+        offsets = [(-1, 0), (0, -1), (1, 0), (0, -1)]
+        for i, (dx, dy) in enumerate(offsets):
+            fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+            fr.paste(f0, (dx, dy), f0)
+            strip.paste(fr, (i * 32, 0))
+        strip.save(dest_path)
+
 
 def _lerp_rgb(c1: tuple[int, int, int], c2: tuple[int, int, int], t: float) -> tuple[int, int, int]:
     return (
@@ -336,6 +506,10 @@ def prepare_sprites():
         outline_col=(48, 28, 86, 255),
     )
 
+    # Animações de caminhada (walk) para Mochi, Caixa e Bípedes
+    generate_mochi_walk_sprite(SPRITES_DIR)
+    generate_box_walk_sprite(SPRITES_DIR / "cat_mochi_box.png", SPRITES_DIR / "cat_mochi_box_walk.png")
+
     # Faixas verticais de FreeCats.png (Pochi Creme): cry (4), cheer (2), sleep (4)
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats.png", 0, 64, 4, 64, 64, "cat_cream_cry.png")
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats.png", 64, 128, 2, 64, 64, "cat_cream_cheer.png")
@@ -347,6 +521,7 @@ def prepare_sprites():
         recolor_cat_sheet("cat_cream_sleep.png", f"{cid}_sleep.png", dark_c, mid_c, light_c)
         recolor_cat_sheet("cat_cream_cheer.png", f"{cid}_cheer.png", dark_c, mid_c, light_c)
         recolor_cat_sheet("cat_cream_cry.png", f"{cid}_cry.png", dark_c, mid_c, light_c)
+        recolor_cat_sheet("cat_mochi_walk.png", f"{cid}_walk.png", dark_c, mid_c, light_c)
 
     # Faixas verticais de FreeCats2.png (Frajola Tuxedo): 256x188
     build_uniform_strip("PetMobileFree/PetMobileFree/FreeCats2.png", 0, 60, 4, 64, 64, "cat_tuxedo_cry.png")
@@ -355,6 +530,11 @@ def prepare_sprites():
 
     # Gatinho Branco comemorando de RetroCatsFree.png (row 1: y=72..133)
     build_uniform_strip("RetroCatsFree.png/RetroCatsFree.png", 72, 133, 2, 64, 64, "cat_white_cheer.png")
+
+    # Gerar ciclos de caminhada para gatos bípedes (Pochi, Frajola, Neve)
+    generate_biped_walk_sprite(SPRITES_DIR / "cat_cream_cheer.png", SPRITES_DIR / "cat_cream_walk.png", 64)
+    generate_biped_walk_sprite(SPRITES_DIR / "cat_tuxedo_cheer.png", SPRITES_DIR / "cat_tuxedo_walk.png", 64)
+    generate_biped_walk_sprite(SPRITES_DIR / "cat_white_cheer.png", SPRITES_DIR / "cat_white_walk.png", 64)
 
     # Gatinho dormindo enroladinho (para UI / dormir / tray)
     crop_save("CatUIFree/CatUIFree/free.png", (66, 90, 109, 122), SPRITES_DIR / "cat_curled_sleep.png")
@@ -1792,6 +1972,7 @@ def prepare_items_and_catalog():
             "description": "Seu companheiro inicial! Abana o rabo e entra em caixinhas.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_mochi_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_mochi_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "box": {"src": "assets/sprites/cat_mochi_box.png", "frames": 4, "fw": 32, "fh": 32, "fps": 4},
                 "sleep": {"src": "assets/sprites/cat_cream_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
@@ -1808,6 +1989,7 @@ def prepare_items_and_catalog():
             "description": "Trabalha com você escondido dentro da caixa de papelão favorita.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_mochi_box.png", "frames": 4, "fw": 32, "fh": 32, "fps": 4},
+                "walk": {"src": "assets/sprites/cat_mochi_box_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_curled_sleep.png", "frames": 1, "fw": 43, "fh": 32, "fps": 1},
                 "cheer": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -1823,6 +2005,7 @@ def prepare_items_and_catalog():
             "description": "Gatinho creme super expressivo: tira sonecas zZz e vibra quando você conclui!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 3},
+                "walk": {"src": "assets/sprites/cat_cream_walk.png", "frames": 4, "fw": 64, "fh": 64, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_cream_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 6},
                 "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
@@ -1838,6 +2021,7 @@ def prepare_items_and_catalog():
             "description": "Elegante de smoking preto e branco, ótimo parceiro de produtividade.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_tuxedo_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 3},
+                "walk": {"src": "assets/sprites/cat_tuxedo_walk.png", "frames": 4, "fw": 64, "fh": 64, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_tuxedo_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_tuxedo_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 6},
                 "cry": {"src": "assets/sprites/cat_tuxedo_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
@@ -1853,6 +2037,7 @@ def prepare_items_and_catalog():
             "description": "Gatinho branquinho de olhos azuis brilhantes.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_white_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 3},
+                "walk": {"src": "assets/sprites/cat_white_walk.png", "frames": 4, "fw": 64, "fh": 64, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_curled_sleep.png", "frames": 1, "fw": 43, "fh": 32, "fps": 1},
                 "cheer": {"src": "assets/sprites/cat_white_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 6},
                 "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
@@ -1868,6 +2053,7 @@ def prepare_items_and_catalog():
             "description": "Capa de vampiro e presinhas fofas para estudar até de madrugada!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_dracula.png", "frames": 6, "fw": 32, "fh": 32, "fps": 5},
+                "walk": {"src": "assets/sprites/cat_dracula.png", "frames": 6, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_tuxedo_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_dracula.png", "frames": 6, "fw": 32, "fh": 32, "fps": 8},
                 "cry": {"src": "assets/sprites/cat_vampire_angry.png", "frames": 9, "fw": 32, "fh": 32, "fps": 7},
@@ -1883,6 +2069,7 @@ def prepare_items_and_catalog():
             "description": "Flutua na vassoura mágica com chapéu de bruxa perto do seu relógio!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_witch.png", "frames": 6, "fw": 48, "fh": 64, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_witch.png", "frames": 6, "fw": 48, "fh": 64, "fps": 7},
                 "sleep": {"src": "assets/sprites/cat_curled_sleep.png", "frames": 1, "fw": 43, "fh": 32, "fps": 1},
                 "cheer": {"src": "assets/sprites/cat_witch.png", "frames": 6, "fw": 48, "fh": 64, "fps": 9},
                 "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
@@ -1898,6 +2085,7 @@ def prepare_items_and_catalog():
             "description": "Gatinho preto de olhos vermelhos vigiando sua produtividade da caixa.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_evil_box.png", "frames": 12, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_evil_box.png", "frames": 12, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_tuxedo_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_evil_box.png", "frames": 12, "fw": 32, "fh": 32, "fps": 10},
                 "cry": {"src": "assets/sprites/cat_tuxedo_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
@@ -1913,6 +2101,7 @@ def prepare_items_and_catalog():
             "description": "Ama lanchinhos no potinho e não larga o foco por nada!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_zombie_eating.png", "frames": 15, "fw": 32, "fh": 32, "fps": 7},
+                "walk": {"src": "assets/sprites/cat_zombie_eating.png", "frames": 15, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_tuxedo_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_zombie_eating.png", "frames": 15, "fw": 32, "fh": 32, "fps": 10},
                 "cry": {"src": "assets/sprites/cat_tuxedo_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
@@ -1929,6 +2118,7 @@ def prepare_items_and_catalog():
             "description": "Caiu a internet? Esse 'gatinho' pré-histórico pula cactos de procrastinação com você!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_dino_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "walk": {"src": "assets/sprites/cat_dino_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_dino_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_dino_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
                 "cry": {"src": "assets/sprites/cat_dino_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
@@ -1944,6 +2134,7 @@ def prepare_items_and_catalog():
             "description": "O clássico dinossaurinho pré-histórico em verde esmeralda vibrante!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_dino_green_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "walk": {"src": "assets/sprites/cat_dino_green_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_dino_green_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_dino_green_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
                 "cry": {"src": "assets/sprites/cat_dino_green_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
@@ -1960,6 +2151,7 @@ def prepare_items_and_catalog():
             "description": "Pelagem cor de flor de cerejeira com orelhinhas doces!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sakura_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_sakura_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_sakura_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sakura_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_sakura_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -1975,6 +2167,7 @@ def prepare_items_and_catalog():
             "description": "Tom azul-celeste suave e tranquilo para dias focados.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_blueberry_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_blueberry_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_blueberry_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_blueberry_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_blueberry_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -1990,6 +2183,7 @@ def prepare_items_and_catalog():
             "description": "Gatinho verde-menta zen inspirado em casas de chá!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_matcha_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_matcha_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_matcha_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_matcha_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_matcha_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2005,6 +2199,7 @@ def prepare_items_and_catalog():
             "description": "Pelagem lilás sonhadora cheia de serenidade.",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_lavender_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_lavender_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_lavender_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_lavender_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_lavender_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2023,6 +2218,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: pelagem cósmica roxo-anil cheia de mistério!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_galaxy_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_sec_galaxy_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_sec_galaxy_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_galaxy_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_sec_galaxy_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2040,6 +2236,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: reluzente como ouro puro!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_gold_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_sec_gold_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_sec_gold_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_gold_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_sec_gold_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2057,6 +2254,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: brilho ciano e magenta futurista!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_cyber_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_sec_cyber_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_sec_cyber_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_cyber_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_sec_cyber_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2074,6 +2272,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: coral quente com reflexos dourados do entardecer!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_sunset_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_sec_sunset_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_sec_sunset_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_sunset_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_sec_sunset_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2089,6 +2288,7 @@ def prepare_items_and_catalog():
             "description": "Marrom achocolatado com patinhas de creme quentinho!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_cocoa_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
+                "walk": {"src": "assets/sprites/cat_sec_cocoa_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_sec_cocoa_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_cocoa_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
                 "cry": {"src": "assets/sprites/cat_sec_cocoa_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
@@ -2106,6 +2306,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: Dino pré-histórico cor-de-rosa super fofo!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_dino_pink_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "walk": {"src": "assets/sprites/cat_sec_dino_pink_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_sec_dino_pink_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_dino_pink_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
                 "cry": {"src": "assets/sprites/cat_sec_dino_pink_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
@@ -2123,6 +2324,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: T-Rex dourado lendário dos mestres do foco!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_dino_gold_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "walk": {"src": "assets/sprites/cat_sec_dino_gold_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_sec_dino_gold_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_dino_gold_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
                 "cry": {"src": "assets/sprites/cat_sec_dino_gold_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},
@@ -2140,6 +2342,7 @@ def prepare_items_and_catalog():
             "description": "Brinde Secreto: Dino místico em roxo ametista brilhante!",
             "animations": {
                 "idle": {"src": "assets/sprites/cat_sec_dino_purple_idle.png", "frames": 8, "fw": 32, "fh": 32, "fps": 7},
+                "walk": {"src": "assets/sprites/cat_sec_dino_purple_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 8},
                 "sleep": {"src": "assets/sprites/cat_sec_dino_purple_sleep.png", "frames": 4, "fw": 32, "fh": 32, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_sec_dino_purple_cheer.png", "frames": 4, "fw": 32, "fh": 32, "fps": 7},
                 "cry": {"src": "assets/sprites/cat_sec_dino_purple_cry.png", "frames": 4, "fw": 32, "fh": 32, "fps": 5},

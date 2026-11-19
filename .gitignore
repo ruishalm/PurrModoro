@@ -8,6 +8,9 @@ functions/node_modules/
 functions/.env
 functions/.env.*
 .firebase/
+scratch/
+__pycache__/
+*.pyc
 
 
 
