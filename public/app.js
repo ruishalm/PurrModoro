@@ -440,7 +440,7 @@ const CAT_HEAD_ANCHORS = {
   'cat_dino_cheer.png': { x: 20, y: 7, bob: [0, -3, -4, -2] },
   'cat_dino_cry.png': { x: 20, y: 7, bob: [0, 1, 0, 1] },
   'cat_dino_walk.png': { x: 20, y: 7, bob: [0, -1, 0, -1] },
-  'cat_mochi_walk.png': { x: 10, y: 5, bob: [0, -1, 0, -1] },
+  'cat_mochi_walk.png': { x: 10, y: 7, bob: [0, -1, 0, -1] },
   'cat_mochi_box_walk.png': { x: 15, y: 5, bob: [0, -1, 0, -1] },
   'cat_cream_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
   'cat_tuxedo_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },

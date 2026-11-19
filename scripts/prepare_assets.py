@@ -254,69 +254,115 @@ def generate_dino_sprites(
 
 
 def generate_mochi_walk_sprite(sprites_dir: Path):
-    """Gera caminhada fofa e 100% fiel para o Mochi (mantém a silhueta original, alternando as patinhas e abanando o rabo)."""
+    """Gera caminhada quadrúpede (de 4 patas!) para o Mochi, com corpo horizontal, patinhas alternadas e rabo em pé."""
     src_idle = SRC / "CatPackFree/CatPackFree/Idle.png"
     if not src_idle.exists():
         src_idle = SPRITES_DIR / "cat_mochi_idle.png"
     with Image.open(src_idle).convert("RGBA") as idle_img:
         f0 = idle_img.crop((0, 0, 32, 32))
 
+    head = f0.crop((3, 4, 18, 18))
     OUTLINE = (33, 33, 33, 255)
     FUR_WHITE = (254, 245, 230, 255)
+    FUR_ORANGE = (253, 213, 181, 255)
+    FUR_SHADOW = (230, 180, 160, 255)
 
-    frames = []
-    for phase in range(4):
+    def build_frame(phase: int) -> Image.Image:
+        bob = -1 if phase in (1, 3) else 0
         fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-        if phase in (1, 3):
-            # Passada / saltinho suave: corpinho sobe 1px
-            fr.paste(f0, (0, -1))
-        elif phase == 0:
-            # Pata dianteira esquerda dá o passo (levanta 2px com piso visível embaixo)
-            fr.paste(f0, (0, 0))
-            px = fr.load()
-            for y in (30, 31):
-                for x in range(5, 10):
-                    px[x, y] = (0, 0, 0, 0)
-            for x in range(5, 10):
-                px[x, 29] = OUTLINE
-            px[5, 28] = OUTLINE
-            px[6, 28] = FUR_WHITE
-            px[7, 28] = FUR_WHITE
-            px[8, 28] = FUR_WHITE
+        px = fr.load()
 
-            # Rabinho balança levemente para a direita (+1px na pontinha)
-            tail_crop = f0.crop((20, 19, 25, 23))
-            for y in range(19, 23):
-                for x in range(20, 25):
-                    px[x, y] = (0, 0, 0, 0)
-            fr.paste(tail_crop, (21, 19), tail_crop)
+        # 1. Peito e Tronco horizontal (de 4 patas)
+        for y in range(18, 25):
+            px[3, y + bob] = OUTLINE
+            for x in range(4, 14):
+                px[x, y + bob] = FUR_WHITE
+
+        # Dorso e corpo horizontal até a anca
+        for y in range(14, 25):
+            for x in range(12, 25):
+                if y == 14 and 14 <= x <= 22:
+                    px[x, y + bob] = OUTLINE
+                elif 15 <= y <= 23:
+                    if x == 24 or (y == 15 and x == 23):
+                        px[x, y + bob] = OUTLINE
+                    elif 12 <= x < 24:
+                        px[x, y + bob] = FUR_ORANGE if y < 20 else FUR_WHITE
+                elif y == 24 and 10 <= x <= 16:
+                    px[x, y + bob] = OUTLINE
+
+        # 2. Rabinho erguido no fundo
+        tail_bobs = [0, -1, 1, -1]
+        tb = tail_bobs[phase]
+        tail_pts = [(23, 14), (24, 13), (25, 12), (25, 11), (24, 10), (23, 10)]
+        for tx, ty in tail_pts:
+            px[tx, ty + bob + tb] = FUR_ORANGE
+            for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                nx, ny = tx + dx, ty + dy + bob + tb
+                if 0 <= nx < 32 and 0 <= ny < 32 and px[nx, ny][3] == 0:
+                    px[nx, ny] = OUTLINE
+
+        # 3. Cabeça original do gatinho
+        fr.paste(head, (2, 7 + bob), head)
+
+        # 4. As 4 patinhas de gato andando no chão
+        if phase == 0:
+            # Pata dianteira esquerda à frente
+            for y in range(24, 31):
+                px[4, y] = OUTLINE; px[5, y] = FUR_WHITE; px[6, y] = FUR_WHITE; px[7, y] = OUTLINE
+            px[4, 31] = OUTLINE; px[5, 31] = OUTLINE; px[6, 31] = OUTLINE; px[7, 31] = OUTLINE
+
+            # Pata dianteira direita recuada
+            for y in range(24, 30):
+                px[8, y] = OUTLINE; px[9, y] = FUR_SHADOW; px[10, y] = FUR_SHADOW; px[11, y] = OUTLINE
+            px[8, 30] = OUTLINE; px[9, 30] = OUTLINE; px[10, 30] = OUTLINE; px[11, 30] = OUTLINE
+
+            # Pata traseira direita avançando
+            for y in range(24, 30):
+                px[16, y] = OUTLINE; px[17, y] = FUR_SHADOW; px[18, y] = FUR_SHADOW; px[19, y] = OUTLINE
+            px[16, 30] = OUTLINE; px[17, 30] = OUTLINE; px[18, 30] = OUTLINE; px[19, 30] = OUTLINE
+
+            # Pata traseira esquerda de apoio
+            for y in range(24, 31):
+                px[20, y] = OUTLINE; px[21, y] = FUR_ORANGE; px[22, y] = FUR_ORANGE; px[23, y] = OUTLINE
+            px[20, 31] = OUTLINE; px[21, 31] = OUTLINE; px[22, 31] = OUTLINE; px[23, 31] = OUTLINE
+
+        elif phase in (1, 3):
+            # Passagem/saltinho centralizado
+            for y in range(23, 30):
+                px[6, y] = OUTLINE; px[7, y] = FUR_WHITE; px[8, y] = FUR_WHITE; px[9, y] = OUTLINE
+            px[6, 30] = OUTLINE; px[7, 30] = OUTLINE; px[8, 30] = OUTLINE; px[9, 30] = OUTLINE
+
+            for y in range(23, 30):
+                px[18, y] = OUTLINE; px[19, y] = FUR_ORANGE; px[20, y] = FUR_ORANGE; px[21, y] = OUTLINE
+            px[18, 30] = OUTLINE; px[19, 30] = OUTLINE; px[20, 30] = OUTLINE; px[21, 30] = OUTLINE
+
         elif phase == 2:
-            # Pata dianteira direita dá o passo (levanta 2px com piso visível embaixo)
-            fr.paste(f0, (0, 0))
-            px = fr.load()
-            for y in (30, 31):
-                for x in range(9, 14):
-                    px[x, y] = (0, 0, 0, 0)
-            for x in range(9, 14):
-                px[x, 29] = OUTLINE
-            px[9, 28] = OUTLINE
-            px[13, 28] = OUTLINE
-            px[10, 28] = FUR_WHITE
-            px[11, 28] = FUR_WHITE
-            px[12, 28] = FUR_WHITE
+            # Pata dianteira esquerda recuada
+            for y in range(24, 31):
+                px[8, y] = OUTLINE; px[9, y] = FUR_WHITE; px[10, y] = FUR_WHITE; px[11, y] = OUTLINE
+            px[8, 31] = OUTLINE; px[9, 31] = OUTLINE; px[10, 31] = OUTLINE; px[11, 31] = OUTLINE
 
-            # Rabinho balança levemente para a esquerda (-1px na pontinha)
-            tail_crop = f0.crop((20, 19, 25, 23))
-            for y in range(19, 23):
-                for x in range(20, 25):
-                    px[x, y] = (0, 0, 0, 0)
-            fr.paste(tail_crop, (19, 19), tail_crop)
+            # Pata dianteira direita à frente
+            for y in range(24, 30):
+                px[4, y] = OUTLINE; px[5, y] = FUR_SHADOW; px[6, y] = FUR_SHADOW; px[7, y] = OUTLINE
+            px[4, 30] = OUTLINE; px[5, 30] = OUTLINE; px[6, 30] = OUTLINE; px[7, 30] = OUTLINE
 
-        frames.append(fr)
+            # Pata traseira direita recuada
+            for y in range(24, 30):
+                px[20, y] = OUTLINE; px[21, y] = FUR_SHADOW; px[22, y] = FUR_SHADOW; px[23, y] = OUTLINE
+            px[20, 30] = OUTLINE; px[21, 30] = OUTLINE; px[22, 30] = OUTLINE; px[23, 30] = OUTLINE
+
+            # Pata traseira esquerda avançando
+            for y in range(24, 31):
+                px[16, y] = OUTLINE; px[17, y] = FUR_ORANGE; px[18, y] = FUR_ORANGE; px[19, y] = OUTLINE
+            px[16, 31] = OUTLINE; px[17, 31] = OUTLINE; px[18, 31] = OUTLINE; px[19, 31] = OUTLINE
+
+        return fr
 
     strip = Image.new("RGBA", (32 * 4, 32), (0, 0, 0, 0))
-    for i, fr in enumerate(frames):
-        strip.paste(fr, (i * 32, 0))
+    for i in range(4):
+        strip.paste(build_frame(i), (i * 32, 0))
     strip.save(sprites_dir / "cat_mochi_walk.png")
 
 
