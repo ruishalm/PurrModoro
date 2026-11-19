@@ -254,66 +254,69 @@ def generate_dino_sprites(
 
 
 def generate_mochi_walk_sprite(sprites_dir: Path):
-    """Gera o ciclo de caminhada de 4 frames (32x32) com patinhas alternadas e barriguinha arqueada."""
+    """Gera caminhada fofa e 100% fiel para o Mochi (mantém a silhueta original, alternando as patinhas e abanando o rabo)."""
     src_idle = SRC / "CatPackFree/CatPackFree/Idle.png"
     if not src_idle.exists():
         src_idle = SPRITES_DIR / "cat_mochi_idle.png"
     with Image.open(src_idle).convert("RGBA") as idle_img:
         f0 = idle_img.crop((0, 0, 32, 32))
 
-    pal = {
-        "O": (33, 33, 33, 255),
-        "W": (254, 245, 230, 255),
-        "w": (253, 213, 181, 255),
-        "S": (230, 180, 160, 255),
-        "B": (215, 140, 119, 255),
-        ".": (0, 0, 0, 0),
-    }
+    OUTLINE = (33, 33, 33, 255)
+    FUR_WHITE = (254, 245, 230, 255)
 
-    legs_p0 = [
-        "....OWWWwOWWWWSWWOO.OWSO..",
-        "....OWWWWOWWWwSWWWWOOWSO..",
-        ".OOOO.WWw.WWWOOOOSWOWWSO..",
-        "OwwwwO.Ww.OWWWWS..OWWSSO..",
-        "OSBwwO....OWWWW..SSWSSO...",
-        "OSBwO.....OWWW...SSSSO....",
-        ".OSSO.....OWW.....OOOO....",
-        "..OO......OOO.............",
-    ]
+    frames = []
+    for phase in range(4):
+        fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
+        if phase in (1, 3):
+            # Passada / saltinho suave: corpinho sobe 1px
+            fr.paste(f0, (0, -1))
+        elif phase == 0:
+            # Pata dianteira esquerda dá o passo (levanta 2px com piso visível embaixo)
+            fr.paste(f0, (0, 0))
+            px = fr.load()
+            for y in (30, 31):
+                for x in range(5, 10):
+                    px[x, y] = (0, 0, 0, 0)
+            for x in range(5, 10):
+                px[x, 29] = OUTLINE
+            px[5, 28] = OUTLINE
+            px[6, 28] = FUR_WHITE
+            px[7, 28] = FUR_WHITE
+            px[8, 28] = FUR_WHITE
 
-    legs_p1 = [
-        "....OWWWwOWWWWSWWOO.OWSO..",
-        "....OWWWWOWWWwSWWWWOOWSO..",
-        "..OOOSWWwOWWW.OOOSWOWWSO..",
-        ".OwwwOSWW.OWW...SSWOWSSO..",
-        ".OSBwOSW..OWW...SSWSSO....",
-        "..OSBwO...OW.....SSSSO....",
-        "...OO.....OO......OOO.....",
-        "..........................",
-    ]
+            # Rabinho balança levemente para a direita (+1px na pontinha)
+            tail_crop = f0.crop((20, 19, 25, 23))
+            for y in range(19, 23):
+                for x in range(20, 25):
+                    px[x, y] = (0, 0, 0, 0)
+            fr.paste(tail_crop, (21, 19), tail_crop)
+        elif phase == 2:
+            # Pata dianteira direita dá o passo (levanta 2px com piso visível embaixo)
+            fr.paste(f0, (0, 0))
+            px = fr.load()
+            for y in (30, 31):
+                for x in range(9, 14):
+                    px[x, y] = (0, 0, 0, 0)
+            for x in range(9, 14):
+                px[x, 29] = OUTLINE
+            px[9, 28] = OUTLINE
+            px[13, 28] = OUTLINE
+            px[10, 28] = FUR_WHITE
+            px[11, 28] = FUR_WHITE
+            px[12, 28] = FUR_WHITE
 
-    legs_p2 = [
-        "....OWWWwOWWWWSWWOO.OWSO..",
-        "....OWWWWOWWWwSWWWWOOWSO..",
-        "..OOOO.WWw..WWOOOOSWOWWSO.",
-        "..OwwwO.Ww..OWWWWS.WOWSSO.",
-        "..OSBwwO....OWWWW.SSWSSO..",
-        "...OSBwO....OWWW..SSSSO...",
-        "....OSSO....OWW....OOOO...",
-        ".....OO......OO...........",
-    ]
+            # Rabinho balança levemente para a esquerda (-1px na pontinha)
+            tail_crop = f0.crop((20, 19, 25, 23))
+            for y in range(19, 23):
+                for x in range(20, 25):
+                    px[x, y] = (0, 0, 0, 0)
+            fr.paste(tail_crop, (19, 19), tail_crop)
 
-    legs_p3 = list(legs_p1)
+        frames.append(fr)
 
     strip = Image.new("RGBA", (32 * 4, 32), (0, 0, 0, 0))
-    upper = f0.crop((0, 0, 32, 24))
-
-    for i, (bob, leg_m) in enumerate([(0, legs_p0), (-1, legs_p1), (0, legs_p2), (-1, legs_p3)]):
-        fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
-        fr.paste(upper, (0, bob), upper)
-        _plot_mask(fr, leg_m, pal, ox=0, oy=24 + bob)
+    for i, fr in enumerate(frames):
         strip.paste(fr, (i * 32, 0))
-
     strip.save(sprites_dir / "cat_mochi_walk.png")
 
 
