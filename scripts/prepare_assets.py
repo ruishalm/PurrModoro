@@ -254,109 +254,157 @@ def generate_dino_sprites(
 
 
 def generate_mochi_walk_sprite(sprites_dir: Path):
-    """Gera caminhada quadrúpede (de 4 patas!) para o Mochi, com corpo horizontal, patinhas alternadas e rabo em pé."""
+    """Gera caminhada quadrupede (de 4 patas!) para o Mochi, com corpo horizontal, patinhas curtas e fofas, e rabo em pe."""
     src_idle = SRC / "CatPackFree/CatPackFree/Idle.png"
     if not src_idle.exists():
         src_idle = SPRITES_DIR / "cat_mochi_idle.png"
     with Image.open(src_idle).convert("RGBA") as idle_img:
         f0 = idle_img.crop((0, 0, 32, 32))
 
-    head = f0.crop((3, 4, 18, 18))
+    head = f0.crop((2, 4, 19, 18))
     OUTLINE = (33, 33, 33, 255)
     FUR_WHITE = (254, 245, 230, 255)
     FUR_ORANGE = (253, 213, 181, 255)
     FUR_SHADOW = (230, 180, 160, 255)
 
     def build_frame(phase: int) -> Image.Image:
-        bob = -1 if phase in (1, 3) else 0
         fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
         px = fr.load()
 
-        # 1. Peito e Tronco horizontal (de 4 patas)
-        for y in range(18, 25):
-            px[3, y + bob] = OUTLINE
-            for x in range(4, 14):
-                px[x, y + bob] = FUR_WHITE
+        bob = 1 if phase in (1, 3) else 0
 
-        # Dorso e corpo horizontal até a anca
-        for y in range(14, 25):
-            for x in range(12, 25):
-                if y == 14 and 14 <= x <= 22:
-                    px[x, y + bob] = OUTLINE
-                elif 15 <= y <= 23:
-                    if x == 24 or (y == 15 and x == 23):
-                        px[x, y + bob] = OUTLINE
-                    elif 12 <= x < 24:
-                        px[x, y + bob] = FUR_ORANGE if y < 20 else FUR_WHITE
-                elif y == 24 and 10 <= x <= 16:
-                    px[x, y + bob] = OUTLINE
+        # 1. Patinhas do fundo (sombreadas, pontinhas visiveis)
+        if phase == 0:
+            for y in range(25, 29):
+                px[11, y + bob] = OUTLINE; px[12, y + bob] = FUR_SHADOW; px[13, y + bob] = OUTLINE
+            px[11, 29 + bob] = OUTLINE; px[12, 29 + bob] = OUTLINE; px[13, 29 + bob] = OUTLINE
+            for y in range(25, 29):
+                px[16, y + bob] = OUTLINE; px[17, y + bob] = FUR_SHADOW; px[18, y + bob] = OUTLINE
+            px[16, 29 + bob] = OUTLINE; px[17, 29 + bob] = OUTLINE; px[18, 29 + bob] = OUTLINE
+        elif phase == 1:
+            for y in range(24, 27):
+                px[10, y] = OUTLINE; px[11, y] = FUR_SHADOW; px[12, y] = OUTLINE
+            px[10, 27] = OUTLINE; px[11, 27] = OUTLINE; px[12, 27] = OUTLINE
+            for y in range(25, 29):
+                px[17, y] = OUTLINE; px[18, y] = FUR_SHADOW; px[19, y] = OUTLINE
+            px[17, 29] = OUTLINE; px[18, 29] = OUTLINE; px[19, 29] = OUTLINE
+        elif phase == 2:
+            for y in range(25, 29):
+                px[7, y + bob] = OUTLINE; px[8, y + bob] = FUR_SHADOW; px[9, y + bob] = OUTLINE
+            px[7, 29 + bob] = OUTLINE; px[8, 29 + bob] = OUTLINE; px[9, 29 + bob] = OUTLINE
+            for y in range(25, 29):
+                px[21, y + bob] = OUTLINE; px[22, y + bob] = FUR_SHADOW; px[23, y + bob] = OUTLINE
+            px[21, 29 + bob] = OUTLINE; px[22, 29 + bob] = OUTLINE; px[23, 29 + bob] = OUTLINE
+        elif phase == 3:
+            for y in range(25, 29):
+                px[9, y] = OUTLINE; px[10, y] = FUR_SHADOW; px[11, y] = OUTLINE
+            px[9, 29] = OUTLINE; px[10, 29] = OUTLINE; px[11, 29] = OUTLINE
+            for y in range(24, 27):
+                px[19, y] = OUTLINE; px[20, y] = FUR_SHADOW; px[21, y] = OUTLINE
+            px[19, 27] = OUTLINE; px[20, 27] = OUTLINE; px[21, 27] = OUTLINE
 
-        # 2. Rabinho erguido no fundo
-        tail_bobs = [0, -1, 1, -1]
-        tb = tail_bobs[phase]
-        tail_pts = [(23, 14), (24, 13), (25, 12), (25, 11), (24, 10), (23, 10)]
+        # 2. Corpo gordinho de 4 patas (horizontal)
+        for x in range(14, 23):
+            px[x, 16 + bob] = OUTLINE
+        px[23, 17 + bob] = OUTLINE
+        px[24, 18 + bob] = OUTLINE
+        px[24, 19 + bob] = OUTLINE
+        px[24, 20 + bob] = OUTLINE
+        px[23, 21 + bob] = OUTLINE
+        px[23, 22 + bob] = OUTLINE
+        px[22, 23 + bob] = OUTLINE
+
+        px[12, 24 + bob] = OUTLINE
+        px[13, 25 + bob] = OUTLINE
+        px[14, 25 + bob] = OUTLINE
+        px[15, 25 + bob] = OUTLINE
+        px[16, 25 + bob] = OUTLINE
+        px[17, 24 + bob] = OUTLINE
+
+        for y in range(17, 25):
+            for x in range(5, 24):
+                if px[x, y + bob] != OUTLINE:
+                    if y <= 18:
+                        px[x, y + bob] = FUR_ORANGE if x >= 15 else FUR_WHITE
+                    elif y <= 21:
+                        px[x, y + bob] = FUR_ORANGE if x >= 18 else FUR_WHITE
+                    elif y in (22, 23):
+                        px[x, y + bob] = FUR_SHADOW if (12 <= x <= 17) else (FUR_ORANGE if x >= 20 else FUR_WHITE)
+                    elif y == 24:
+                        if 13 <= x <= 16:
+                            px[x, y + bob] = FUR_SHADOW
+
+        for y in range(17, 24):
+            px[4, y + bob] = OUTLINE
+
+        # 3. Rabinho empinado e alegre com movimento
+        tw = [-1, 0, 1, 0][phase]
+        tail_pts = [
+            (23, 18),
+            (24, 17),
+            (25, 16),
+            (26, 15 + tw),
+            (26, 14 + tw),
+            (26, 13 + tw),
+            (25, 12 + tw),
+            (24, 12 + tw),
+        ]
         for tx, ty in tail_pts:
-            px[tx, ty + bob + tb] = FUR_ORANGE
+            px[tx, ty + bob] = FUR_ORANGE
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                nx, ny = tx + dx, ty + dy + bob + tb
-                if 0 <= nx < 32 and 0 <= ny < 32 and px[nx, ny][3] == 0:
+                nx, ny = tx + dx, ty + dy + bob
+                if 0 <= nx < 32 and 0 <= ny < 32 and px[nx, ny] == (0, 0, 0, 0):
                     px[nx, ny] = OUTLINE
 
-        # 3. Cabeça original do gatinho
-        fr.paste(head, (2, 7 + bob), head)
+        # 4. Cabeca original do Mochi
+        fr.paste(head, (2, 4 + bob), head)
 
-        # 4. As 4 patinhas de gato andando no chão
+        # 5. Patinhas da frente e traseiras
         if phase == 0:
-            # Pata dianteira esquerda à frente
-            for y in range(24, 31):
-                px[4, y] = OUTLINE; px[5, y] = FUR_WHITE; px[6, y] = FUR_WHITE; px[7, y] = OUTLINE
-            px[4, 31] = OUTLINE; px[5, 31] = OUTLINE; px[6, 31] = OUTLINE; px[7, 31] = OUTLINE
-
-            # Pata dianteira direita recuada
-            for y in range(24, 30):
-                px[8, y] = OUTLINE; px[9, y] = FUR_SHADOW; px[10, y] = FUR_SHADOW; px[11, y] = OUTLINE
-            px[8, 30] = OUTLINE; px[9, 30] = OUTLINE; px[10, 30] = OUTLINE; px[11, 30] = OUTLINE
-
-            # Pata traseira direita avançando
-            for y in range(24, 30):
-                px[16, y] = OUTLINE; px[17, y] = FUR_SHADOW; px[18, y] = FUR_SHADOW; px[19, y] = OUTLINE
-            px[16, 30] = OUTLINE; px[17, 30] = OUTLINE; px[18, 30] = OUTLINE; px[19, 30] = OUTLINE
-
-            # Pata traseira esquerda de apoio
-            for y in range(24, 31):
-                px[20, y] = OUTLINE; px[21, y] = FUR_ORANGE; px[22, y] = FUR_ORANGE; px[23, y] = OUTLINE
-            px[20, 31] = OUTLINE; px[21, 31] = OUTLINE; px[22, 31] = OUTLINE; px[23, 31] = OUTLINE
-
-        elif phase in (1, 3):
-            # Passagem/saltinho centralizado
             for y in range(23, 30):
-                px[6, y] = OUTLINE; px[7, y] = FUR_WHITE; px[8, y] = FUR_WHITE; px[9, y] = OUTLINE
-            px[6, 30] = OUTLINE; px[7, 30] = OUTLINE; px[8, 30] = OUTLINE; px[9, 30] = OUTLINE
-
+                px[5, y + bob] = OUTLINE; px[6, y + bob] = FUR_WHITE; px[7, y + bob] = FUR_WHITE; px[8, y + bob] = OUTLINE
+            px[5, 30 + bob] = OUTLINE; px[6, 30 + bob] = OUTLINE; px[7, 30 + bob] = OUTLINE; px[8, 30 + bob] = OUTLINE
+        elif phase == 1:
             for y in range(23, 30):
-                px[18, y] = OUTLINE; px[19, y] = FUR_ORANGE; px[20, y] = FUR_ORANGE; px[21, y] = OUTLINE
-            px[18, 30] = OUTLINE; px[19, 30] = OUTLINE; px[20, 30] = OUTLINE; px[21, 30] = OUTLINE
-
+                px[7, y] = OUTLINE; px[8, y] = FUR_WHITE; px[9, y] = FUR_WHITE; px[10, y] = OUTLINE
+            px[7, 30] = OUTLINE; px[8, 30] = OUTLINE; px[9, 30] = OUTLINE; px[10, 30] = OUTLINE
         elif phase == 2:
-            # Pata dianteira esquerda recuada
-            for y in range(24, 31):
+            for y in range(23, 30):
+                px[9, y + bob] = OUTLINE; px[10, y + bob] = FUR_WHITE; px[11, y + bob] = FUR_WHITE; px[12, y + bob] = OUTLINE
+            px[9, 30 + bob] = OUTLINE; px[10, 30 + bob] = OUTLINE; px[11, 30 + bob] = OUTLINE; px[12, 30 + bob] = OUTLINE
+        elif phase == 3:
+            for y in range(22, 28):
                 px[8, y] = OUTLINE; px[9, y] = FUR_WHITE; px[10, y] = FUR_WHITE; px[11, y] = OUTLINE
-            px[8, 31] = OUTLINE; px[9, 31] = OUTLINE; px[10, 31] = OUTLINE; px[11, 31] = OUTLINE
+            px[8, 28] = OUTLINE; px[9, 28] = OUTLINE; px[10, 28] = OUTLINE; px[11, 28] = OUTLINE
 
-            # Pata dianteira direita à frente
-            for y in range(24, 30):
-                px[4, y] = OUTLINE; px[5, y] = FUR_SHADOW; px[6, y] = FUR_SHADOW; px[7, y] = OUTLINE
-            px[4, 30] = OUTLINE; px[5, 30] = OUTLINE; px[6, 30] = OUTLINE; px[7, 30] = OUTLINE
-
-            # Pata traseira direita recuada
-            for y in range(24, 30):
-                px[20, y] = OUTLINE; px[21, y] = FUR_SHADOW; px[22, y] = FUR_SHADOW; px[23, y] = OUTLINE
-            px[20, 30] = OUTLINE; px[21, 30] = OUTLINE; px[22, 30] = OUTLINE; px[23, 30] = OUTLINE
-
-            # Pata traseira esquerda avançando
-            for y in range(24, 31):
-                px[16, y] = OUTLINE; px[17, y] = FUR_ORANGE; px[18, y] = FUR_ORANGE; px[19, y] = OUTLINE
-            px[16, 31] = OUTLINE; px[17, 31] = OUTLINE; px[18, 31] = OUTLINE; px[19, 31] = OUTLINE
+        if phase == 0:
+            for y in range(22, 30):
+                px[20, y + bob] = OUTLINE
+                px[21, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[22, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[23, y + bob] = OUTLINE
+            px[20, 30 + bob] = OUTLINE; px[21, 30 + bob] = OUTLINE; px[22, 30 + bob] = OUTLINE; px[23, 30 + bob] = OUTLINE
+        elif phase == 1:
+            for y in range(22, 28):
+                px[19, y] = OUTLINE
+                px[20, y] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[21, y] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[22, y] = OUTLINE
+            px[19, 28] = OUTLINE; px[20, 28] = OUTLINE; px[21, 28] = OUTLINE; px[22, 28] = OUTLINE
+        elif phase == 2:
+            for y in range(22, 30):
+                px[17, y + bob] = OUTLINE
+                px[18, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[19, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[20, y + bob] = OUTLINE
+            px[17, 30 + bob] = OUTLINE; px[18, 30 + bob] = OUTLINE; px[19, 30 + bob] = OUTLINE; px[20, 30 + bob] = OUTLINE
+        elif phase == 3:
+            for y in range(22, 30):
+                px[18, y] = OUTLINE
+                px[19, y] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[20, y] = FUR_ORANGE if y < 25 else FUR_WHITE
+                px[21, y] = OUTLINE
+            px[18, 30] = OUTLINE; px[19, 30] = OUTLINE; px[20, 30] = OUTLINE; px[21, 30] = OUTLINE
 
         return fr
 
