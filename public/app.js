@@ -363,6 +363,28 @@ async function loadState() {
   state.coins = !Number.isFinite(loadedCoins) || loadedCoins >= 900000
     ? 100
     : Math.max(0, Math.floor(loadedCoins));
+  checkLifetimeVipGrant(state);
+}
+
+const LIFETIME_VIP_EMAILS = ['melanciacomics@gmail.com'];
+
+function checkLifetimeVipGrant(st) {
+  if (!st) return;
+  const email = (st.cloudUser?.email || '').trim().toLowerCase();
+  if (LIFETIME_VIP_EMAILS.includes(email)) {
+    if (!st.supporter?.active) {
+      st.supporter = {
+        active: true,
+        since: st.supporter?.since || '2026-11-19T00:00:00.000Z',
+        lastClaimMonth: st.supporter?.lastClaimMonth || null,
+        isLifetime: true,
+      };
+    }
+    if (!Array.isArray(st.unlockedCats)) st.unlockedCats = ['cat_mochi'];
+    if (!st.unlockedCats.includes('cat_chicken')) st.unlockedCats.push('cat_chicken');
+    if (!Array.isArray(st.unlockedPets)) st.unlockedPets = [];
+    if (!st.unlockedPets.includes('pet_chicks')) st.unlockedPets.push('pet_chicks');
+  }
 }
 
 let saveDebounce = null;
@@ -422,16 +444,48 @@ function drawSpriteSheetFrame(canvas, src, fw, fh, frameIndex, flip = false, cus
   ctx.restore();
 }
 
+const HAT_BOTTOM_PADS = {
+  hat_crown: 4,
+  hat_chef: 4,
+  hat_wizard: 4,
+  hat_bow_pink: 4,
+  hat_sprout: 4,
+  hat_tophat: 4,
+  hat_straw: 4,
+  hat_beret: 4,
+  hat_headphones: 2,
+  hat_halo: 12,
+  hat_cloud_star: 8,
+  hat_sec_astronaut: 7,
+  hat_sec_viking: 7,
+  hat_sec_pirate: 7,
+  hat_sec_flower_crown: 7,
+  hat_sec_rgb_ears: 7,
+  hat_sec_detective: 6,
+  hat_sec_party: 8,
+  hat_sec_ufo: 9,
+  hat_sec_propeller: 8,
+  hat_sec_samurai: 7,
+  hat_sec_cowboy: 7,
+  hat_sec_devil_horns: 7,
+  hat_sec_unicorn: 9,
+  hat_sec_grad_cap: 6,
+  hat_sec_coffee_cup: 8,
+  hat_sec_sakura_pin: 7,
+};
+
 const CAT_HEAD_ANCHORS = {
-  'cat_mochi_idle.png': { x: 10, y: 5, bob: [0, 0, 0, 1, 1, 1, 1, 0, 0, 0] },
+  'cat_mochi_idle.png': { x: 32, y: 22, bob: [0, 0, 1, 0] },
+  'cat_mochi_walk.png': { x: 32, y: 21, bob: [0, 1, 0, 1] },
   'cat_mochi_box.png': { x: 15, y: 5, bob: [0, 0, 0, 0] },
-  'cat_cream_cheer.png': { x: 31, y: 18, bob: [0, 1] },
-  'cat_tuxedo_cheer.png': { x: 31, y: 18, bob: [0, 1] },
-  'cat_white_cheer.png': { x: 31, y: 18, bob: [0, 1] },
-  'cat_cream_cry.png': { x: 27, y: 18, bob: [0, 1, 1, 0] },
-  'cat_tuxedo_cry.png': { x: 27, y: 18, bob: [0, 1, 1, 0] },
-  'cat_cream_sleep.png': { x: 40, y: 29, bob: [0, 0, 1, 0] },
-  'cat_tuxedo_sleep.png': { x: 40, y: 29, bob: [0, 0, 1, 0] },
+  'cat_mochi_cheer.png': { x: 32, y: 22, bob: [0, 1, 1, 0] },
+  'cat_mochi_cry.png': { x: 38, y: 25, bob: [0, 0, 0, 0] },
+  'cat_mochi_sleep.png': { x: 32, y: 26, bob: [0, 0, 1, 0] },
+  'cat_chicken_idle.png': { x: 8, y: 6, bob: [0, 0, 0, 0] },
+  'cat_chicken_walk.png': { x: 8, y: 6, bob: [0, 1, 0, 1] },
+  'cat_chicken_sleep.png': { x: 10, y: 12, bob: [0, 0, 1, 0] },
+  'cat_chicken_cheer.png': { x: 8, y: 8, bob: [0, 2, 3, 1] },
+  'cat_chicken_cry.png': { x: 8, y: 10, bob: [0, 0, 0, 0] },
   'cat_curled_sleep.png': { x: 19, y: 3, bob: [0] },
   'cat_dracula.png': { x: 9, y: 4, bob: [0, 0, 1, 0, 0, 1] },
   'cat_vampire_angry.png': { x: 10, y: 4, bob: [0, 0, 0, 1, 1, 1, 0, 0, 0] },
@@ -443,18 +497,18 @@ const CAT_HEAD_ANCHORS = {
   'cat_dino_cheer.png': { x: 20, y: 7, bob: [0, -3, -4, -2] },
   'cat_dino_cry.png': { x: 20, y: 7, bob: [0, 1, 0, 1] },
   'cat_dino_walk.png': { x: 20, y: 7, bob: [0, -1, 0, -1] },
-  'cat_mochi_walk.png': { x: 10, y: 5, bob: [0, 1, 0, 1] },
-  'cat_mochi_sleep.png': { x: 40, y: 29, bob: [0, 0, 1, 0] },
-  'cat_mochi_cheer.png': { x: 31, y: 18, bob: [0, 1] },
-  'cat_mochi_cry.png': { x: 27, y: 18, bob: [0, 1, 1, 0] },
   'cat_mochi_box_walk.png': { x: 15, y: 5, bob: [0, -1, 0, -1] },
-  'cat_cream_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
-  'cat_tuxedo_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
-  'cat_white_walk.png': { x: 31, y: 18, bob: [0, -1, 0, -1] },
 };
 
 function resolveCatHeadAnchor(sheetName, fw = 32) {
   if (CAT_HEAD_ANCHORS[sheetName]) return CAT_HEAD_ANCHORS[sheetName];
+  if (sheetName.includes('_chicken')) {
+    if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_chicken_sleep.png'];
+    if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_chicken_cheer.png'];
+    if (sheetName.endsWith('_cry.png')) return CAT_HEAD_ANCHORS['cat_chicken_cry.png'];
+    if (sheetName.endsWith('_walk.png')) return CAT_HEAD_ANCHORS['cat_chicken_walk.png'];
+    return CAT_HEAD_ANCHORS['cat_chicken_idle.png'];
+  }
   if (sheetName.includes('_dino')) {
     if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_dino_sleep.png'];
     if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_dino_cheer.png'];
@@ -462,12 +516,12 @@ function resolveCatHeadAnchor(sheetName, fw = 32) {
     if (sheetName.endsWith('_walk.png')) return CAT_HEAD_ANCHORS['cat_dino_walk.png'];
     return CAT_HEAD_ANCHORS['cat_dino_idle.png'];
   }
-  if (sheetName.endsWith('_walk.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_mochi_walk.png'] : CAT_HEAD_ANCHORS['cat_cream_walk.png'];
-  if (sheetName.endsWith('_idle.png')) return CAT_HEAD_ANCHORS['cat_mochi_idle.png'];
-  if (sheetName.endsWith('_sleep.png')) return CAT_HEAD_ANCHORS['cat_cream_sleep.png'];
-  if (sheetName.endsWith('_cheer.png')) return CAT_HEAD_ANCHORS['cat_cream_cheer.png'];
-  if (sheetName.endsWith('_cry.png')) return CAT_HEAD_ANCHORS['cat_cream_cry.png'];
-  return { x: fw / 2, y: 4, bob: [0] };
+  if (sheetName.endsWith('_walk.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_chicken_walk.png'] : CAT_HEAD_ANCHORS['cat_mochi_walk.png'];
+  if (sheetName.endsWith('_idle.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_chicken_idle.png'] : CAT_HEAD_ANCHORS['cat_mochi_idle.png'];
+  if (sheetName.endsWith('_sleep.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_chicken_sleep.png'] : CAT_HEAD_ANCHORS['cat_mochi_sleep.png'];
+  if (sheetName.endsWith('_cheer.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_chicken_cheer.png'] : CAT_HEAD_ANCHORS['cat_mochi_cheer.png'];
+  if (sheetName.endsWith('_cry.png')) return fw <= 32 ? CAT_HEAD_ANCHORS['cat_chicken_cry.png'] : CAT_HEAD_ANCHORS['cat_mochi_cry.png'];
+  return { x: fw / 2, y: 22, bob: [0] };
 }
 
 function isDinoId(id) {
@@ -492,18 +546,45 @@ function drawCatFrameWithHat(canvas, anim, frameIndex, flip = false, customScale
   const dy = canvas.height - dh;
 
   const sheetName = anim.src.split('/').pop();
+  const isSleeping = sheetName.includes('sleep');
+
+  const hatScale = anim.fw <= 32 ? drawScale * 0.65 : drawScale * 1.15;
+  const hatW = Math.round(hatImg.naturalWidth * hatScale);
+  const hatH = Math.round(hatImg.naturalHeight * hatScale);
+
+  ctx.save();
+  ctx.imageSmoothingEnabled = false;
+
+  if (isSleeping) {
+    // Opção B: chapéu descansando no chão ao lado do gatinho dormindo
+    const floorHatX = dx + (flip ? dw * 0.78 : dw * 0.22);
+    const floorHatY = dy + dh * 0.90;
+    if (flip) {
+      ctx.translate(canvas.width, 0);
+      ctx.scale(-1, 1);
+    }
+    ctx.drawImage(
+      hatImg,
+      Math.round(floorHatX - hatW / 2),
+      Math.round(floorHatY - hatH),
+      hatW,
+      hatH
+    );
+    ctx.restore();
+    return;
+  }
+
   const anchor = resolveCatHeadAnchor(sheetName, anim.fw);
   const bobArr = anchor.bob || [0];
   const bobY = bobArr[frameIndex % bobArr.length] || 0;
   const headCanvasX = dx + anchor.x * drawScale;
   const headCanvasY = dy + (anchor.y + bobY) * drawScale;
 
-  const hatScale = anim.fw <= 32 ? drawScale * 0.62 : drawScale * 1.15;
-  const hatW = Math.round(hatImg.naturalWidth * hatScale);
-  const hatH = Math.round(hatImg.naturalHeight * hatScale);
+  const pad = HAT_BOTTOM_PADS[hatId] !== undefined ? HAT_BOTTOM_PADS[hatId] : 4;
+  const visibleRimY = (hatImg.naturalHeight - pad) * hatScale;
+  const floatOffset = hatId === 'hat_halo' ? 4 * hatScale : 0;
+  const hatDrawY = Math.round(headCanvasY - visibleRimY - floatOffset);
 
-  ctx.save();
-  ctx.imageSmoothingEnabled = false;
   if (flip) {
     ctx.translate(canvas.width, 0);
     ctx.scale(-1, 1);
@@ -511,7 +592,7 @@ function drawCatFrameWithHat(canvas, anim, frameIndex, flip = false, customScale
   ctx.drawImage(
     hatImg,
     Math.round(headCanvasX - hatW / 2),
-    Math.round(headCanvasY - hatH * 0.78),
+    hatDrawY,
     hatW,
     hatH
   );
@@ -527,6 +608,7 @@ function getActorSpriteScale(kind, config, inCompact = false, animFw = 32) {
     return 1.0;
   }
   if (id === 'pet_bunny') return 1.25;
+  if (id === 'pet_chicks') return 1.25;
   if (id === 'pet_zombie_hand') return 1.65;
   if (id === 'pet_golden') return 1.2;
   return 1.0;
@@ -539,6 +621,7 @@ function getActorCanvasSize(kind, config) {
     return { w: 68, h: 82 };
   }
   if (id === 'pet_bunny') return { w: 40, h: 32 };
+  if (id === 'pet_chicks') return { w: 52, h: 40 };
   if (id === 'pet_zombie_hand') return { w: 44, h: 52 };
   if (id === 'pet_golden') return { w: 66, h: 38 };
   return { w: 48, h: 48 };
@@ -2745,7 +2828,11 @@ function createRoomActor(id, kind, config, startX, startY) {
       return;
     }
     if (actor.kind === 'cat') {
-      if (isDinoId(actor.config.id)) {
+      if (actor.config.id === 'cat_chicken') {
+        window.purrSound.playClick();
+        spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🌽', '🌾', '🥚', '✨']));
+        showRoomPetSpeech(actor, randomFrom(['Cocoricó! 🐔', 'Pó pó pó! ✨', 'Ciscando o foco! 🌾', 'Choquei uma tarefa! 🥚']));
+      } else if (isDinoId(actor.config.id)) {
         window.purrSound.playClick();
         spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🦖', '🌵', '✨', '💚']));
         showRoomPetSpeech(actor, randomFrom(DINO_PHRASES));
@@ -2754,6 +2841,10 @@ function createRoomActor(id, kind, config, startX, startY) {
         spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['❤️', '💖', '🐾']));
         showRoomPetSpeech(actor, randomFrom(SPEECH_PHRASES.pet));
       }
+    } else if (actor.config.id === 'pet_chicks') {
+      window.purrSound.playClick();
+      spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🐣', '🐥', '✨', '💛']));
+      showRoomPetSpeech(actor, randomFrom(['Piu piu piu! 🐥', 'Piu! ✨', '💛🐣', 'Piu piu! 🌾']));
     } else if (actor.config.id === 'pet_bunny') {
       window.purrSound.playClick();
       spawnRoomParticle(actor.x, actor.y - 10, randomFrom(['🥕', '🌸', '💖', '✨']));
@@ -2802,16 +2893,22 @@ function updateCompactPet(dt) {
     compactPet.behaviorTimer -= dt;
     if (compactPet.behaviorTimer <= 0) {
       const roll = Math.random();
-      if (roll < 0.45) {
+      if (roll < 0.35) {
         compactPet.behavior = 'walk';
         compactPet.targetX = 12 + Math.random() * 88;
         compactPet.behaviorTimer = 2.4 + Math.random() * 2.5;
-      } else if (roll < 0.72) {
+      } else if (roll < 0.58) {
         compactPet.behavior = 'idle';
         compactPet.behaviorTimer = 3.0 + Math.random() * 3.5;
+      } else if (roll < 0.75) {
+        compactPet.behavior = 'cheer'; // Lambendo a patinha no relógio!
+        compactPet.behaviorTimer = 2.5 + Math.random() * 2.5;
+      } else if (roll < 0.88) {
+        compactPet.behavior = 'cry'; // Espreguiçando deitadinho no relógio!
+        compactPet.behaviorTimer = 3.0 + Math.random() * 2.5;
       } else {
         compactPet.behavior = 'sleep';
-        compactPet.behaviorTimer = 4.5 + Math.random() * 4.5;
+        compactPet.behaviorTimer = 5.0 + Math.random() * 4.0;
       }
     }
 
@@ -2844,8 +2941,36 @@ function updateCompactPet(dt) {
 function updateRoomActors(dt) {
   if (appMode !== 'expanded') return;
 
+  const mainCat = roomActors.find((a) => a.kind === 'cat');
+  const isMomChicken = mainCat?.config?.id === 'cat_chicken';
+
   roomActors.forEach((actor) => {
-    if (actor.kind === 'cat' && (petMood === 'cheer' || petMood === 'cry')) {
+    // Especial: se o pet for os Pintinhos e a mãe for a Dona Galinha, eles a seguem fielmente!
+    if (actor.config?.id === 'pet_chicks' && isMomChicken && mainCat) {
+      const followOffset = mainCat.dir > 0 ? -5.5 : 5.5;
+      const targetFollow = clampToIsometricFloor(mainCat.x + followOffset, mainCat.y + 0.4);
+      const fDx = targetFollow.x - actor.x;
+      const fDy = targetFollow.y - actor.y;
+      const fDist = Math.hypot(fDx, fDy);
+
+      if (fDist > 2.8) {
+        actor.behavior = 'walk';
+        actor.dir = fDx >= 0 ? 1 : -1;
+        const speed = Math.min(22, Math.max(12, fDist * 3.2)) * dt;
+        const next = clampToIsometricFloor(
+          actor.x + (fDx / fDist) * speed,
+          actor.y + (fDy / fDist) * speed * 0.7
+        );
+        actor.x = next.x;
+        actor.y = next.y;
+        actor.el.style.left = `${actor.x}%`;
+        actor.el.style.top = `${actor.y}%`;
+        actor.el.style.zIndex = String(Math.round(actor.y));
+      } else {
+        actor.behavior = 'idle';
+        actor.dir = mainCat.dir;
+      }
+    } else if (actor.kind === 'cat' && (petMood === 'cheer' || petMood === 'cry')) {
       actor.targetFoodUid = null;
     } else {
       let targetFood = actor.targetFoodUid
@@ -2997,7 +3122,7 @@ function updateAnimatedDecorAndPreviews() {
     if (!catDef) return;
     const anim = getCatAnimationForState(catDef, 'idle');
     const frame = Math.floor(animElapsed * (anim.fps || 5)) % anim.frames;
-    const previewScale = anim.fw <= 32 ? 1.55 : (anim.fh >= 64 ? 0.8 : 1.3);
+    const previewScale = anim.fw <= 32 ? 1.55 : (anim.fh >= 64 ? 1.32 : 1.3);
     drawCatFrameWithHat(cv, anim, frame, false, previewScale, state.activeHat);
   });
 
@@ -3007,7 +3132,7 @@ function updateAnimatedDecorAndPreviews() {
     if (!catDef) return;
     const anim = getCatAnimationForState(catDef, 'idle');
     const frame = Math.floor(animElapsed * (anim.fps || 5)) % anim.frames;
-    const previewScale = anim.fw <= 32 ? 1.85 : (anim.fh >= 64 ? 0.94 : 1.5);
+    const previewScale = anim.fw <= 32 ? 1.85 : (anim.fh >= 64 ? 1.38 : 1.5);
     drawCatFrameWithHat(cv, anim, frame, false, previewScale, cv.dataset.previewHat);
   });
 
@@ -3641,6 +3766,7 @@ async function handleGoogleSignIn() {
 
   // Primeiro puxa gatinhos, chapéus, móveis e moedas que já estejam salvos na nuvem
   const pullRes = await window.purrCloud.pullFromCloudIntoState(state);
+  checkLifetimeVipGrant(state);
 
   let bonusMsg = pullRes.merged
     ? '☁️ Conta e gatinhos sincronizados da nuvem!'
@@ -4057,6 +4183,7 @@ function applyLanguageUI() {
 function initWebPromoBanner() {
   const banner = document.getElementById('webPromoBanner');
   if (!window.purrAPI?.isElectron) {
+    document.documentElement.classList.add('is-web-browser');
     document.body.classList.add('is-web-browser');
     if (banner) banner.classList.remove('hidden');
     document.getElementById('webLandingHero')?.classList.remove('hidden');
