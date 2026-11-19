@@ -272,31 +272,28 @@ def generate_mochi_walk_sprite(sprites_dir: Path):
         yf = y_ground + bob
         yt = y_top + bob
 
-        for y in range(yt, yf):
+        for y in range(yt, yf - 1):
             px[x0, y] = OUTLINE
             px[x1, y] = fur_color
             px[x2, y] = fur_color
             px[x3, y] = OUTLINE
 
-        # Base arredondada: cantos cortados
-        px[x0, yf - 1] = OUTLINE
-        px[x1, yf] = OUTLINE
-        px[x2, yf] = OUTLINE
-        px[x3, yf - 1] = OUTLINE
+        # Base arredondada com cantos comidos (apenas os 2 centrais tocam o chão)
+        px[x1, yf - 1] = OUTLINE
+        px[x2, yf - 1] = OUTLINE
 
     def draw_round_far_paw_connected(px, cx, y_top, y_ground, bob):
         x0, x1, x2 = cx - 1, cx, cx + 1
         yf = y_ground + bob
         yt = y_top + bob
 
-        for y in range(yt, yf):
+        for y in range(yt, yf - 1):
             px[x0, y] = OUTLINE
             px[x1, y] = FUR_SHADOW
             px[x2, y] = OUTLINE
 
-        px[x0, yf - 1] = OUTLINE
-        px[x1, yf] = OUTLINE
-        px[x2, yf - 1] = OUTLINE
+        # Base arredondada com cantos comidos (apenas o pixel central)
+        px[x1, yf - 1] = OUTLINE
 
     def build_frame(phase: int) -> Image.Image:
         fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
@@ -526,6 +523,49 @@ CAT_RECOLOR_PALETTES = {
 }
 
 
+def generate_mochi_variations():
+    """Gera sono, comemoração e choro fiéis ao Mochi original (creme com manchas laranjas), em vez de usar o gato cinza/marrom."""
+    OUTLINE = (33, 33, 33, 255)
+    FUR_WHITE = (254, 245, 230, 255)
+    FUR_WHITE_SHADOW = (240, 230, 215, 255)
+    FUR_ORANGE = (253, 213, 181, 255)
+    FUR_ORANGE_SHADOW = (230, 180, 160, 255)
+    PINK_CHEEK = (235, 148, 134, 255)
+
+    def recolor_to_mochi(src_name, dst_name):
+        src_path = SPRITES_DIR / src_name
+        dst_path = SPRITES_DIR / dst_name
+        with Image.open(src_path).convert("RGBA") as im:
+            out = Image.new("RGBA", im.size, (0, 0, 0, 0))
+            px_in = im.load()
+            px_out = out.load()
+            for y in range(im.height):
+                for x in range(im.width):
+                    c = px_in[x, y]
+                    if c[3] == 0:
+                        continue
+                    rgb = c[:3]
+                    if rgb in [(54, 32, 16), (48, 40, 35)]:
+                        px_out[x, y] = OUTLINE
+                    elif rgb == (201, 172, 153):
+                        px_out[x, y] = FUR_ORANGE
+                    elif rgb == (192, 161, 141):
+                        px_out[x, y] = FUR_ORANGE_SHADOW
+                    elif rgb == (255, 255, 227):
+                        px_out[x, y] = FUR_WHITE
+                    elif rgb in [(240, 240, 220), (234, 234, 211), (222, 222, 201)]:
+                        px_out[x, y] = FUR_WHITE_SHADOW
+                    elif rgb in [(219, 127, 127), (225, 151, 146)]:
+                        px_out[x, y] = PINK_CHEEK
+                    else:
+                        px_out[x, y] = c
+            out.save(dst_path)
+
+    recolor_to_mochi("cat_cream_sleep.png", "cat_mochi_sleep.png")
+    recolor_to_mochi("cat_cream_cheer.png", "cat_mochi_cheer.png")
+    recolor_to_mochi("cat_cream_cry.png", "cat_mochi_cry.png")
+
+
 def prepare_sprites():
     print("-> Processando sprite sheets de gatinhos e pets...")
     # Folhas já alinhadas horizontalmente
@@ -599,6 +639,8 @@ def prepare_sprites():
     generate_biped_walk_sprite(SPRITES_DIR / "cat_cream_cheer.png", SPRITES_DIR / "cat_cream_walk.png", 64)
     generate_biped_walk_sprite(SPRITES_DIR / "cat_tuxedo_cheer.png", SPRITES_DIR / "cat_tuxedo_walk.png", 64)
     generate_biped_walk_sprite(SPRITES_DIR / "cat_white_cheer.png", SPRITES_DIR / "cat_white_walk.png", 64)
+
+    generate_mochi_variations()
 
     # Gatinho dormindo enroladinho (para UI / dormir / tray)
     crop_save("CatUIFree/CatUIFree/free.png", (66, 90, 109, 122), SPRITES_DIR / "cat_curled_sleep.png")
@@ -2038,9 +2080,9 @@ def prepare_items_and_catalog():
                 "idle": {"src": "assets/sprites/cat_mochi_idle.png", "frames": 10, "fw": 32, "fh": 32, "fps": 6},
                 "walk": {"src": "assets/sprites/cat_mochi_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "box": {"src": "assets/sprites/cat_mochi_box.png", "frames": 4, "fw": 32, "fh": 32, "fps": 4},
-                "sleep": {"src": "assets/sprites/cat_cream_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
-                "cheer": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
-                "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+                "sleep": {"src": "assets/sprites/cat_mochi_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "cheer": {"src": "assets/sprites/cat_mochi_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_mochi_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
             },
             "previewScale": 2.0,
         },
@@ -2055,8 +2097,8 @@ def prepare_items_and_catalog():
                 "idle": {"src": "assets/sprites/cat_mochi_box.png", "frames": 4, "fw": 32, "fh": 32, "fps": 4},
                 "walk": {"src": "assets/sprites/cat_mochi_box_walk.png", "frames": 4, "fw": 32, "fh": 32, "fps": 6},
                 "sleep": {"src": "assets/sprites/cat_curled_sleep.png", "frames": 1, "fw": 43, "fh": 32, "fps": 1},
-                "cheer": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
-                "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
+                "cheer": {"src": "assets/sprites/cat_mochi_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 5},
+                "cry": {"src": "assets/sprites/cat_mochi_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 4},
             },
             "previewScale": 2.0,
         },
@@ -2070,7 +2112,7 @@ def prepare_items_and_catalog():
             "animations": {
                 "idle": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 3},
                 "walk": {"src": "assets/sprites/cat_cream_walk.png", "frames": 4, "fw": 64, "fh": 64, "fps": 6},
-                "sleep": {"src": "assets/sprites/cat_cream_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
+                "sleep": {"src": "assets/sprites/cat_mochi_sleep.png", "frames": 4, "fw": 64, "fh": 64, "fps": 3},
                 "cheer": {"src": "assets/sprites/cat_cream_cheer.png", "frames": 2, "fw": 64, "fh": 64, "fps": 6},
                 "cry": {"src": "assets/sprites/cat_cream_cry.png", "frames": 4, "fw": 64, "fh": 64, "fps": 5},
             },
