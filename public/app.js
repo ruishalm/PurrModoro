@@ -284,7 +284,7 @@ function getHatDef(id) {
   return (catalog.hats || []).find((h) => h.id === id) || null;
 }
 
-const APP_ASSET_VERSION = '0.1.7';
+const APP_ASSET_VERSION = '0.1.8';
 
 function loadImage(src) {
   if (imageCache.has(src)) return imageCache.get(src);

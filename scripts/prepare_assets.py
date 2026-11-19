@@ -254,7 +254,7 @@ def generate_dino_sprites(
 
 
 def generate_mochi_walk_sprite(sprites_dir: Path):
-    """Gera caminhada quadrupede (de 4 patas!) para o Mochi, com corpo horizontal, patinhas curtas e fofas, e rabo em pe."""
+    """Gera caminhada quadrupede fofinha, gordinha e totalmente arredondada para o Mochi."""
     src_idle = SRC / "CatPackFree/CatPackFree/Idle.png"
     if not src_idle.exists():
         src_idle = SPRITES_DIR / "cat_mochi_idle.png"
@@ -267,87 +267,127 @@ def generate_mochi_walk_sprite(sprites_dir: Path):
     FUR_ORANGE = (253, 213, 181, 255)
     FUR_SHADOW = (230, 180, 160, 255)
 
+    def draw_round_paw_connected(px, cx, y_top, y_ground, bob, fur_color):
+        x0, x1, x2, x3 = cx - 1, cx, cx + 1, cx + 2
+        yf = y_ground + bob
+        yt = y_top + bob
+
+        for y in range(yt, yf):
+            px[x0, y] = OUTLINE
+            px[x1, y] = fur_color
+            px[x2, y] = fur_color
+            px[x3, y] = OUTLINE
+
+        # Base arredondada: cantos cortados
+        px[x0, yf - 1] = OUTLINE
+        px[x1, yf] = OUTLINE
+        px[x2, yf] = OUTLINE
+        px[x3, yf - 1] = OUTLINE
+
+    def draw_round_far_paw_connected(px, cx, y_top, y_ground, bob):
+        x0, x1, x2 = cx - 1, cx, cx + 1
+        yf = y_ground + bob
+        yt = y_top + bob
+
+        for y in range(yt, yf):
+            px[x0, y] = OUTLINE
+            px[x1, y] = FUR_SHADOW
+            px[x2, y] = OUTLINE
+
+        px[x0, yf - 1] = OUTLINE
+        px[x1, yf] = OUTLINE
+        px[x2, yf - 1] = OUTLINE
+
     def build_frame(phase: int) -> Image.Image:
         fr = Image.new("RGBA", (32, 32), (0, 0, 0, 0))
         px = fr.load()
 
         bob = 1 if phase in (1, 3) else 0
 
-        # 1. Patinhas do fundo (sombreadas, pontinhas visiveis)
+        # 1. Patinhas do fundo (pequenas, arredondadas e sombreadas)
         if phase == 0:
-            for y in range(25, 29):
-                px[11, y + bob] = OUTLINE; px[12, y + bob] = FUR_SHADOW; px[13, y + bob] = OUTLINE
-            px[11, 29 + bob] = OUTLINE; px[12, 29 + bob] = OUTLINE; px[13, 29 + bob] = OUTLINE
-            for y in range(25, 29):
-                px[16, y + bob] = OUTLINE; px[17, y + bob] = FUR_SHADOW; px[18, y + bob] = OUTLINE
-            px[16, 29 + bob] = OUTLINE; px[17, 29 + bob] = OUTLINE; px[18, 29 + bob] = OUTLINE
+            draw_round_far_paw_connected(px, 17, 23, 28, bob)
+            draw_round_far_paw_connected(px, 12, 23, 28, bob)
         elif phase == 1:
-            for y in range(24, 27):
-                px[10, y] = OUTLINE; px[11, y] = FUR_SHADOW; px[12, y] = OUTLINE
-            px[10, 27] = OUTLINE; px[11, 27] = OUTLINE; px[12, 27] = OUTLINE
-            for y in range(25, 29):
-                px[17, y] = OUTLINE; px[18, y] = FUR_SHADOW; px[19, y] = OUTLINE
-            px[17, 29] = OUTLINE; px[18, 29] = OUTLINE; px[19, 29] = OUTLINE
+            draw_round_far_paw_connected(px, 18, 23, 28, 0)
+            draw_round_far_paw_connected(px, 11, 23, 26, 0)
         elif phase == 2:
-            for y in range(25, 29):
-                px[7, y + bob] = OUTLINE; px[8, y + bob] = FUR_SHADOW; px[9, y + bob] = OUTLINE
-            px[7, 29 + bob] = OUTLINE; px[8, 29 + bob] = OUTLINE; px[9, 29 + bob] = OUTLINE
-            for y in range(25, 29):
-                px[21, y + bob] = OUTLINE; px[22, y + bob] = FUR_SHADOW; px[23, y + bob] = OUTLINE
-            px[21, 29 + bob] = OUTLINE; px[22, 29 + bob] = OUTLINE; px[23, 29 + bob] = OUTLINE
+            draw_round_far_paw_connected(px, 21, 23, 28, bob)
+            draw_round_far_paw_connected(px, 8, 23, 28, bob)
         elif phase == 3:
-            for y in range(25, 29):
-                px[9, y] = OUTLINE; px[10, y] = FUR_SHADOW; px[11, y] = OUTLINE
-            px[9, 29] = OUTLINE; px[10, 29] = OUTLINE; px[11, 29] = OUTLINE
-            for y in range(24, 27):
-                px[19, y] = OUTLINE; px[20, y] = FUR_SHADOW; px[21, y] = OUTLINE
-            px[19, 27] = OUTLINE; px[20, 27] = OUTLINE; px[21, 27] = OUTLINE
+            draw_round_far_paw_connected(px, 20, 23, 26, 0)
+            draw_round_far_paw_connected(px, 10, 23, 28, 0)
 
-        # 2. Corpo gordinho de 4 patas (horizontal)
-        for x in range(14, 23):
-            px[x, 16 + bob] = OUTLINE
+        # 2. Corpo Super Arredondado (Oval / Bolinho)
+        # Dorso curvo
+        px[13, 16 + bob] = OUTLINE
+        px[14, 15 + bob] = OUTLINE
+        px[15, 15 + bob] = OUTLINE
+        px[16, 14 + bob] = OUTLINE
+        px[17, 14 + bob] = OUTLINE
+        px[18, 14 + bob] = OUTLINE
+        px[19, 14 + bob] = OUTLINE
+        px[20, 15 + bob] = OUTLINE
+        px[21, 15 + bob] = OUTLINE
+        px[22, 16 + bob] = OUTLINE
+
+        # Bumbum em formato de arco (sem nenhum angulo reto)
         px[23, 17 + bob] = OUTLINE
         px[24, 18 + bob] = OUTLINE
         px[24, 19 + bob] = OUTLINE
-        px[24, 20 + bob] = OUTLINE
-        px[23, 21 + bob] = OUTLINE
-        px[23, 22 + bob] = OUTLINE
-        px[22, 23 + bob] = OUTLINE
+        px[23, 20 + bob] = OUTLINE
+        px[22, 21 + bob] = OUTLINE
+        px[21, 22 + bob] = OUTLINE
 
-        px[12, 24 + bob] = OUTLINE
-        px[13, 25 + bob] = OUTLINE
-        px[14, 25 + bob] = OUTLINE
-        px[15, 25 + bob] = OUTLINE
-        px[16, 25 + bob] = OUTLINE
-        px[17, 24 + bob] = OUTLINE
+        # Barriguinha arredondada suspensa (catenaria suave)
+        px[11, 22 + bob] = OUTLINE
+        px[12, 23 + bob] = OUTLINE
+        px[13, 24 + bob] = OUTLINE
+        px[14, 24 + bob] = OUTLINE
+        px[15, 24 + bob] = OUTLINE
+        px[16, 23 + bob] = OUTLINE
+        px[17, 23 + bob] = OUTLINE
 
-        for y in range(17, 25):
-            for x in range(5, 24):
+        # Contorno suave do peito
+        px[4, 17 + bob] = OUTLINE
+        px[4, 18 + bob] = OUTLINE
+        px[5, 19 + bob] = OUTLINE
+        px[5, 20 + bob] = OUTLINE
+        px[6, 21 + bob] = OUTLINE
+
+        # Preenchimento organico arredondado
+        for y in range(14, 25):
+            for x in range(4, 25):
                 if px[x, y + bob] != OUTLINE:
-                    if y <= 18:
+                    if y == 14 and not (16 <= x <= 19): continue
+                    if y == 15 and not (14 <= x <= 21): continue
+                    if y == 16 and not (12 <= x <= 22): continue
+                    if y in (17, 18, 19) and not (5 <= x <= 23): continue
+                    if y == 20 and not (5 <= x <= 22): continue
+                    if y == 21 and not (6 <= x <= 21): continue
+                    if y == 22 and not (6 <= x <= 20): continue
+                    if y == 23 and not (7 <= x <= 18): continue
+                    if y == 24 and not (13 <= x <= 15): continue
+
+                    if y <= 16:
                         px[x, y + bob] = FUR_ORANGE if x >= 15 else FUR_WHITE
-                    elif y <= 21:
+                    elif y <= 19:
                         px[x, y + bob] = FUR_ORANGE if x >= 18 else FUR_WHITE
-                    elif y in (22, 23):
-                        px[x, y + bob] = FUR_SHADOW if (12 <= x <= 17) else (FUR_ORANGE if x >= 20 else FUR_WHITE)
-                    elif y == 24:
-                        if 13 <= x <= 16:
-                            px[x, y + bob] = FUR_SHADOW
+                    elif y in (20, 21):
+                        px[x, y + bob] = FUR_ORANGE if x >= 19 else FUR_WHITE
+                    elif y in (22, 23, 24):
+                        px[x, y + bob] = FUR_SHADOW if (12 <= x <= 16) else (FUR_ORANGE if x >= 19 else FUR_WHITE)
 
-        for y in range(17, 24):
-            px[4, y + bob] = OUTLINE
-
-        # 3. Rabinho empinado e alegre com movimento
+        # 3. Rabinho empinado e curvo
         tw = [-1, 0, 1, 0][phase]
         tail_pts = [
-            (23, 18),
-            (24, 17),
-            (25, 16),
-            (26, 15 + tw),
-            (26, 14 + tw),
-            (26, 13 + tw),
+            (23, 17),
+            (24, 16),
+            (24, 15),
+            (25, 14 + tw),
+            (25, 13 + tw),
             (25, 12 + tw),
-            (24, 12 + tw),
+            (24, 11 + tw),
         ]
         for tx, ty in tail_pts:
             px[tx, ty + bob] = FUR_ORANGE
@@ -359,52 +399,28 @@ def generate_mochi_walk_sprite(sprites_dir: Path):
         # 4. Cabeca original do Mochi
         fr.paste(head, (2, 4 + bob), head)
 
-        # 5. Patinhas da frente e traseiras
+        # 5. Patinhas Arredondadas (Dianteira e Traseira)
         if phase == 0:
-            for y in range(23, 30):
-                px[5, y + bob] = OUTLINE; px[6, y + bob] = FUR_WHITE; px[7, y + bob] = FUR_WHITE; px[8, y + bob] = OUTLINE
-            px[5, 30 + bob] = OUTLINE; px[6, 30 + bob] = OUTLINE; px[7, 30 + bob] = OUTLINE; px[8, 30 + bob] = OUTLINE
+            draw_round_paw_connected(px, 7, 21, 29, bob, FUR_WHITE)
+            draw_round_paw_connected(px, 20, 21, 29, bob, FUR_WHITE)
+            px[19, 21 + bob] = FUR_ORANGE; px[20, 21 + bob] = FUR_ORANGE
+            px[19, 22 + bob] = FUR_ORANGE; px[20, 22 + bob] = FUR_ORANGE
+            px[21, 21 + bob] = OUTLINE; px[21, 22 + bob] = OUTLINE
         elif phase == 1:
-            for y in range(23, 30):
-                px[7, y] = OUTLINE; px[8, y] = FUR_WHITE; px[9, y] = FUR_WHITE; px[10, y] = OUTLINE
-            px[7, 30] = OUTLINE; px[8, 30] = OUTLINE; px[9, 30] = OUTLINE; px[10, 30] = OUTLINE
+            draw_round_paw_connected(px, 8, 21, 29, 0, FUR_WHITE)
+            draw_round_paw_connected(px, 19, 21, 27, 0, FUR_WHITE)
+            px[18, 21] = FUR_ORANGE; px[19, 21] = FUR_ORANGE
+            px[20, 21] = OUTLINE
         elif phase == 2:
-            for y in range(23, 30):
-                px[9, y + bob] = OUTLINE; px[10, y + bob] = FUR_WHITE; px[11, y + bob] = FUR_WHITE; px[12, y + bob] = OUTLINE
-            px[9, 30 + bob] = OUTLINE; px[10, 30 + bob] = OUTLINE; px[11, 30 + bob] = OUTLINE; px[12, 30 + bob] = OUTLINE
+            draw_round_paw_connected(px, 9, 21, 29, bob, FUR_WHITE)
+            draw_round_paw_connected(px, 17, 21, 29, bob, FUR_WHITE)
+            px[17, 21 + bob] = FUR_ORANGE; px[18, 21 + bob] = FUR_ORANGE
+            px[19, 21 + bob] = OUTLINE
         elif phase == 3:
-            for y in range(22, 28):
-                px[8, y] = OUTLINE; px[9, y] = FUR_WHITE; px[10, y] = FUR_WHITE; px[11, y] = OUTLINE
-            px[8, 28] = OUTLINE; px[9, 28] = OUTLINE; px[10, 28] = OUTLINE; px[11, 28] = OUTLINE
-
-        if phase == 0:
-            for y in range(22, 30):
-                px[20, y + bob] = OUTLINE
-                px[21, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[22, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[23, y + bob] = OUTLINE
-            px[20, 30 + bob] = OUTLINE; px[21, 30 + bob] = OUTLINE; px[22, 30 + bob] = OUTLINE; px[23, 30 + bob] = OUTLINE
-        elif phase == 1:
-            for y in range(22, 28):
-                px[19, y] = OUTLINE
-                px[20, y] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[21, y] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[22, y] = OUTLINE
-            px[19, 28] = OUTLINE; px[20, 28] = OUTLINE; px[21, 28] = OUTLINE; px[22, 28] = OUTLINE
-        elif phase == 2:
-            for y in range(22, 30):
-                px[17, y + bob] = OUTLINE
-                px[18, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[19, y + bob] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[20, y + bob] = OUTLINE
-            px[17, 30 + bob] = OUTLINE; px[18, 30 + bob] = OUTLINE; px[19, 30 + bob] = OUTLINE; px[20, 30 + bob] = OUTLINE
-        elif phase == 3:
-            for y in range(22, 30):
-                px[18, y] = OUTLINE
-                px[19, y] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[20, y] = FUR_ORANGE if y < 25 else FUR_WHITE
-                px[21, y] = OUTLINE
-            px[18, 30] = OUTLINE; px[19, 30] = OUTLINE; px[20, 30] = OUTLINE; px[21, 30] = OUTLINE
+            draw_round_paw_connected(px, 8, 21, 27, 0, FUR_WHITE)
+            draw_round_paw_connected(px, 18, 21, 29, 0, FUR_WHITE)
+            px[18, 21] = FUR_ORANGE; px[19, 21] = FUR_ORANGE
+            px[20, 21] = OUTLINE
 
         return fr
 
