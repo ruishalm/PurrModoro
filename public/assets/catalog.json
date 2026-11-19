@@ -872,24 +872,17 @@
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_mochi_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_mochi_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
-        },
-        "box": {
-          "src": "assets/sprites/cat_mochi_box.png",
-          "frames": 4,
-          "fw": 32,
-          "fh": 32,
-          "fps": 4
         },
         "sleep": {
           "src": "assets/sprites/cat_mochi_sleep.png",
@@ -900,7 +893,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_mochi_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -913,7 +906,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_mochi_box",
@@ -964,49 +957,49 @@
     },
     {
       "id": "cat_pochi_cream",
-      "name": "Pochi Creme",
+      "name": "Pochi Latte",
       "category": "cats",
       "subCategory": "skin",
       "price": 75,
-      "description": "Gatinho creme super expressivo: tira sonecas zZz e vibra quando você conclui!",
+      "description": "Tons de café com leite cremoso e olhar sereno.",
       "animations": {
         "idle": {
-          "src": "assets/sprites/cat_cream_cheer.png",
-          "frames": 2,
+          "src": "assets/sprites/cat_pochi_cream_idle.png",
+          "frames": 4,
           "fw": 64,
           "fh": 64,
-          "fps": 3
+          "fps": 5
         },
         "walk": {
-          "src": "assets/sprites/cat_cream_walk.png",
+          "src": "assets/sprites/cat_pochi_cream_walk.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 6
         },
         "sleep": {
-          "src": "assets/sprites/cat_mochi_sleep.png",
+          "src": "assets/sprites/cat_pochi_cream_sleep.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 3
         },
         "cheer": {
-          "src": "assets/sprites/cat_cream_cheer.png",
-          "frames": 2,
-          "fw": 64,
-          "fh": 64,
-          "fps": 6
-        },
-        "cry": {
-          "src": "assets/sprites/cat_cream_cry.png",
+          "src": "assets/sprites/cat_pochi_cream_cheer.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_pochi_cream_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
         }
       },
-      "previewScale": 1.15
+      "previewScale": 1.32
     },
     {
       "id": "cat_frajola",
@@ -1014,45 +1007,45 @@
       "category": "cats",
       "subCategory": "skin",
       "price": 90,
-      "description": "Elegante de smoking preto e branco, ótimo parceiro de produtividade.",
+      "description": "Máscara clássica preta com peitinho branco e gravatinha.",
       "animations": {
         "idle": {
-          "src": "assets/sprites/cat_tuxedo_cheer.png",
-          "frames": 2,
+          "src": "assets/sprites/cat_frajola_idle.png",
+          "frames": 4,
           "fw": 64,
           "fh": 64,
-          "fps": 3
+          "fps": 5
         },
         "walk": {
-          "src": "assets/sprites/cat_tuxedo_walk.png",
+          "src": "assets/sprites/cat_frajola_walk.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 6
         },
         "sleep": {
-          "src": "assets/sprites/cat_tuxedo_sleep.png",
+          "src": "assets/sprites/cat_frajola_sleep.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 3
         },
         "cheer": {
-          "src": "assets/sprites/cat_tuxedo_cheer.png",
-          "frames": 2,
-          "fw": 64,
-          "fh": 64,
-          "fps": 6
-        },
-        "cry": {
-          "src": "assets/sprites/cat_tuxedo_cry.png",
+          "src": "assets/sprites/cat_frajola_cheer.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_frajola_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
         }
       },
-      "previewScale": 1.15
+      "previewScale": 1.32
     },
     {
       "id": "cat_white",
@@ -1060,14 +1053,14 @@
       "category": "cats",
       "subCategory": "skin",
       "price": 100,
-      "description": "Gatinho branquinho de olhos azuis brilhantes.",
+      "description": "Pelagem branca como neve pura e olhos azuis cristalinos.",
       "animations": {
         "idle": {
-          "src": "assets/sprites/cat_white_cheer.png",
-          "frames": 2,
+          "src": "assets/sprites/cat_white_idle.png",
+          "frames": 4,
           "fw": 64,
           "fh": 64,
-          "fps": 3
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_white_walk.png",
@@ -1077,28 +1070,28 @@
           "fps": 6
         },
         "sleep": {
-          "src": "assets/sprites/cat_curled_sleep.png",
-          "frames": 1,
-          "fw": 43,
-          "fh": 32,
-          "fps": 1
+          "src": "assets/sprites/cat_white_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
         },
         "cheer": {
           "src": "assets/sprites/cat_white_cheer.png",
-          "frames": 2,
-          "fw": 64,
-          "fh": 64,
-          "fps": 6
-        },
-        "cry": {
-          "src": "assets/sprites/cat_cream_cry.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_white_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
         }
       },
-      "previewScale": 1.15
+      "previewScale": 1.32
     },
     {
       "id": "cat_dracula",
@@ -1386,20 +1379,20 @@
       "category": "cats",
       "subCategory": "skin",
       "price": 95,
-      "description": "Pelagem cor de flor de cerejeira com orelhinhas doces!",
+      "description": "Aroma suave de primavera e pétalas rosadas.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_sakura_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_sakura_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1411,7 +1404,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_sakura_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1424,28 +1417,28 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_blueberry",
-      "name": "Mochi Azul Gelo",
+      "name": "Mochi Azul Luar",
       "category": "cats",
       "subCategory": "skin",
       "price": 95,
-      "description": "Tom azul-celeste suave e tranquilo para dias focados.",
+      "description": "Mistura cósmica de lavanda e mirtilo estelar.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_blueberry_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_blueberry_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1457,7 +1450,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_blueberry_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1470,7 +1463,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_matcha",
@@ -1478,20 +1471,20 @@
       "category": "cats",
       "subCategory": "skin",
       "price": 100,
-      "description": "Gatinho verde-menta zen inspirado em casas de chá!",
+      "description": "Calmo e zen como uma xícara de chá verde quentinho.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_matcha_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_matcha_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1503,7 +1496,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_matcha_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1516,7 +1509,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_lavender",
@@ -1524,20 +1517,20 @@
       "category": "cats",
       "subCategory": "skin",
       "price": 110,
-      "description": "Pelagem lilás sonhadora cheia de serenidade.",
+      "description": "Tons suaves de lilás com essência relaxante.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_lavender_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_lavender_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1549,7 +1542,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_lavender_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1562,7 +1555,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_sec_galaxy",
@@ -1572,20 +1565,20 @@
       "price": 0,
       "secret": true,
       "supporterDrop": true,
-      "description": "Brinde Secreto: pelagem cósmica roxo-anil cheia de mistério!",
+      "description": "Poeira de estrelas e nebulosas cósmicas.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_sec_galaxy_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_sec_galaxy_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1597,7 +1590,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_sec_galaxy_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1610,30 +1603,30 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_sec_gold",
-      "name": "Mochi Dourado",
+      "name": "Mochi Rei Dourado",
       "category": "cats",
       "subCategory": "skin",
       "price": 0,
       "secret": true,
       "supporterDrop": true,
-      "description": "Brinde Secreto: reluzente como ouro puro!",
+      "description": "Pelagem que brilha como ouro puro.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_sec_gold_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_sec_gold_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1645,7 +1638,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_sec_gold_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1658,7 +1651,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_sec_cyber",
@@ -1668,20 +1661,20 @@
       "price": 0,
       "secret": true,
       "supporterDrop": true,
-      "description": "Brinde Secreto: brilho ciano e magenta futurista!",
+      "description": "Luzes neon futuristas com olhos ciano brilhantes.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_sec_cyber_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_sec_cyber_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1693,7 +1686,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_sec_cyber_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1706,7 +1699,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_sec_sunset",
@@ -1716,20 +1709,20 @@
       "price": 0,
       "secret": true,
       "supporterDrop": true,
-      "description": "Brinde Secreto: coral quente com reflexos dourados do entardecer!",
+      "description": "Cores quentes do crepúsculo no horizonte.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_sec_sunset_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_sec_sunset_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1741,7 +1734,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_sec_sunset_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1754,7 +1747,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_sec_cocoa",
@@ -1762,20 +1755,20 @@
       "category": "cats",
       "subCategory": "skin",
       "price": 105,
-      "description": "Marrom achocolatado com patinhas de creme quentinho!",
+      "description": "Chocolate cremoso para dias frios de foco.",
       "animations": {
         "idle": {
           "src": "assets/sprites/cat_sec_cocoa_idle.png",
-          "frames": 10,
-          "fw": 32,
-          "fh": 32,
-          "fps": 6
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
         },
         "walk": {
           "src": "assets/sprites/cat_sec_cocoa_walk.png",
           "frames": 4,
-          "fw": 32,
-          "fh": 32,
+          "fw": 64,
+          "fh": 64,
           "fps": 6
         },
         "sleep": {
@@ -1787,7 +1780,7 @@
         },
         "cheer": {
           "src": "assets/sprites/cat_sec_cocoa_cheer.png",
-          "frames": 2,
+          "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 5
@@ -1800,7 +1793,7 @@
           "fps": 4
         }
       },
-      "previewScale": 2.0
+      "previewScale": 1.32
     },
     {
       "id": "cat_sec_dino_pink",
@@ -1945,6 +1938,241 @@
         }
       },
       "previewScale": 2.0
+    },
+    {
+      "id": "cat_black",
+      "name": "Salem Pretinho",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 70,
+      "starter": false,
+      "description": "Um void pretinho aveludado com olhinhos âmbar brilhantes.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_black_idle.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "walk": {
+          "src": "assets/sprites/cat_black_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_black_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_black_cheer.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_black_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 1.32
+    },
+    {
+      "id": "cat_grey",
+      "name": "Cinza Nevado",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 55,
+      "starter": false,
+      "description": "Cinza azulado elegante com olhar esmeralda.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_grey_idle.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "walk": {
+          "src": "assets/sprites/cat_grey_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_grey_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_grey_cheer.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_grey_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 1.32
+    },
+    {
+      "id": "cat_ginger",
+      "name": "Ruivinho Marmelada",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 55,
+      "starter": false,
+      "description": "Laranjinha por inteiro, adora cochilar no sol.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_ginger_idle.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "walk": {
+          "src": "assets/sprites/cat_ginger_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_ginger_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_ginger_cheer.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_ginger_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 1.32
+    },
+    {
+      "id": "cat_calico",
+      "name": "Calico Tricolor",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 75,
+      "starter": false,
+      "description": "Branco com manchinhas preta e laranja da sorte.",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_calico_idle.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "walk": {
+          "src": "assets/sprites/cat_calico_walk.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_calico_sleep.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_calico_cheer.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 5
+        },
+        "cry": {
+          "src": "assets/sprites/cat_calico_cry.png",
+          "frames": 4,
+          "fw": 64,
+          "fh": 64,
+          "fps": 4
+        }
+      },
+      "previewScale": 1.32
+    },
+    {
+      "id": "cat_chicken",
+      "name": "Dona Galinha",
+      "category": "cats",
+      "subCategory": "skin",
+      "price": 90,
+      "starter": false,
+      "description": "Cisca o quarto, choca tarefas e bica com carinho. Cocoricó!",
+      "animations": {
+        "idle": {
+          "src": "assets/sprites/cat_chicken_idle.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 4
+        },
+        "walk": {
+          "src": "assets/sprites/cat_chicken_walk.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "sleep": {
+          "src": "assets/sprites/cat_chicken_sleep.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 3
+        },
+        "cheer": {
+          "src": "assets/sprites/cat_chicken_cheer.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 6
+        },
+        "cry": {
+          "src": "assets/sprites/cat_chicken_cry.png",
+          "frames": 4,
+          "fw": 32,
+          "fh": 32,
+          "fps": 4
+        }
+      },
+      "previewScale": 1.6
     }
   ],
   "pets": [
@@ -1992,6 +2220,20 @@
       "fps": 9,
       "scale": 2.0,
       "premiumOnly": true
+    },
+    {
+      "id": "pet_chicks",
+      "name": "Trio Pintinhos",
+      "category": "pets",
+      "subCategory": "pet",
+      "price": 60,
+      "starter": false,
+      "description": "Três bolinhas amarelas fofinhas pulando e piando atrás de você!",
+      "src": "assets/sprites/pet_chicks.png",
+      "frames": 4,
+      "fw": 40,
+      "fh": 32,
+      "fps": 6
     }
   ],
   "hats": [

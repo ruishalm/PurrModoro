@@ -3,7 +3,7 @@
    ============================================================================ */
 
 (function () {
-  const APP_VERSION = '0.1.5';
+  const APP_VERSION = '0.2.0';
   const GITHUB_LATEST_API = 'https://api.github.com/repos/ruishalm/PurrModoro/releases/latest';
   const GITHUB_RELEASES_URL = 'https://github.com/ruishalm/PurrModoro/releases/latest';
   const WEB_APP_URL = 'https://purrrmodoro.web.app';
@@ -589,7 +589,17 @@
     state.unlockedThemes = Array.from(new Set(['cozy', ...(state.unlockedThemes || []), ...remoteThemes]));
     state.unlockedSecretIds = Array.from(new Set([...(state.unlockedSecretIds || []), ...remoteSecrets]));
 
-    if (remote.supporter?.active || state.supporter?.active) {
+    const userEmail = (state.cloudUser?.email || remote.email || '').trim().toLowerCase();
+    if (userEmail === 'melanciacomics@gmail.com') {
+      state.supporter = {
+        active: true,
+        since: state.supporter?.since || remote.supporter?.since || '2026-11-19T00:00:00.000Z',
+        lastClaimMonth: state.supporter?.lastClaimMonth || remote.supporter?.lastClaimMonth || null,
+        isLifetime: true,
+      };
+      if (!state.unlockedCats.includes('cat_chicken')) state.unlockedCats.push('cat_chicken');
+      if (!state.unlockedPets.includes('pet_chicks')) state.unlockedPets.push('pet_chicks');
+    } else if (remote.supporter?.active || state.supporter?.active) {
       state.supporter = {
         active: Boolean(state.supporter?.active || remote.supporter?.active),
         since: remote.supporter?.since || state.supporter?.since || null,

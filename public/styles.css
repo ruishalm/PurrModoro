@@ -100,10 +100,48 @@ body {
   width: 100%;
   height: 100%;
   background: transparent;
-  overflow: hidden;
   user-select: none;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   color: var(--text-main);
+}
+
+body.mode-compact {
+  overflow: hidden;
+}
+
+html.is-web-browser {
+  height: 100%;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  background: radial-gradient(circle at top, var(--accent-soft), var(--diorama-backdrop) 70%);
+}
+
+body.is-web-browser {
+  height: auto;
+  min-height: 100%;
+  overflow-y: visible !important;
+  overflow-x: hidden !important;
+  background: transparent !important;
+}
+
+/* Custom Cozy Scrollbars */
+html.is-web-browser::-webkit-scrollbar,
+body.is-web-browser::-webkit-scrollbar {
+  width: 10px;
+}
+html.is-web-browser::-webkit-scrollbar-track,
+body.is-web-browser::-webkit-scrollbar-track {
+  background: rgba(92, 61, 46, 0.08);
+}
+html.is-web-browser::-webkit-scrollbar-thumb,
+body.is-web-browser::-webkit-scrollbar-thumb {
+  background: var(--border-mid);
+  border: 2px solid var(--bg-panel);
+  border-radius: 6px;
+}
+html.is-web-browser::-webkit-scrollbar-thumb:hover,
+body.is-web-browser::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 img,
@@ -762,11 +800,11 @@ input {
 }
 
 .room-furniture-layer {
-  z-index: 5;
+  z-index: auto;
 }
 
 .room-pets-layer {
-  z-index: 20;
+  z-index: auto;
   pointer-events: none;
 }
 
@@ -1381,7 +1419,7 @@ body.dragging-furniture .room-pet {
 }
 
 .shop-preview {
-  height: 68px;
+  height: 74px;
   background: var(--accent-soft);
   border: 1.5px solid var(--border-mid);
   border-radius: 7px;
@@ -1393,8 +1431,8 @@ body.dragging-furniture .room-pet {
 
 .shop-preview img,
 .shop-preview canvas {
-  max-height: 60px;
-  max-width: 90%;
+  max-height: 68px;
+  max-width: 95%;
   object-fit: contain;
 }
 
