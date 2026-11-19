@@ -892,21 +892,21 @@
           "fps": 4
         },
         "sleep": {
-          "src": "assets/sprites/cat_cream_sleep.png",
+          "src": "assets/sprites/cat_mochi_sleep.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
           "fps": 3
         },
         "cheer": {
-          "src": "assets/sprites/cat_cream_cheer.png",
+          "src": "assets/sprites/cat_mochi_cheer.png",
           "frames": 2,
           "fw": 64,
           "fh": 64,
           "fps": 5
         },
         "cry": {
-          "src": "assets/sprites/cat_cream_cry.png",
+          "src": "assets/sprites/cat_mochi_cry.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
@@ -945,14 +945,14 @@
           "fps": 1
         },
         "cheer": {
-          "src": "assets/sprites/cat_cream_cheer.png",
+          "src": "assets/sprites/cat_mochi_cheer.png",
           "frames": 2,
           "fw": 64,
           "fh": 64,
           "fps": 5
         },
         "cry": {
-          "src": "assets/sprites/cat_cream_cry.png",
+          "src": "assets/sprites/cat_mochi_cry.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
@@ -985,7 +985,7 @@
           "fps": 6
         },
         "sleep": {
-          "src": "assets/sprites/cat_cream_sleep.png",
+          "src": "assets/sprites/cat_mochi_sleep.png",
           "frames": 4,
           "fw": 64,
           "fh": 64,
