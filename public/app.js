@@ -284,10 +284,13 @@ function getHatDef(id) {
   return (catalog.hats || []).find((h) => h.id === id) || null;
 }
 
+const APP_ASSET_VERSION = '0.1.6';
+
 function loadImage(src) {
   if (imageCache.has(src)) return imageCache.get(src);
   const img = new Image();
-  img.src = src;
+  const sep = src.includes('?') ? '&' : '?';
+  img.src = `${src}${sep}v=${APP_ASSET_VERSION}`;
   imageCache.set(src, img);
   return img;
 }
