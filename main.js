@@ -457,7 +457,7 @@ function registerIpc() {
   ipcMain.handle('purr:install-update', () => {
     if (autoUpdater && app.isPackaged) {
       isQuitting = true;
-      autoUpdater.quitAndInstall(false, true);
+      autoUpdater.quitAndInstall(true, true);
       return true;
     }
     return false;

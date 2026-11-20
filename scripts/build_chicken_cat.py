@@ -1,51 +1,63 @@
-from PIL import Image
-import numpy as np
+from PIL import Image, ImageOps
 import os
 
 im = Image.open('Chicken_Sprite_Sheet.png')
 # Size 128x128 -> 4 cols x 4 rows of 32x32
+# Source chicken natively faces left. In PurrModoro engine, actors natively face right
+# and are flipped when moving left (dir < 0).
+# Therefore, all frames MUST be mirrored (ImageOps.mirror) so she natively faces right.
 
-# Let's check each row:
-# Row 0 (Y: 0..32): Pecking grain (4 frames)
-# Row 1 (Y: 32..64): Preparing to nest / sitting (4 frames)
-# Row 2 (Y: 64..96): Sitting loafing / sleeping in nest (4 frames)
-# Row 3 (Y: 96..128): Walking (4 frames)
+def get_frame(r, c):
+    f = im.crop((c * 32, r * 32, (c + 1) * 32, (r + 1) * 32))
+    return ImageOps.mirror(f)
 
-# In 32x32:
-# Walk: Row 3 (4 frames)
-# Sleep: Row 2 (4 frames of cozy sitting in nest!)
-# Cheer: Row 0 (4 frames of happy pecking / ciscar o chão!)
-# Cry: Row 1 (4 frames of crouching down)
-# Idle: Can be Row 2 frame 0/1 (standing alert looking around, blinking) or Row 3 frame 0
+# 1. Walk: Row 3 (cols 0, 1, 2, 3) - Mirrored, walking forward to the right
+walk_frames = [get_frame(3, c) for c in range(4)]
+strip_walk = Image.new('RGBA', (128, 32))
+for i, f in enumerate(walk_frames):
+    strip_walk.paste(f, (i * 32, 0))
 
-# Let's crop:
-def get_row_strip(row_idx):
-    return im.crop((0, row_idx * 32, 128, (row_idx + 1) * 32))
-
-strip_walk = get_row_strip(3)
-strip_sleep = get_row_strip(2)
-strip_cheer = get_row_strip(0)
-strip_cry = get_row_strip(1)
-
-# For idle: let's use standing alert (Row 3 frame 0, Row 0 frame 0)
-f_stand = im.crop((0, 3*32, 32, 4*32))
-f_blink = im.crop((0, 0*32, 32, 1*32))
+# 2. Idle: Calm standing with subtle curious head-tilt (never sitting/popping up)
+idle_frames = [get_frame(0, 0), get_frame(0, 1), get_frame(0, 0), get_frame(0, 0)]
 strip_idle = Image.new('RGBA', (128, 32))
-strip_idle.paste(f_stand, (0, 0))
-strip_idle.paste(f_blink, (32, 0))
-strip_idle.paste(f_stand, (64, 0))
-strip_idle.paste(f_stand, (96, 0))
+for i, f in enumerate(idle_frames):
+    strip_idle.paste(f, (i * 32, 0))
+
+# 3. Sleep: Row 2 Col 2, Row 2 Col 3, Row 2 Col 2, Row 2 Col 3
+# Stays nestled down on the ground in loaf position with gentle breathing (never standing up in loop)
+sleep_frames = [get_frame(2, 2), get_frame(2, 3), get_frame(2, 2), get_frame(2, 3)]
+strip_sleep = Image.new('RGBA', (128, 32))
+for i, f in enumerate(sleep_frames):
+    strip_sleep.paste(f, (i * 32, 0))
+
+# 4. Cheer: Row 0 (cols 0, 1, 2, 3) - Mirrored, happy pecking / ciscar o chão
+cheer_frames = [get_frame(0, c) for c in range(4)]
+strip_cheer = Image.new('RGBA', (128, 32))
+for i, f in enumerate(cheer_frames):
+    strip_cheer.paste(f, (i * 32, 0))
+
+# 5. Cry: Row 1 Col 1, Row 1 Col 2, Row 1 Col 2, Row 1 Col 1
+# Crouched sadly, staying low (never standing up)
+cry_frames = [get_frame(1, 1), get_frame(1, 2), get_frame(1, 2), get_frame(1, 1)]
+strip_cry = Image.new('RGBA', (128, 32))
+for i, f in enumerate(cry_frames):
+    strip_cry.paste(f, (i * 32, 0))
 
 os.makedirs('public/assets/sprites', exist_ok=True)
 strip_walk.save('public/assets/sprites/cat_chicken_walk.png')
+strip_idle.save('public/assets/sprites/cat_chicken_idle.png')
 strip_sleep.save('public/assets/sprites/cat_chicken_sleep.png')
 strip_cheer.save('public/assets/sprites/cat_chicken_cheer.png')
 strip_cry.save('public/assets/sprites/cat_chicken_cry.png')
-strip_idle.save('public/assets/sprites/cat_chicken_idle.png')
 
 # Save animated GIFs for preview
-for name, strip in [('walk', strip_walk), ('sleep', strip_sleep), ('cheer', strip_cheer), ('idle', strip_idle)]:
-    frames = [strip.crop((i*32, 0, (i+1)*32, 32)) for i in range(4)]
-    frames[0].save(f'public/preview_chicken_{name}.gif', save_all=True, append_images=frames[1:], duration=160, loop=0, disposal=2)
+for name, frames, dur in [
+    ('walk', walk_frames, 140),
+    ('idle', idle_frames, 240),
+    ('sleep', sleep_frames, 300),
+    ('cheer', cheer_frames, 140),
+    ('cry', cry_frames, 250)
+]:
+    frames[0].save(f'public/preview_chicken_{name}.gif', save_all=True, append_images=frames[1:], duration=dur, loop=0, disposal=2)
 
 print('Built cat_chicken sprites and previews successfully!')

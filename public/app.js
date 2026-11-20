@@ -284,7 +284,7 @@ function getHatDef(id) {
   return (catalog.hats || []).find((h) => h.id === id) || null;
 }
 
-const APP_ASSET_VERSION = '0.2.1';
+const APP_ASSET_VERSION = '0.2.2';
 
 function loadImage(src) {
   if (imageCache.has(src)) return imageCache.get(src);
@@ -481,11 +481,11 @@ const CAT_HEAD_ANCHORS = {
   'cat_mochi_cheer.png': { x: 32, y: 22, bob: [0, 1, 1, 0] },
   'cat_mochi_cry.png': { x: 38, y: 25, bob: [0, 0, 0, 0] },
   'cat_mochi_sleep.png': { x: 32, y: 26, bob: [0, 0, 1, 0] },
-  'cat_chicken_idle.png': { x: 8, y: 6, bob: [0, 0, 0, 0] },
-  'cat_chicken_walk.png': { x: 8, y: 6, bob: [0, 1, 0, 1] },
-  'cat_chicken_sleep.png': { x: 10, y: 12, bob: [0, 0, 1, 0] },
-  'cat_chicken_cheer.png': { x: 8, y: 8, bob: [0, 2, 3, 1] },
-  'cat_chicken_cry.png': { x: 8, y: 10, bob: [0, 0, 0, 0] },
+  'cat_chicken_idle.png': { x: 23, y: 6, bob: [0, 0, 0, 0] },
+  'cat_chicken_walk.png': { x: 23, y: 6, bob: [0, 1, 0, 1] },
+  'cat_chicken_sleep.png': { x: 21, y: 12, bob: [0, 0, 1, 0] },
+  'cat_chicken_cheer.png': { x: 23, y: 8, bob: [0, 2, 3, 1] },
+  'cat_chicken_cry.png': { x: 23, y: 10, bob: [0, 0, 0, 0] },
   'cat_curled_sleep.png': { x: 19, y: 3, bob: [0] },
   'cat_dracula.png': { x: 9, y: 4, bob: [0, 0, 1, 0, 0, 1] },
   'cat_vampire_angry.png': { x: 10, y: 4, bob: [0, 0, 0, 1, 1, 1, 0, 0, 0] },

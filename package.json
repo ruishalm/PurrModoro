@@ -1,6 +1,6 @@
 {
   "name": "purrmodoro",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Idle game de gatinho em pixel art com Timer Pomodoro regulável perto do relógio do Windows.",
   "author": "ruishalm",
   "main": "main.js",
@@ -12,7 +12,7 @@
   "build": {
     "appId": "com.ruishalm.purrmodoro",
     "productName": "PurrModoro",
-    "asar": false,
+    "asar": true,
     "publish": [
       {
         "provider": "github",
