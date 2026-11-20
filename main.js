@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage, shell } = require('electron');
+const { app, BrowserWindow, Tray, Menu, ipcMain, screen, nativeImage, shell, session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 let autoUpdater = null;
@@ -285,6 +285,7 @@ function createWindow() {
 
   mainWindow.setAlwaysOnTop(true, 'screen-saver');
   mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  session.defaultSession.clearCache().catch(() => {});
   mainWindow.loadFile(path.join(__dirname, 'public', 'index.html'));
 
   mainWindow.on('close', (event) => {

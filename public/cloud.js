@@ -3,7 +3,7 @@
    ============================================================================ */
 
 (function () {
-  const APP_VERSION = '0.2.0';
+  const APP_VERSION = '0.2.1';
   const GITHUB_LATEST_API = 'https://api.github.com/repos/ruishalm/PurrModoro/releases/latest';
   const GITHUB_RELEASES_URL = 'https://github.com/ruishalm/PurrModoro/releases/latest';
   const WEB_APP_URL = 'https://purrrmodoro.web.app';

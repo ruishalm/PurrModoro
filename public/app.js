@@ -284,7 +284,7 @@ function getHatDef(id) {
   return (catalog.hats || []).find((h) => h.id === id) || null;
 }
 
-const APP_ASSET_VERSION = '0.1.9';
+const APP_ASSET_VERSION = '0.2.1';
 
 function loadImage(src) {
   if (imageCache.has(src)) return imageCache.get(src);
@@ -4205,7 +4205,7 @@ async function checkAppUpdates() {
 }
 
 async function init() {
-  const resp = await fetch('assets/catalog.json');
+  const resp = await fetch(`assets/catalog.json?v=${APP_ASSET_VERSION}`);
   catalog = await resp.json();
 
   await loadState();
